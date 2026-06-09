@@ -258,19 +258,19 @@
       <div class="card-titulo">Estado del torneo</div>
       <div id="estado-torneo" class="loading">Cargando...</div>
     </div>
-    <div class="card">
-      <div class="card-titulo">Marcador general</div>
-      <div id="marcador-general" style="display:flex; gap:40px; justify-content:center; padding: 10px 0; flex-wrap:wrap;">
+    <div id="card-marcador" class="card" style="display:none;">
+      <div class="card-titulo">Equipos en el torneo</div>
+      <div style="display:flex; gap:40px; justify-content:center; padding: 10px 0; flex-wrap:wrap;">
         <div style="text-align:center;">
           <div style="font-size:13px; margin-bottom:6px;" class="badge-santi">SANTI</div>
           <div id="pts-santi" style="font-size:40px; font-weight:700; color:#4a9eff;">0</div>
-          <div class="text-gris">equipos activos</div>
+          <div class="text-gris">equipos</div>
         </div>
         <div style="text-align:center; align-self:center; font-size:24px; color:var(--gris);">vs</div>
         <div style="text-align:center;">
           <div style="font-size:13px; margin-bottom:6px;" class="badge-luciano">LUCIANO</div>
           <div id="pts-luciano" style="font-size:40px; font-weight:700; color:#ff6b6b;">0</div>
-          <div class="text-gris">equipos activos</div>
+          <div class="text-gris">equipos</div>
         </div>
       </div>
     </div>
@@ -510,12 +510,18 @@ function renderEstadoInicio() {
     <div class="estado-badge">${fase}</div>
     <p class="text-gris">Última actualización: ${estado.ultimaActualizacion ? new Date(estado.ultimaActualizacion).toLocaleString('es-MX') : 'Nunca'}</p>
   `
-  // Marcador: contar equipos activos por dueño
-  const todos = getTodosEquipos()
-  const santi = todos.filter(e => e.dueno === 'santi').length
-  const luciano = todos.filter(e => e.dueno === 'luciano').length
-  document.getElementById('pts-santi').textContent = santi
-  document.getElementById('pts-luciano').textContent = luciano
+  // Marcador: solo mostrar cuando el sorteo esté confirmado
+  const cardMarcador = document.getElementById('card-marcador')
+  if (estado.sorteo.confirmado) {
+    const todos = getTodosEquipos()
+    const santi = todos.filter(e => e.dueno === 'santi').length
+    const luciano = todos.filter(e => e.dueno === 'luciano').length
+    document.getElementById('pts-santi').textContent = santi
+    document.getElementById('pts-luciano').textContent = luciano
+    cardMarcador.style.display = ''
+  } else {
+    cardMarcador.style.display = 'none'
+  }
 }
 
 function getFaseActual() {

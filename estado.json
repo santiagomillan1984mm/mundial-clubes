@@ -1,6 +1,6 @@
 {
   "version": "1.0",
-  "ultimaActualizacion": "2026-06-10T21:24:38.141Z",
+  "ultimaActualizacion": "2026-06-10T21:25:29.948Z",
   "equiposArgentinos": [
     {
       "id": "arg1",
@@ -44,9 +44,154 @@
     }
   ],
   "sorteo": {
-    "realizado": false,
-    "confirmado": false,
-    "internacionales": []
+    "realizado": true,
+    "confirmado": true,
+    "internacionales": [
+      {
+        "id": "int_s1",
+        "nombre": "Stade Rennais FC",
+        "liga": "Francia - Ligue 1",
+        "dueno": "santi"
+      },
+      {
+        "id": "int_s2",
+        "nombre": "Farul Constanța",
+        "liga": "Rumania - SuperLiga",
+        "dueno": "santi"
+      },
+      {
+        "id": "int_s3",
+        "nombre": "Mjällby AIF",
+        "liga": "Suecia - Allsvenskan",
+        "dueno": "santi"
+      },
+      {
+        "id": "int_s4",
+        "nombre": "Bruk-Bet Termalica Nieciecza",
+        "liga": "Polonia - Ekstraklasa",
+        "dueno": "santi"
+      },
+      {
+        "id": "int_s5",
+        "nombre": "Heart of Midlothian",
+        "liga": "Escocia - Premiership",
+        "dueno": "santi"
+      },
+      {
+        "id": "int_s6",
+        "nombre": "FC Fredericia",
+        "liga": "Dinamarca - Superliga",
+        "dueno": "santi"
+      },
+      {
+        "id": "int_s7",
+        "nombre": "SM Caen",
+        "liga": "Francia - Ligue 2",
+        "dueno": "santi"
+      },
+      {
+        "id": "int_s8",
+        "nombre": "Exeter City",
+        "liga": "Inglaterra - League One",
+        "dueno": "santi"
+      },
+      {
+        "id": "int_s9",
+        "nombre": "FC Zürich",
+        "liga": "Suiza - Super League",
+        "dueno": "santi"
+      },
+      {
+        "id": "int_s10",
+        "nombre": "Real Salt Lake",
+        "liga": "Estados Unidos - MLS",
+        "dueno": "santi"
+      },
+      {
+        "id": "int_s11",
+        "nombre": "Korona Kielce",
+        "liga": "Polonia - Ekstraklasa",
+        "dueno": "santi"
+      },
+      {
+        "id": "int_s12",
+        "nombre": "Preston North End",
+        "liga": "Inglaterra - Championship",
+        "dueno": "santi"
+      },
+      {
+        "id": "int_s13",
+        "nombre": "Blackpool",
+        "liga": "Inglaterra - League One",
+        "dueno": "santi"
+      },
+      {
+        "id": "int_l1",
+        "nombre": "Gangwon FC",
+        "liga": "Corea del Sur - K League 1",
+        "dueno": "luciano"
+      },
+      {
+        "id": "int_l2",
+        "nombre": "Dynamo Dresden",
+        "liga": "Alemania - Bundesliga 2",
+        "dueno": "luciano"
+      },
+      {
+        "id": "int_l3",
+        "nombre": "Wisła Płock",
+        "liga": "Polonia - Ekstraklasa",
+        "dueno": "luciano"
+      },
+      {
+        "id": "int_l4",
+        "nombre": "Portland Timbers",
+        "liga": "Estados Unidos - MLS",
+        "dueno": "luciano"
+      },
+      {
+        "id": "int_l5",
+        "nombre": "Chesterfield",
+        "liga": "Inglaterra - League Two",
+        "dueno": "luciano"
+      },
+      {
+        "id": "int_l6",
+        "nombre": "Nashville SC",
+        "liga": "Estados Unidos - MLS",
+        "dueno": "luciano"
+      },
+      {
+        "id": "int_l7",
+        "nombre": "Pisa SC",
+        "liga": "Italia - Serie A",
+        "dueno": "luciano"
+      },
+      {
+        "id": "int_l8",
+        "nombre": "Port Vale",
+        "liga": "Inglaterra - League One",
+        "dueno": "luciano"
+      },
+      {
+        "id": "int_l9",
+        "nombre": "Drogheda United",
+        "liga": "Irlanda - Premier Division",
+        "dueno": "luciano"
+      },
+      {
+        "id": "int_l10",
+        "nombre": "Ulsan HD FC",
+        "liga": "Corea del Sur - K League 1",
+        "dueno": "luciano"
+      },
+      {
+        "id": "int_l11",
+        "nombre": "Blackburn Rovers",
+        "liga": "Inglaterra - Championship",
+        "dueno": "luciano"
+      }
+    ]
   },
   "bracket": {
     "dieciseisavos": [],

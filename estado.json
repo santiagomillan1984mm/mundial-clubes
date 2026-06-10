@@ -1,6 +1,6 @@
 {
   "version": "1.0",
-  "ultimaActualizacion": "2026-06-10T02:28:19.841Z",
+  "ultimaActualizacion": "2026-06-10T19:43:11.632Z",
   "equiposArgentinos": [
     {
       "id": "arg1",
@@ -192,5 +192,14 @@
       "semis": [],
       "final": []
     }
-  }
+  },
+  "historial": [
+    {
+      "id": "1781120591632",
+      "temporada": 2026,
+      "competencia": "liga",
+      "campeon": "River Plate",
+      "dueno": "luciano"
+    }
+  ]
 }

@@ -1,15 +1,47 @@
 {
   "version": "1.0",
-  "ultimaActualizacion": "",
+  "ultimaActualizacion": "2026-06-10T00:00:25.206Z",
   "equiposArgentinos": [
-    { "id": "arg1", "nombre": "Equipo 1", "dueno": "luciano" },
-    { "id": "arg2", "nombre": "Equipo 2", "dueno": "luciano" },
-    { "id": "arg3", "nombre": "Equipo 3", "dueno": "luciano" },
-    { "id": "arg4", "nombre": "Equipo 4", "dueno": "luciano" },
-    { "id": "arg5", "nombre": "Equipo 5", "dueno": "luciano" },
-    { "id": "arg6", "nombre": "Equipo 6", "dueno": "santi" },
-    { "id": "arg7", "nombre": "Equipo 7", "dueno": "santi" },
-    { "id": "arg8", "nombre": "Equipo 8", "dueno": "santi" }
+    {
+      "id": "arg1",
+      "nombre": "Equipo 1",
+      "dueno": "luciano"
+    },
+    {
+      "id": "arg2",
+      "nombre": "Equipo 2",
+      "dueno": "luciano"
+    },
+    {
+      "id": "arg3",
+      "nombre": "Equipo 3",
+      "dueno": "luciano"
+    },
+    {
+      "id": "arg4",
+      "nombre": "Equipo 4",
+      "dueno": "luciano"
+    },
+    {
+      "id": "arg5",
+      "nombre": "Equipo 5",
+      "dueno": "luciano"
+    },
+    {
+      "id": "arg6",
+      "nombre": "Equipo 6",
+      "dueno": "santi"
+    },
+    {
+      "id": "arg7",
+      "nombre": "Equipo 7",
+      "dueno": "santi"
+    },
+    {
+      "id": "arg8",
+      "nombre": "Equipo 8",
+      "dueno": "santi"
+    }
   ],
   "sorteo": {
     "realizado": false,

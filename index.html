@@ -2119,6 +2119,97 @@ function logoHTML(id, size = 28) {
   return `<div class="logo-init" style="width:${size}px;height:${size}px;font-size:${fs}px;">${ini}</div>`
 }
 
+function calcularEvolucionPuntos() {
+  const liga = estado?.ligaAfa
+  if (!liga?.configurado) return null
+  const teams = liga.equipos || []
+  const partidos = liga.partidos || []
+  const evo = {}
+  for (const t of teams) evo[t.id] = { dueno: t.dueno, pts: [0] }
+  for (let j = 1; j <= 10; j++) {
+    for (const t of teams) evo[t.id].pts.push(evo[t.id].pts[j - 1])
+    for (const p of partidos) {
+      if (p.jornada !== j || p.golesLocal === null || p.golesVisitante === null) continue
+      if (!evo[p.local] || !evo[p.visitante]) continue
+      if (p.golesLocal > p.golesVisitante) { evo[p.local].pts[j] += 3 }
+      else if (p.golesVisitante > p.golesLocal) { evo[p.visitante].pts[j] += 3 }
+      else { evo[p.local].pts[j] += 1; evo[p.visitante].pts[j] += 1 }
+    }
+  }
+  return evo
+}
+
+function renderGraficoPuntos() {
+  const evo = calcularEvolucionPuntos()
+  if (!evo) return ''
+  const teams = estado.ligaAfa.equipos || []
+  const partidos = estado.ligaAfa.partidos || []
+  let lastJ = 0
+  for (const p of partidos) { if (p.golesLocal !== null && p.jornada > lastJ) lastJ = p.jornada }
+  if (lastJ === 0) return ''
+
+  const tabla = calcularTablaLiga()
+  const top8ids = new Set(tabla.slice(0, 8).map(t => t.id))
+
+  const W = 560, H = 260, mL = 34, mR = 10, mT = 12, mB = 28
+  const pw = W - mL - mR, ph = H - mT - mB
+  let maxPts = 0
+  for (const id in evo) { const v = evo[id].pts[lastJ]; if (v > maxPts) maxPts = v }
+  const yMax = Math.max(Math.ceil(maxPts / 3) * 3 + 3, 9)
+  const xOf = j => mL + (j / 10) * pw
+  const yOf = p => mT + ph - (p / yMax) * ph
+
+  let grid = ''
+  for (let y = 0; y <= yMax; y += 3) {
+    const yy = yOf(y)
+    grid += `<line x1="${mL}" y1="${yy}" x2="${W - mR}" y2="${yy}" stroke="#2a3a5c" stroke-width="${y === 0 ? 1.5 : 0.7}"/>`
+    grid += `<text x="${mL - 5}" y="${yy + 4}" text-anchor="end" font-size="9" fill="#8892a4">${y}</text>`
+  }
+  let xLabels = ''
+  for (let j = 0; j <= lastJ; j++) {
+    xLabels += `<text x="${xOf(j)}" y="${H - 7}" text-anchor="middle" font-size="9" fill="#8892a4">${j === 0 ? '0' : 'J' + j}</text>`
+  }
+
+  let lines = ''
+  for (const t of teams) {
+    if (top8ids.has(t.id)) continue
+    const color = t.dueno === 'santi' ? '#1e5080' : '#6b2020'
+    const pts = evo[t.id].pts
+    let d = `M ${xOf(0)} ${yOf(0)}`
+    for (let j = 1; j <= lastJ; j++) d += ` L ${xOf(j)} ${yOf(pts[j])}`
+    lines += `<path d="${d}" fill="none" stroke="${color}" stroke-width="1.2" opacity="0.45"/>`
+  }
+  for (const t of teams) {
+    if (!top8ids.has(t.id)) continue
+    const color = t.dueno === 'santi' ? '#4a9eff' : '#ff6b6b'
+    const pts = evo[t.id].pts
+    let d = `M ${xOf(0)} ${yOf(0)}`
+    for (let j = 1; j <= lastJ; j++) d += ` L ${xOf(j)} ${yOf(pts[j])}`
+    lines += `<path d="${d}" fill="none" stroke="${color}" stroke-width="2.2"/>`
+    lines += `<circle cx="${xOf(lastJ)}" cy="${yOf(pts[lastJ])}" r="3.5" fill="${color}"/>`
+    const nombre = getPoolNombre(t.id)
+    const labelX = xOf(lastJ) + 5
+    const labelY = yOf(pts[lastJ]) + 4
+    lines += `<text x="${labelX}" y="${labelY}" font-size="8" fill="${color}" font-weight="700">${nombre.split(' ')[0]}</text>`
+  }
+
+  const axes = `<line x1="${mL}" y1="${mT}" x2="${mL}" y2="${mT + ph}" stroke="#4a5568" stroke-width="1.5"/>
+    <line x1="${mL}" y1="${mT + ph}" x2="${W - mR}" y2="${mT + ph}" stroke="#4a5568" stroke-width="1.5"/>`
+
+  const svg = `<svg viewBox="0 0 ${W} ${H}" xmlns="http://www.w3.org/2000/svg" style="width:100%;min-width:400px;max-height:260px;">${grid}${xLabels}${lines}${axes}</svg>`
+
+  return `<div class="card" style="margin-bottom:14px;">
+    <div class="card-titulo">📈 Evolución de puntos por jornada</div>
+    <div style="display:flex;gap:16px;margin-bottom:10px;font-size:11px;flex-wrap:wrap;">
+      <div style="display:flex;align-items:center;gap:5px;"><div style="width:16px;height:3px;background:#4a9eff;border-radius:2px;"></div>Top 8 Santi</div>
+      <div style="display:flex;align-items:center;gap:5px;"><div style="width:16px;height:3px;background:#ff6b6b;border-radius:2px;"></div>Top 8 Luciano</div>
+      <div style="display:flex;align-items:center;gap:5px;"><div style="width:16px;height:2px;background:#1e5080;border-radius:2px;"></div>Resto Santi</div>
+      <div style="display:flex;align-items:center;gap:5px;"><div style="width:16px;height:2px;background:#6b2020;border-radius:2px;"></div>Resto Luciano</div>
+    </div>
+    <div style="overflow-x:auto;">${svg}</div>
+  </div>`
+}
+
 function calcularTablaLiga() {
   const tabla = {}
   for (const eq of (estado.ligaAfa.equipos || [])) {
@@ -2209,6 +2300,8 @@ function renderLiga() {
       </tbody>
     </table></div>
   </div>`
+
+  html += renderGraficoPuntos()
 
   // Stats Santi vs Luciano
   const jugados = liga.partidos.filter(p => p.golesLocal !== null)

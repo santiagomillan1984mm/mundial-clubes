@@ -21,6 +21,22 @@
       --border: #2a3a5c;
     }
 
+    body.modo-claro {
+      --azul: #f0f4f8;
+      --azul2: #ffffff;
+      --azul3: #dbeafe;
+      --dorado: #e94560;
+      --dorado2: #d97706;
+      --texto: #1e293b;
+      --gris: #64748b;
+      --card: #ffffff;
+      --border: #e2e8f0;
+    }
+    body.modo-claro header { box-shadow: 0 1px 6px rgba(0,0,0,0.08); }
+    body.modo-claro nav { box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
+    body.modo-claro .bracket-equipo { color: var(--texto); }
+    body.modo-claro select, body.modo-claro input { background: #fff; color: var(--texto); border-color: var(--border); }
+
     body {
       background: var(--azul);
       color: var(--texto);
@@ -629,6 +645,8 @@
     <span>🏆</span> Torneo de Campeones
   </div>
   <div style="display:flex;align-items:center;gap:10px;">
+    <button id="btn-tema" onclick="toggleTema()" title="Cambiar tema"
+      style="background:none;border:none;font-size:18px;cursor:pointer;color:var(--gris);padding:4px;">🌙</button>
     <button id="btn-notif" onclick="solicitarNotificaciones()" title="Activar notificaciones"
       style="background:none;border:none;font-size:18px;cursor:pointer;color:var(--gris);padding:4px;">🔕</button>
     <div id="admin-status" style="font-size:12px; color: var(--gris);">Solo lectura</div>
@@ -3143,6 +3161,22 @@ function toast(msg, error = false) {
 // ══════════════════════════════════════════════
 // POLLING — ACTUALIZACIONES EN VIVO
 // ══════════════════════════════════════════════
+function toggleTema() {
+  const claro = document.body.classList.toggle('modo-claro')
+  localStorage.setItem('tdc_tema', claro ? 'claro' : 'oscuro')
+  const btn = document.getElementById('btn-tema')
+  if (btn) btn.textContent = claro ? '☀️' : '🌙'
+}
+
+function aplicarTemaGuardado() {
+  const tema = localStorage.getItem('tdc_tema')
+  if (tema === 'claro') {
+    document.body.classList.add('modo-claro')
+    const btn = document.getElementById('btn-tema')
+    if (btn) btn.textContent = '☀️'
+  }
+}
+
 function startPolling() {
   if (pollingInterval) clearInterval(pollingInterval)
   pollingInterval = setInterval(async () => {
@@ -3200,6 +3234,7 @@ async function init() {
   if (t) { esAdmin = true; actualizarUIAdmin() }
   await cargarPool()
   await cargarEstado()
+  aplicarTemaGuardado()
   actualizarUIAdmin()
   actualizarBtnNotif()
   startPolling()

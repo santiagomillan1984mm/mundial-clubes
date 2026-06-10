@@ -1,6 +1,6 @@
 {
   "version": "1.0",
-  "ultimaActualizacion": "2026-06-10T00:17:25.444Z",
+  "ultimaActualizacion": "2026-06-10T00:45:43.961Z",
   "equiposArgentinos": [
     {
       "id": "arg1",
@@ -44,321 +44,183 @@
     }
   ],
   "sorteo": {
-    "realizado": true,
-    "confirmado": true,
-    "internacionales": [
-      {
-        "id": "int_s1",
-        "nombre": "Dinamo București",
-        "liga": "Rumania - SuperLiga",
-        "dueno": "santi"
-      },
-      {
-        "id": "int_s2",
-        "nombre": "SM Caen",
-        "liga": "Francia - Ligue 2",
-        "dueno": "santi"
-      },
-      {
-        "id": "int_s3",
-        "nombre": "Portsmouth",
-        "liga": "Inglaterra - Championship",
-        "dueno": "santi"
-      },
-      {
-        "id": "int_s4",
-        "nombre": "Queens Park Rangers",
-        "liga": "Inglaterra - Championship",
-        "dueno": "santi"
-      },
-      {
-        "id": "int_s5",
-        "nombre": "Adelaide United",
-        "liga": "Australia - A-League",
-        "dueno": "santi"
-      },
-      {
-        "id": "int_s6",
-        "nombre": "Wellington Phoenix",
-        "liga": "Australia - A-League",
-        "dueno": "santi"
-      },
-      {
-        "id": "int_s7",
-        "nombre": "Tianjin Jinmen Tiger",
-        "liga": "China - Super League",
-        "dueno": "santi"
-      },
-      {
-        "id": "int_s8",
-        "nombre": "Chengdu Rongcheng",
-        "liga": "China - Super League",
-        "dueno": "santi"
-      },
-      {
-        "id": "int_s9",
-        "nombre": "Auckland FC",
-        "liga": "Australia - A-League",
-        "dueno": "santi"
-      },
-      {
-        "id": "int_s10",
-        "nombre": "AGF",
-        "liga": "Dinamarca - Superliga",
-        "dueno": "santi"
-      },
-      {
-        "id": "int_s11",
-        "nombre": "Bolton Wanderers",
-        "liga": "Inglaterra - League One",
-        "dueno": "santi"
-      },
-      {
-        "id": "int_s12",
-        "nombre": "Unirea Slobozia",
-        "liga": "Rumania - SuperLiga",
-        "dueno": "santi"
-      },
-      {
-        "id": "int_s13",
-        "nombre": "Melbourne Victory",
-        "liga": "Australia - A-League",
-        "dueno": "santi"
-      },
-      {
-        "id": "int_l1",
-        "nombre": "Sheffield Wednesday",
-        "liga": "Inglaterra - Championship",
-        "dueno": "luciano"
-      },
-      {
-        "id": "int_l2",
-        "nombre": "Cardiff City",
-        "liga": "Inglaterra - Championship",
-        "dueno": "luciano"
-      },
-      {
-        "id": "int_l3",
-        "nombre": "UTA Arad",
-        "liga": "Rumania - SuperLiga",
-        "dueno": "luciano"
-      },
-      {
-        "id": "int_l4",
-        "nombre": "Lincoln City",
-        "liga": "Inglaterra - League One",
-        "dueno": "luciano"
-      },
-      {
-        "id": "int_l5",
-        "nombre": "Brøndby IF",
-        "liga": "Dinamarca - Superliga",
-        "dueno": "luciano"
-      },
-      {
-        "id": "int_l6",
-        "nombre": "Drogheda United",
-        "liga": "Irlanda - Premier Division",
-        "dueno": "luciano"
-      },
-      {
-        "id": "int_l7",
-        "nombre": "Beijing Guoan",
-        "liga": "China - Super League",
-        "dueno": "luciano"
-      },
-      {
-        "id": "int_l8",
-        "nombre": "Brisbane Roar",
-        "liga": "Australia - A-League",
-        "dueno": "luciano"
-      },
-      {
-        "id": "int_l9",
-        "nombre": "Al-Fayha",
-        "liga": "Arabia Saudita - Pro League",
-        "dueno": "luciano"
-      },
-      {
-        "id": "int_l10",
-        "nombre": "Macarthur FC",
-        "liga": "Australia - A-League",
-        "dueno": "luciano"
-      },
-      {
-        "id": "int_l11",
-        "nombre": "Galway United",
-        "liga": "Irlanda - Premier Division",
-        "dueno": "luciano"
-      }
-    ]
+    "realizado": false,
+    "confirmado": false,
+    "internacionales": []
   },
   "bracket": {
-    "dieciseisavos": [
-      {
-        "id": "d1",
-        "local": "int_s1",
-        "visitante": "int_l1",
-        "golesLocal1": null,
-        "golesVisitante1": null,
-        "golesLocal2": null,
-        "golesVisitante2": null,
-        "ganador": null
-      },
-      {
-        "id": "d2",
-        "local": "arg8",
-        "visitante": "arg5",
-        "golesLocal1": null,
-        "golesVisitante1": null,
-        "golesLocal2": null,
-        "golesVisitante2": null,
-        "ganador": null
-      },
-      {
-        "id": "d3",
-        "local": "int_s3",
-        "visitante": "int_l10",
-        "golesLocal1": null,
-        "golesVisitante1": null,
-        "golesLocal2": null,
-        "golesVisitante2": null,
-        "ganador": null
-      },
-      {
-        "id": "d4",
-        "local": "arg7",
-        "visitante": "int_l6",
-        "golesLocal1": null,
-        "golesVisitante1": null,
-        "golesLocal2": null,
-        "golesVisitante2": null,
-        "ganador": null
-      },
-      {
-        "id": "d5",
-        "local": "int_s10",
-        "visitante": "int_l2",
-        "golesLocal1": null,
-        "golesVisitante1": null,
-        "golesLocal2": null,
-        "golesVisitante2": null,
-        "ganador": null
-      },
-      {
-        "id": "d6",
-        "local": "int_s2",
-        "visitante": "int_l8",
-        "golesLocal1": null,
-        "golesVisitante1": null,
-        "golesLocal2": null,
-        "golesVisitante2": null,
-        "ganador": null
-      },
-      {
-        "id": "d7",
-        "local": "int_s13",
-        "visitante": "int_l4",
-        "golesLocal1": null,
-        "golesVisitante1": null,
-        "golesLocal2": null,
-        "golesVisitante2": null,
-        "ganador": null
-      },
-      {
-        "id": "d8",
-        "local": "int_s11",
-        "visitante": "int_l11",
-        "golesLocal1": null,
-        "golesVisitante1": null,
-        "golesLocal2": null,
-        "golesVisitante2": null,
-        "ganador": null
-      },
-      {
-        "id": "d9",
-        "local": "int_s7",
-        "visitante": "int_l7",
-        "golesLocal1": null,
-        "golesVisitante1": null,
-        "golesLocal2": null,
-        "golesVisitante2": null,
-        "ganador": null
-      },
-      {
-        "id": "d10",
-        "local": "int_s6",
-        "visitante": "arg4",
-        "golesLocal1": null,
-        "golesVisitante1": null,
-        "golesLocal2": null,
-        "golesVisitante2": null,
-        "ganador": null
-      },
-      {
-        "id": "d11",
-        "local": "int_s5",
-        "visitante": "int_l5",
-        "golesLocal1": null,
-        "golesVisitante1": null,
-        "golesLocal2": null,
-        "golesVisitante2": null,
-        "ganador": null
-      },
-      {
-        "id": "d12",
-        "local": "int_s12",
-        "visitante": "arg2",
-        "golesLocal1": null,
-        "golesVisitante1": null,
-        "golesLocal2": null,
-        "golesVisitante2": null,
-        "ganador": null
-      },
-      {
-        "id": "d13",
-        "local": "int_s8",
-        "visitante": "arg1",
-        "golesLocal1": null,
-        "golesVisitante1": null,
-        "golesLocal2": null,
-        "golesVisitante2": null,
-        "ganador": null
-      },
-      {
-        "id": "d14",
-        "local": "int_s9",
-        "visitante": "int_l3",
-        "golesLocal1": null,
-        "golesVisitante1": null,
-        "golesLocal2": null,
-        "golesVisitante2": null,
-        "ganador": null
-      },
-      {
-        "id": "d15",
-        "local": "arg6",
-        "visitante": "arg3",
-        "golesLocal1": null,
-        "golesVisitante1": null,
-        "golesLocal2": null,
-        "golesVisitante2": null,
-        "ganador": null
-      },
-      {
-        "id": "d16",
-        "local": "int_s4",
-        "visitante": "int_l9",
-        "golesLocal1": null,
-        "golesVisitante1": null,
-        "golesLocal2": null,
-        "golesVisitante2": null,
-        "ganador": null
-      }
-    ],
+    "dieciseisavos": [],
     "octavos": [],
     "cuartos": [],
     "semis": [],
     "final": []
+  },
+  "poolArgentino": [
+    {
+      "id": "pa1",
+      "nombre": "Boca Juniors",
+      "logo": "https://en.wikipedia.org/wiki/Special:FilePath/Club_Atlético_Boca_Juniors_logo.svg"
+    },
+    {
+      "id": "pa2",
+      "nombre": "River Plate",
+      "logo": "https://en.wikipedia.org/wiki/Special:FilePath/Escudo_del_Club_Atletico_River_Plate.svg"
+    },
+    {
+      "id": "pa3",
+      "nombre": "Racing Club",
+      "logo": "https://en.wikipedia.org/wiki/Special:FilePath/Racing_Club_de_Avellaneda_Logo.svg"
+    },
+    {
+      "id": "pa4",
+      "nombre": "Rosario Central",
+      "logo": "https://en.wikipedia.org/wiki/Special:FilePath/Rosario_Central_logo.svg"
+    },
+    {
+      "id": "pa5",
+      "nombre": "Estudiantes",
+      "logo": "https://en.wikipedia.org/wiki/Special:FilePath/Estudiantes_de_La_Plata_logo.svg"
+    },
+    {
+      "id": "pa6",
+      "nombre": "Vélez Sarsfield",
+      "logo": "https://en.wikipedia.org/wiki/Special:FilePath/Vélez_Sársfield_logo.svg"
+    },
+    {
+      "id": "pa7",
+      "nombre": "Lanús",
+      "logo": "https://en.wikipedia.org/wiki/Special:FilePath/Club_Atlético_Lanús_logo.svg"
+    },
+    {
+      "id": "pa8",
+      "nombre": "Argentinos Juniors",
+      "logo": "https://en.wikipedia.org/wiki/Special:FilePath/Argentinos_Juniors_logo.svg"
+    },
+    {
+      "id": "pa9",
+      "nombre": "Talleres",
+      "logo": "https://en.wikipedia.org/wiki/Special:FilePath/Club_Atlético_Talleres_(Córdoba)_logo.svg"
+    },
+    {
+      "id": "pa10",
+      "nombre": "Independiente",
+      "logo": "https://en.wikipedia.org/wiki/Special:FilePath/Club_Atlético_Independiente_logo.svg"
+    },
+    {
+      "id": "pa11",
+      "nombre": "Belgrano",
+      "logo": "https://en.wikipedia.org/wiki/Special:FilePath/Club_Atlético_Belgrano_(Córdoba)_logo.svg"
+    },
+    {
+      "id": "pa12",
+      "nombre": "San Lorenzo",
+      "logo": "https://en.wikipedia.org/wiki/Special:FilePath/San_Lorenzo_de_Almagro_logo.svg"
+    },
+    {
+      "id": "pa13",
+      "nombre": "Indep. Rivadavia",
+      "logo": "https://en.wikipedia.org/wiki/Special:FilePath/Independiente_Rivadavia_logo.svg"
+    },
+    {
+      "id": "pa14",
+      "nombre": "Defensa y Justicia",
+      "logo": "https://en.wikipedia.org/wiki/Special:FilePath/Defensa_y_Justicia_logo.svg"
+    },
+    {
+      "id": "pa15",
+      "nombre": "Huracán",
+      "logo": "https://en.wikipedia.org/wiki/Special:FilePath/Club_Atlético_Huracán_(Argentina)_logo.svg"
+    },
+    {
+      "id": "pa16",
+      "nombre": "Platense",
+      "logo": "https://en.wikipedia.org/wiki/Special:FilePath/Club_Atlético_Platense_logo.svg"
+    },
+    {
+      "id": "pa17",
+      "nombre": "Instituto",
+      "logo": "https://en.wikipedia.org/wiki/Special:FilePath/Instituto_Atlético_Central_Córdoba_logo.svg"
+    },
+    {
+      "id": "pa18",
+      "nombre": "Atlético Tucumán",
+      "logo": "https://en.wikipedia.org/wiki/Special:FilePath/Club_Atlético_Tucumán_logo.svg"
+    },
+    {
+      "id": "pa19",
+      "nombre": "Tigre",
+      "logo": "https://en.wikipedia.org/wiki/Special:FilePath/Club_Atlético_Tigre_logo.svg"
+    },
+    {
+      "id": "pa20",
+      "nombre": "Unión de Santa Fe",
+      "logo": "https://en.wikipedia.org/wiki/Special:FilePath/Club_Unión_(Santa_Fe)_logo.svg"
+    },
+    {
+      "id": "pa21",
+      "nombre": "Barracas Central",
+      "logo": "https://en.wikipedia.org/wiki/Special:FilePath/Barracas_Central_logo.svg"
+    },
+    {
+      "id": "pa22",
+      "nombre": "Banfield",
+      "logo": "https://en.wikipedia.org/wiki/Special:FilePath/Club_Atlético_Banfield_logo.svg"
+    },
+    {
+      "id": "pa23",
+      "nombre": "Newell's",
+      "logo": "https://en.wikipedia.org/wiki/Special:FilePath/Newell's_Old_Boys_Logo.svg"
+    },
+    {
+      "id": "pa24",
+      "nombre": "Aldosivi",
+      "logo": "https://en.wikipedia.org/wiki/Special:FilePath/Club_Atlético_Aldosivi_logo.svg"
+    },
+    {
+      "id": "pa25",
+      "nombre": "Gimnasia LP",
+      "logo": "https://en.wikipedia.org/wiki/Special:FilePath/Gimnasia_y_Esgrima_La_Plata_logo.svg"
+    },
+    {
+      "id": "pa26",
+      "nombre": "Sarmiento",
+      "logo": "https://en.wikipedia.org/wiki/Special:FilePath/Club_Atlético_Sarmiento_(Junín)_logo.svg"
+    },
+    {
+      "id": "pa27",
+      "nombre": "Godoy Cruz",
+      "logo": "https://en.wikipedia.org/wiki/Special:FilePath/Godoy_Cruz_Antonio_Tomba_logo.svg"
+    },
+    {
+      "id": "pa28",
+      "nombre": "Central Córdoba",
+      "logo": "https://en.wikipedia.org/wiki/Special:FilePath/Central_Córdoba_(Santiago_del_Estero)_logo.svg"
+    },
+    {
+      "id": "pa29",
+      "nombre": "Dep. Riestra",
+      "logo": "https://en.wikipedia.org/wiki/Special:FilePath/Club_Deportivo_Riestra_logo.svg"
+    },
+    {
+      "id": "pa30",
+      "nombre": "San Martín SJ",
+      "logo": "https://en.wikipedia.org/wiki/Special:FilePath/San_Martín_(San_Juan)_logo.svg"
+    }
+  ],
+  "ligaAfa": {
+    "configurado": false,
+    "equipos": [],
+    "partidos": []
+  },
+  "copaArgentina": {
+    "configurado": false,
+    "equipos": [],
+    "bracket": {
+      "r1": [],
+      "r2": [],
+      "cuartos": [],
+      "semis": [],
+      "final": []
+    }
   }
 }

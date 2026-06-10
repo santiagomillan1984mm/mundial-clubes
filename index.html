@@ -2435,6 +2435,28 @@ function renderLiga() {
   cont.innerHTML = html
 }
 
+function compartirResultadoLiga(localId, visitId, gl, gv, jornada) {
+  const localN = getPoolNombre(localId)
+  const visitN = getPoolNombre(visitId)
+  const dL = (estado.ligaAfa.equipos.find(e => e.id === localId)?.dueno || '') === 'santi' ? 'Santi' : 'Luciano'
+  const dV = (estado.ligaAfa.equipos.find(e => e.id === visitId)?.dueno || '') === 'santi' ? 'Santi' : 'Luciano'
+  const gl2 = Number(gl), gv2 = Number(gv)
+  const resultado = gl2 > gv2 ? `🏆 Ganó ${localN} (${dL})` : gl2 < gv2 ? `🏆 Ganó ${visitN} (${dV})` : '🤝 Empate'
+  const texto = `⚽ *Liga AFA — Jornada ${jornada}*\n${localN} *${gl}* - *${gv}* ${visitN}\n${resultado}\n\n🏆 Torneo de Campeones\nhttps://santiagomillan1984mm.github.io/mundial-clubes/`
+  window.open('https://wa.me/?text=' + encodeURIComponent(texto), '_blank')
+}
+
+function compartirResultadoCopa(localId, visitId, gl, gv, ronda) {
+  const localN = getCopaNombre(localId)
+  const visitN = getCopaNombre(visitId)
+  const gl2 = Number(gl), gv2 = Number(gv)
+  const rondaNombres = { r1: 'Ronda 1', r2: 'Octavos', cuartos: 'Cuartos de final', semis: 'Semifinal', final: 'Final' }
+  const rondaN = rondaNombres[ronda] || ronda
+  const resultado = gl2 > gv2 ? `🏆 Avanzó ${localN}` : gl2 < gv2 ? `🏆 Avanzó ${visitN}` : `🏆 Avanzó en penales`
+  const texto = `🏆 *Copa Argentina — ${rondaN}*\n${localN} *${gl}* - *${gv}* ${visitN}\n${resultado}\n\n🏆 Torneo de Campeones\nhttps://santiagomillan1984mm.github.io/mundial-clubes/`
+  window.open('https://wa.me/?text=' + encodeURIComponent(texto), '_blank')
+}
+
 function renderPartidoLigaHTML(p) {
   const gl = p.golesLocal !== null ? p.golesLocal : ''
   const gv = p.golesVisitante !== null ? p.golesVisitante : ''
@@ -2445,6 +2467,9 @@ function renderPartidoLigaHTML(p) {
   const esGanL = p.golesLocal !== null && p.golesLocal > p.golesVisitante
   const esGanV = p.golesVisitante !== null && p.golesVisitante > p.golesLocal
   const esEmpate = p.golesLocal !== null && p.golesLocal === p.golesVisitante
+  const btnWA = p.golesLocal !== null
+    ? `<button onclick="event.stopPropagation();compartirResultadoLiga('${p.local}','${p.visitante}',${p.golesLocal},${p.golesVisitante},${p.jornada})" title="Compartir por WhatsApp" style="background:none;border:none;cursor:pointer;font-size:15px;padding:2px 4px;flex-shrink:0;" >📤</button>`
+    : ''
   if (esAdmin) {
     return `<div class="partido-row" data-local="${dLocal}" data-visita="${dVisit}" data-jugado="${p.golesLocal !== null}">
       <div class="partido-equipo" style="display:flex;align-items:center;gap:6px;color:${dLocal==='santi'?'#4a9eff':'#ff6b6b'};font-weight:${esGanL?700:400}">${logoHTML(p.local,20)}<span>${localN}</span></div>
@@ -2454,6 +2479,7 @@ function renderPartidoLigaHTML(p) {
         <input class="input score-input" type="number" min="0" max="99" value="${gv}" placeholder="-" id="gv_${p.id}" onchange="guardarPartidoLiga('${p.id}')">
       </div>
       <div class="partido-equipo derecha" style="display:flex;align-items:center;justify-content:flex-end;gap:6px;color:${dVisit==='santi'?'#4a9eff':'#ff6b6b'};font-weight:${esGanV?700:400}"><span>${visitN}</span>${logoHTML(p.visitante,20)}</div>
+      ${btnWA}
     </div>`
   } else {
     const sc = p.golesLocal !== null ? `<span style="font-size:15px;font-weight:800;color:${esEmpate?'var(--gris)':'var(--dorado2)'};">${p.golesLocal} - ${p.golesVisitante}</span>` : `<span style="color:var(--gris);font-size:13px;">vs</span>`
@@ -2461,6 +2487,7 @@ function renderPartidoLigaHTML(p) {
       <div class="partido-equipo" style="display:flex;align-items:center;gap:6px;color:${dLocal==='santi'?'#4a9eff':'#ff6b6b'};font-weight:${esGanL?700:400}">${logoHTML(p.local,20)}<span>${localN}</span></div>
       <div style="flex-shrink:0;padding:0 10px;">${sc}</div>
       <div class="partido-equipo derecha" style="display:flex;align-items:center;justify-content:flex-end;gap:6px;color:${dVisit==='santi'?'#4a9eff':'#ff6b6b'};font-weight:${esGanV?700:400}"><span>${visitN}</span>${logoHTML(p.visitante,20)}</div>
+      ${btnWA}
     </div>`
   }
 }
@@ -3019,9 +3046,12 @@ function renderCopaBracket(cont) {
     const ganador = cruce.ganador
     const jugado = cruce.golesLocal !== null && cruce.golesVisitante !== null
     const adminAttr = esAdmin ? `onclick="abrirModalCopa('${cruce.id}','${ronda}')" title="Cargar resultado" style="cursor:pointer;margin:3px 0;"` : 'style="margin:3px 0;"'
-    return `<div class="bracket-cruce" ${adminAttr}>
-      ${copaEquipoCard(cruce.local, jugado ? cruce.golesLocal : null, ganador, true)}
-      ${copaEquipoCard(cruce.visitante, jugado ? cruce.golesVisitante : null, ganador, false)}
+    const waBtn = jugado ? `<div style="text-align:center;margin-top:2px;"><button onclick="event.stopPropagation();compartirResultadoCopa('${cruce.local}','${cruce.visitante}',${cruce.golesLocal},${cruce.golesVisitante},'${ronda}')" title="Compartir por WhatsApp" style="background:none;border:none;cursor:pointer;font-size:13px;padding:1px 4px;color:var(--gris);">📤</button></div>` : ''
+    return `<div style="margin:3px 0;">
+      <div class="bracket-cruce" ${adminAttr}>
+        ${copaEquipoCard(cruce.local, jugado ? cruce.golesLocal : null, ganador, true)}
+        ${copaEquipoCard(cruce.visitante, jugado ? cruce.golesVisitante : null, ganador, false)}
+      </div>${waBtn}
     </div>`
   }
 

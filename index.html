@@ -804,19 +804,31 @@ const POOL_ARG = [
   { id:'pa30', nombre:'San Martín SJ' },
 ]
 
+// URLs directas para clubs donde la API de Wikipedia no devuelve thumbnail
+const LOGO_OVERRIDES = {
+  pa6: 'https://commons.wikimedia.org/wiki/Special:Redirect/file/Vélez_Sársfield_logo.svg?width=80',
+}
+
 // Cache de logos resueltos vía Wikipedia API
-const LOGO_CACHE_KEY = 'tdc_logos_v4'
+const LOGO_CACHE_KEY = 'tdc_logos_v5'
 let resolvedLogos = {}
 
 async function loadLogos() {
-  // Intentar cargar del cache local primero
+  // Aplicar overrides primero
+  Object.assign(resolvedLogos, LOGO_OVERRIDES)
+
+  // Intentar cargar del cache local
   try {
     const cached = localStorage.getItem(LOGO_CACHE_KEY)
-    if (cached) { resolvedLogos = JSON.parse(cached); return }
+    if (cached) {
+      resolvedLogos = { ...JSON.parse(cached), ...LOGO_OVERRIDES }
+      return
+    }
   } catch(e) {}
 
   // Fetch en paralelo usando Wikipedia REST API (soporta CORS)
   await Promise.all(POOL_ARG.map(async eq => {
+    if (LOGO_OVERRIDES[eq.id]) return  // ya tiene override
     const article = WIKI_ARTICLES[eq.id]
     if (!article) return
     try {

@@ -1,6 +1,6 @@
 {
   "version": "1.0",
-  "ultimaActualizacion": "2026-06-10T19:43:11.632Z",
+  "ultimaActualizacion": "2026-06-10T20:24:01.519Z",
   "equiposArgentinos": [
     {
       "id": "arg1",
@@ -178,9 +178,891 @@
     }
   ],
   "ligaAfa": {
-    "configurado": false,
-    "equipos": [],
-    "partidos": []
+    "configurado": true,
+    "equipos": [
+      {
+        "id": "pa1",
+        "dueno": "santi"
+      },
+      {
+        "id": "pa2",
+        "dueno": "santi"
+      },
+      {
+        "id": "pa3",
+        "dueno": "santi"
+      },
+      {
+        "id": "pa6",
+        "dueno": "santi"
+      },
+      {
+        "id": "pa5",
+        "dueno": "santi"
+      },
+      {
+        "id": "pa9",
+        "dueno": "santi"
+      },
+      {
+        "id": "pa8",
+        "dueno": "santi"
+      },
+      {
+        "id": "pa11",
+        "dueno": "santi"
+      },
+      {
+        "id": "pa10",
+        "dueno": "santi"
+      },
+      {
+        "id": "pa12",
+        "dueno": "santi"
+      },
+      {
+        "id": "pa7",
+        "dueno": "luciano"
+      },
+      {
+        "id": "pa4",
+        "dueno": "luciano"
+      },
+      {
+        "id": "pa13",
+        "dueno": "luciano"
+      },
+      {
+        "id": "pa14",
+        "dueno": "luciano"
+      },
+      {
+        "id": "pa15",
+        "dueno": "luciano"
+      },
+      {
+        "id": "pa16",
+        "dueno": "luciano"
+      },
+      {
+        "id": "pa17",
+        "dueno": "luciano"
+      },
+      {
+        "id": "pa18",
+        "dueno": "luciano"
+      },
+      {
+        "id": "pa19",
+        "dueno": "luciano"
+      },
+      {
+        "id": "pa20",
+        "dueno": "luciano"
+      }
+    ],
+    "partidos": [
+      {
+        "id": "liga_1",
+        "jornada": 1,
+        "local": "pa1",
+        "visitante": "pa7",
+        "golesLocal": null,
+        "golesVisitante": null
+      },
+      {
+        "id": "liga_2",
+        "jornada": 1,
+        "local": "pa2",
+        "visitante": "pa4",
+        "golesLocal": null,
+        "golesVisitante": null
+      },
+      {
+        "id": "liga_3",
+        "jornada": 1,
+        "local": "pa3",
+        "visitante": "pa13",
+        "golesLocal": null,
+        "golesVisitante": null
+      },
+      {
+        "id": "liga_4",
+        "jornada": 1,
+        "local": "pa6",
+        "visitante": "pa14",
+        "golesLocal": null,
+        "golesVisitante": null
+      },
+      {
+        "id": "liga_5",
+        "jornada": 1,
+        "local": "pa5",
+        "visitante": "pa15",
+        "golesLocal": null,
+        "golesVisitante": null
+      },
+      {
+        "id": "liga_6",
+        "jornada": 1,
+        "local": "pa9",
+        "visitante": "pa16",
+        "golesLocal": null,
+        "golesVisitante": null
+      },
+      {
+        "id": "liga_7",
+        "jornada": 1,
+        "local": "pa8",
+        "visitante": "pa17",
+        "golesLocal": null,
+        "golesVisitante": null
+      },
+      {
+        "id": "liga_8",
+        "jornada": 1,
+        "local": "pa11",
+        "visitante": "pa18",
+        "golesLocal": null,
+        "golesVisitante": null
+      },
+      {
+        "id": "liga_9",
+        "jornada": 1,
+        "local": "pa10",
+        "visitante": "pa19",
+        "golesLocal": null,
+        "golesVisitante": null
+      },
+      {
+        "id": "liga_10",
+        "jornada": 1,
+        "local": "pa12",
+        "visitante": "pa20",
+        "golesLocal": null,
+        "golesVisitante": null
+      },
+      {
+        "id": "liga_11",
+        "jornada": 2,
+        "local": "pa1",
+        "visitante": "pa4",
+        "golesLocal": null,
+        "golesVisitante": null
+      },
+      {
+        "id": "liga_12",
+        "jornada": 2,
+        "local": "pa2",
+        "visitante": "pa13",
+        "golesLocal": null,
+        "golesVisitante": null
+      },
+      {
+        "id": "liga_13",
+        "jornada": 2,
+        "local": "pa3",
+        "visitante": "pa14",
+        "golesLocal": null,
+        "golesVisitante": null
+      },
+      {
+        "id": "liga_14",
+        "jornada": 2,
+        "local": "pa6",
+        "visitante": "pa15",
+        "golesLocal": null,
+        "golesVisitante": null
+      },
+      {
+        "id": "liga_15",
+        "jornada": 2,
+        "local": "pa5",
+        "visitante": "pa16",
+        "golesLocal": null,
+        "golesVisitante": null
+      },
+      {
+        "id": "liga_16",
+        "jornada": 2,
+        "local": "pa9",
+        "visitante": "pa17",
+        "golesLocal": null,
+        "golesVisitante": null
+      },
+      {
+        "id": "liga_17",
+        "jornada": 2,
+        "local": "pa8",
+        "visitante": "pa18",
+        "golesLocal": null,
+        "golesVisitante": null
+      },
+      {
+        "id": "liga_18",
+        "jornada": 2,
+        "local": "pa11",
+        "visitante": "pa19",
+        "golesLocal": null,
+        "golesVisitante": null
+      },
+      {
+        "id": "liga_19",
+        "jornada": 2,
+        "local": "pa10",
+        "visitante": "pa20",
+        "golesLocal": null,
+        "golesVisitante": null
+      },
+      {
+        "id": "liga_20",
+        "jornada": 2,
+        "local": "pa12",
+        "visitante": "pa7",
+        "golesLocal": null,
+        "golesVisitante": null
+      },
+      {
+        "id": "liga_21",
+        "jornada": 3,
+        "local": "pa1",
+        "visitante": "pa13",
+        "golesLocal": null,
+        "golesVisitante": null
+      },
+      {
+        "id": "liga_22",
+        "jornada": 3,
+        "local": "pa2",
+        "visitante": "pa14",
+        "golesLocal": null,
+        "golesVisitante": null
+      },
+      {
+        "id": "liga_23",
+        "jornada": 3,
+        "local": "pa3",
+        "visitante": "pa15",
+        "golesLocal": null,
+        "golesVisitante": null
+      },
+      {
+        "id": "liga_24",
+        "jornada": 3,
+        "local": "pa6",
+        "visitante": "pa16",
+        "golesLocal": null,
+        "golesVisitante": null
+      },
+      {
+        "id": "liga_25",
+        "jornada": 3,
+        "local": "pa5",
+        "visitante": "pa17",
+        "golesLocal": null,
+        "golesVisitante": null
+      },
+      {
+        "id": "liga_26",
+        "jornada": 3,
+        "local": "pa9",
+        "visitante": "pa18",
+        "golesLocal": null,
+        "golesVisitante": null
+      },
+      {
+        "id": "liga_27",
+        "jornada": 3,
+        "local": "pa8",
+        "visitante": "pa19",
+        "golesLocal": null,
+        "golesVisitante": null
+      },
+      {
+        "id": "liga_28",
+        "jornada": 3,
+        "local": "pa11",
+        "visitante": "pa20",
+        "golesLocal": null,
+        "golesVisitante": null
+      },
+      {
+        "id": "liga_29",
+        "jornada": 3,
+        "local": "pa10",
+        "visitante": "pa7",
+        "golesLocal": null,
+        "golesVisitante": null
+      },
+      {
+        "id": "liga_30",
+        "jornada": 3,
+        "local": "pa12",
+        "visitante": "pa4",
+        "golesLocal": null,
+        "golesVisitante": null
+      },
+      {
+        "id": "liga_31",
+        "jornada": 4,
+        "local": "pa1",
+        "visitante": "pa14",
+        "golesLocal": null,
+        "golesVisitante": null
+      },
+      {
+        "id": "liga_32",
+        "jornada": 4,
+        "local": "pa2",
+        "visitante": "pa15",
+        "golesLocal": null,
+        "golesVisitante": null
+      },
+      {
+        "id": "liga_33",
+        "jornada": 4,
+        "local": "pa3",
+        "visitante": "pa16",
+        "golesLocal": null,
+        "golesVisitante": null
+      },
+      {
+        "id": "liga_34",
+        "jornada": 4,
+        "local": "pa6",
+        "visitante": "pa17",
+        "golesLocal": null,
+        "golesVisitante": null
+      },
+      {
+        "id": "liga_35",
+        "jornada": 4,
+        "local": "pa5",
+        "visitante": "pa18",
+        "golesLocal": null,
+        "golesVisitante": null
+      },
+      {
+        "id": "liga_36",
+        "jornada": 4,
+        "local": "pa9",
+        "visitante": "pa19",
+        "golesLocal": null,
+        "golesVisitante": null
+      },
+      {
+        "id": "liga_37",
+        "jornada": 4,
+        "local": "pa8",
+        "visitante": "pa20",
+        "golesLocal": null,
+        "golesVisitante": null
+      },
+      {
+        "id": "liga_38",
+        "jornada": 4,
+        "local": "pa11",
+        "visitante": "pa7",
+        "golesLocal": null,
+        "golesVisitante": null
+      },
+      {
+        "id": "liga_39",
+        "jornada": 4,
+        "local": "pa10",
+        "visitante": "pa4",
+        "golesLocal": null,
+        "golesVisitante": null
+      },
+      {
+        "id": "liga_40",
+        "jornada": 4,
+        "local": "pa12",
+        "visitante": "pa13",
+        "golesLocal": null,
+        "golesVisitante": null
+      },
+      {
+        "id": "liga_41",
+        "jornada": 5,
+        "local": "pa1",
+        "visitante": "pa15",
+        "golesLocal": null,
+        "golesVisitante": null
+      },
+      {
+        "id": "liga_42",
+        "jornada": 5,
+        "local": "pa2",
+        "visitante": "pa16",
+        "golesLocal": null,
+        "golesVisitante": null
+      },
+      {
+        "id": "liga_43",
+        "jornada": 5,
+        "local": "pa3",
+        "visitante": "pa17",
+        "golesLocal": null,
+        "golesVisitante": null
+      },
+      {
+        "id": "liga_44",
+        "jornada": 5,
+        "local": "pa6",
+        "visitante": "pa18",
+        "golesLocal": null,
+        "golesVisitante": null
+      },
+      {
+        "id": "liga_45",
+        "jornada": 5,
+        "local": "pa5",
+        "visitante": "pa19",
+        "golesLocal": null,
+        "golesVisitante": null
+      },
+      {
+        "id": "liga_46",
+        "jornada": 5,
+        "local": "pa9",
+        "visitante": "pa20",
+        "golesLocal": null,
+        "golesVisitante": null
+      },
+      {
+        "id": "liga_47",
+        "jornada": 5,
+        "local": "pa8",
+        "visitante": "pa7",
+        "golesLocal": null,
+        "golesVisitante": null
+      },
+      {
+        "id": "liga_48",
+        "jornada": 5,
+        "local": "pa11",
+        "visitante": "pa4",
+        "golesLocal": null,
+        "golesVisitante": null
+      },
+      {
+        "id": "liga_49",
+        "jornada": 5,
+        "local": "pa10",
+        "visitante": "pa13",
+        "golesLocal": null,
+        "golesVisitante": null
+      },
+      {
+        "id": "liga_50",
+        "jornada": 5,
+        "local": "pa12",
+        "visitante": "pa14",
+        "golesLocal": null,
+        "golesVisitante": null
+      },
+      {
+        "id": "liga_51",
+        "jornada": 6,
+        "local": "pa1",
+        "visitante": "pa16",
+        "golesLocal": null,
+        "golesVisitante": null
+      },
+      {
+        "id": "liga_52",
+        "jornada": 6,
+        "local": "pa2",
+        "visitante": "pa17",
+        "golesLocal": null,
+        "golesVisitante": null
+      },
+      {
+        "id": "liga_53",
+        "jornada": 6,
+        "local": "pa3",
+        "visitante": "pa18",
+        "golesLocal": null,
+        "golesVisitante": null
+      },
+      {
+        "id": "liga_54",
+        "jornada": 6,
+        "local": "pa6",
+        "visitante": "pa19",
+        "golesLocal": null,
+        "golesVisitante": null
+      },
+      {
+        "id": "liga_55",
+        "jornada": 6,
+        "local": "pa5",
+        "visitante": "pa20",
+        "golesLocal": null,
+        "golesVisitante": null
+      },
+      {
+        "id": "liga_56",
+        "jornada": 6,
+        "local": "pa9",
+        "visitante": "pa7",
+        "golesLocal": null,
+        "golesVisitante": null
+      },
+      {
+        "id": "liga_57",
+        "jornada": 6,
+        "local": "pa8",
+        "visitante": "pa4",
+        "golesLocal": null,
+        "golesVisitante": null
+      },
+      {
+        "id": "liga_58",
+        "jornada": 6,
+        "local": "pa11",
+        "visitante": "pa13",
+        "golesLocal": null,
+        "golesVisitante": null
+      },
+      {
+        "id": "liga_59",
+        "jornada": 6,
+        "local": "pa10",
+        "visitante": "pa14",
+        "golesLocal": null,
+        "golesVisitante": null
+      },
+      {
+        "id": "liga_60",
+        "jornada": 6,
+        "local": "pa12",
+        "visitante": "pa15",
+        "golesLocal": null,
+        "golesVisitante": null
+      },
+      {
+        "id": "liga_61",
+        "jornada": 7,
+        "local": "pa1",
+        "visitante": "pa17",
+        "golesLocal": null,
+        "golesVisitante": null
+      },
+      {
+        "id": "liga_62",
+        "jornada": 7,
+        "local": "pa2",
+        "visitante": "pa18",
+        "golesLocal": null,
+        "golesVisitante": null
+      },
+      {
+        "id": "liga_63",
+        "jornada": 7,
+        "local": "pa3",
+        "visitante": "pa19",
+        "golesLocal": null,
+        "golesVisitante": null
+      },
+      {
+        "id": "liga_64",
+        "jornada": 7,
+        "local": "pa6",
+        "visitante": "pa20",
+        "golesLocal": null,
+        "golesVisitante": null
+      },
+      {
+        "id": "liga_65",
+        "jornada": 7,
+        "local": "pa5",
+        "visitante": "pa7",
+        "golesLocal": null,
+        "golesVisitante": null
+      },
+      {
+        "id": "liga_66",
+        "jornada": 7,
+        "local": "pa9",
+        "visitante": "pa4",
+        "golesLocal": null,
+        "golesVisitante": null
+      },
+      {
+        "id": "liga_67",
+        "jornada": 7,
+        "local": "pa8",
+        "visitante": "pa13",
+        "golesLocal": null,
+        "golesVisitante": null
+      },
+      {
+        "id": "liga_68",
+        "jornada": 7,
+        "local": "pa11",
+        "visitante": "pa14",
+        "golesLocal": null,
+        "golesVisitante": null
+      },
+      {
+        "id": "liga_69",
+        "jornada": 7,
+        "local": "pa10",
+        "visitante": "pa15",
+        "golesLocal": null,
+        "golesVisitante": null
+      },
+      {
+        "id": "liga_70",
+        "jornada": 7,
+        "local": "pa12",
+        "visitante": "pa16",
+        "golesLocal": null,
+        "golesVisitante": null
+      },
+      {
+        "id": "liga_71",
+        "jornada": 8,
+        "local": "pa1",
+        "visitante": "pa18",
+        "golesLocal": null,
+        "golesVisitante": null
+      },
+      {
+        "id": "liga_72",
+        "jornada": 8,
+        "local": "pa2",
+        "visitante": "pa19",
+        "golesLocal": null,
+        "golesVisitante": null
+      },
+      {
+        "id": "liga_73",
+        "jornada": 8,
+        "local": "pa3",
+        "visitante": "pa20",
+        "golesLocal": null,
+        "golesVisitante": null
+      },
+      {
+        "id": "liga_74",
+        "jornada": 8,
+        "local": "pa6",
+        "visitante": "pa7",
+        "golesLocal": null,
+        "golesVisitante": null
+      },
+      {
+        "id": "liga_75",
+        "jornada": 8,
+        "local": "pa5",
+        "visitante": "pa4",
+        "golesLocal": null,
+        "golesVisitante": null
+      },
+      {
+        "id": "liga_76",
+        "jornada": 8,
+        "local": "pa9",
+        "visitante": "pa13",
+        "golesLocal": null,
+        "golesVisitante": null
+      },
+      {
+        "id": "liga_77",
+        "jornada": 8,
+        "local": "pa8",
+        "visitante": "pa14",
+        "golesLocal": null,
+        "golesVisitante": null
+      },
+      {
+        "id": "liga_78",
+        "jornada": 8,
+        "local": "pa11",
+        "visitante": "pa15",
+        "golesLocal": null,
+        "golesVisitante": null
+      },
+      {
+        "id": "liga_79",
+        "jornada": 8,
+        "local": "pa10",
+        "visitante": "pa16",
+        "golesLocal": null,
+        "golesVisitante": null
+      },
+      {
+        "id": "liga_80",
+        "jornada": 8,
+        "local": "pa12",
+        "visitante": "pa17",
+        "golesLocal": null,
+        "golesVisitante": null
+      },
+      {
+        "id": "liga_81",
+        "jornada": 9,
+        "local": "pa1",
+        "visitante": "pa19",
+        "golesLocal": null,
+        "golesVisitante": null
+      },
+      {
+        "id": "liga_82",
+        "jornada": 9,
+        "local": "pa2",
+        "visitante": "pa20",
+        "golesLocal": null,
+        "golesVisitante": null
+      },
+      {
+        "id": "liga_83",
+        "jornada": 9,
+        "local": "pa3",
+        "visitante": "pa7",
+        "golesLocal": null,
+        "golesVisitante": null
+      },
+      {
+        "id": "liga_84",
+        "jornada": 9,
+        "local": "pa6",
+        "visitante": "pa4",
+        "golesLocal": null,
+        "golesVisitante": null
+      },
+      {
+        "id": "liga_85",
+        "jornada": 9,
+        "local": "pa5",
+        "visitante": "pa13",
+        "golesLocal": null,
+        "golesVisitante": null
+      },
+      {
+        "id": "liga_86",
+        "jornada": 9,
+        "local": "pa9",
+        "visitante": "pa14",
+        "golesLocal": null,
+        "golesVisitante": null
+      },
+      {
+        "id": "liga_87",
+        "jornada": 9,
+        "local": "pa8",
+        "visitante": "pa15",
+        "golesLocal": null,
+        "golesVisitante": null
+      },
+      {
+        "id": "liga_88",
+        "jornada": 9,
+        "local": "pa11",
+        "visitante": "pa16",
+        "golesLocal": null,
+        "golesVisitante": null
+      },
+      {
+        "id": "liga_89",
+        "jornada": 9,
+        "local": "pa10",
+        "visitante": "pa17",
+        "golesLocal": null,
+        "golesVisitante": null
+      },
+      {
+        "id": "liga_90",
+        "jornada": 9,
+        "local": "pa12",
+        "visitante": "pa18",
+        "golesLocal": null,
+        "golesVisitante": null
+      },
+      {
+        "id": "liga_91",
+        "jornada": 10,
+        "local": "pa1",
+        "visitante": "pa20",
+        "golesLocal": null,
+        "golesVisitante": null
+      },
+      {
+        "id": "liga_92",
+        "jornada": 10,
+        "local": "pa2",
+        "visitante": "pa7",
+        "golesLocal": null,
+        "golesVisitante": null
+      },
+      {
+        "id": "liga_93",
+        "jornada": 10,
+        "local": "pa3",
+        "visitante": "pa4",
+        "golesLocal": null,
+        "golesVisitante": null
+      },
+      {
+        "id": "liga_94",
+        "jornada": 10,
+        "local": "pa6",
+        "visitante": "pa13",
+        "golesLocal": null,
+        "golesVisitante": null
+      },
+      {
+        "id": "liga_95",
+        "jornada": 10,
+        "local": "pa5",
+        "visitante": "pa14",
+        "golesLocal": null,
+        "golesVisitante": null
+      },
+      {
+        "id": "liga_96",
+        "jornada": 10,
+        "local": "pa9",
+        "visitante": "pa15",
+        "golesLocal": null,
+        "golesVisitante": null
+      },
+      {
+        "id": "liga_97",
+        "jornada": 10,
+        "local": "pa8",
+        "visitante": "pa16",
+        "golesLocal": null,
+        "golesVisitante": null
+      },
+      {
+        "id": "liga_98",
+        "jornada": 10,
+        "local": "pa11",
+        "visitante": "pa17",
+        "golesLocal": null,
+        "golesVisitante": null
+      },
+      {
+        "id": "liga_99",
+        "jornada": 10,
+        "local": "pa10",
+        "visitante": "pa18",
+        "golesLocal": null,
+        "golesVisitante": null
+      },
+      {
+        "id": "liga_100",
+        "jornada": 10,
+        "local": "pa12",
+        "visitante": "pa19",
+        "golesLocal": null,
+        "golesVisitante": null
+      }
+    ]
   },
   "copaArgentina": {
     "configurado": false,

@@ -701,6 +701,7 @@
   <button class="nav-btn" onclick="mostrarSeccion('sorteo')">Sorteo</button>
   <button class="nav-btn" onclick="mostrarSeccion('bracket')">Eliminatorias</button>
   <button class="nav-btn" onclick="mostrarSeccion('historial')">🏅 Historial</button>
+  <button class="nav-btn" onclick="mostrarSeccion('relampago')">⚡ Relámpago</button>
   <button class="nav-btn" onclick="mostrarSeccion('admin')">Admin</button>
 </nav>
 
@@ -760,6 +761,12 @@
   <div id="sec-historial" class="seccion">
     <div class="sec-titulo">🏅 Historial de Campeones</div>
     <div id="historial-contenido"></div>
+  </div>
+
+  <!-- RELÁMPAGO -->
+  <div id="sec-relampago" class="seccion">
+    <div class="sec-titulo">⚡ Torneos Relámpago</div>
+    <div id="relampago-contenido"></div>
   </div>
 
   <div id="sec-admin" class="seccion">
@@ -937,7 +944,8 @@ const ESTADO_INICIAL = {
   ],
   sorteo: { realizado: false, confirmado: false, internacionales: [] },
   bracket: { dieciseisavos: [], octavos: [], cuartos: [], semis: [], final: [] },
-  historial: []
+  historial: [],
+  torneosRelampago: []
 }
 
 // ══════════════════════════════════════════════
@@ -1221,6 +1229,7 @@ function renderTodo() {
   if (!estado.ligaAfa) estado.ligaAfa = { configurado: false, equipos: [], partidos: [] }
   if (!estado.copaArgentina) estado.copaArgentina = { configurado: false, equipos: [], bracket: { r1: [], r2: [], cuartos: [], semis: [], final: [] } }
   if (!estado.historial) estado.historial = []
+  if (!estado.torneosRelampago) estado.torneosRelampago = []
   renderEstadoInicio()
   renderLiga()
   renderCopa()
@@ -1228,6 +1237,7 @@ function renderTodo() {
   renderSorteo()
   renderBracket()
   renderHistorial()
+  renderRelampago()
 }
 
 // ── Stats helpers ──────────────────────────────
@@ -3294,6 +3304,575 @@ function toast(msg, error = false) {
   el.style.display = 'block'
   clearTimeout(toastTimer)
   toastTimer = setTimeout(() => { el.style.display = 'none' }, 2500)
+}
+
+// ══════════════════════════════════════════════
+// TORNEOS RELÁMPAGO
+// ══════════════════════════════════════════════
+
+function rlId() { return 'rl_' + Date.now() + '_' + Math.random().toString(36).slice(2,7) }
+
+let rlCreando = { nombre:'', formato:'liga', equipos:[], clasificadosPorGrupo:2, numGrupos:2 }
+let rlModalTorneoId, rlModalCruceId, rlModalRonda
+
+function renderRelampago() {
+  const cont = document.getElementById('relampago-contenido')
+  if (!cont || !estado) return
+  if (!estado.torneosRelampago) estado.torneosRelampago = []
+  const creando = cont.dataset.creando === '1'
+  const activo = cont.dataset.torneoActivo
+  if (creando) renderCrearTorneoRL(cont)
+  else if (activo) {
+    const t = estado.torneosRelampago.find(t => t.id === activo)
+    if (t) renderTorneoRLDetalle(cont, t)
+    else renderListaTorneosRL(cont)
+  } else renderListaTorneosRL(cont)
+}
+
+function renderListaTorneosRL(cont) {
+  const torneos = estado.torneosRelampago || []
+  const fmt = { liga:'🔄 Liga', eliminatorias:'⚔️ Eliminatorias', grupos:'🌍 Grupos+Elim' }
+  let html = esAdmin ? `<button class="btn btn-primary" style="margin-bottom:16px;" onclick="iniciarCrearTorneoRL()">+ Nuevo torneo</button>` : ''
+  if (!torneos.length) {
+    html += `<div class="card"><p class="text-gris" style="text-align:center;padding:20px 0;">No hay torneos creados aún.</p></div>`
+  } else {
+    torneos.slice().reverse().forEach(t => {
+      const campLabel = t.campeon ? `<span style="color:var(--dorado2);font-weight:700;">🏆 ${t.campeon}</span>` : `<span style="color:var(--gris);">${t.equipos.length} equipos</span>`
+      html += `<div class="card" style="cursor:pointer;margin-bottom:10px;" onclick="abrirTorneoRL('${t.id}')">
+        <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;">
+          <div>
+            <div style="font-weight:700;font-size:16px;margin-bottom:4px;">${t.nombre}</div>
+            <div style="display:flex;gap:10px;align-items:center;">${campLabel}&nbsp;<span class="clasifica-badge">${fmt[t.formato]||t.formato}</span></div>
+          </div>
+          ${esAdmin?`<button onclick="event.stopPropagation();eliminarTorneoRL('${t.id}')" style="background:#fee2e2;color:#dc2626;border:none;border-radius:6px;padding:4px 10px;cursor:pointer;font-weight:700;">✕</button>`:''}
+        </div>
+      </div>`
+    })
+  }
+  cont.innerHTML = html
+}
+
+function iniciarCrearTorneoRL() {
+  rlCreando = { nombre:'', formato:'liga', equipos:[], clasificadosPorGrupo:2, numGrupos:2 }
+  const cont = document.getElementById('relampago-contenido')
+  cont.dataset.creando = '1'
+  delete cont.dataset.torneoActivo
+  renderCrearTorneoRL(cont)
+}
+
+function abrirTorneoRL(id) {
+  const cont = document.getElementById('relampago-contenido')
+  cont.dataset.torneoActivo = id
+  delete cont.dataset.creando
+  renderRelampago()
+}
+
+function volverListaRL() {
+  const cont = document.getElementById('relampago-contenido')
+  delete cont.dataset.creando
+  delete cont.dataset.torneoActivo
+  renderListaTorneosRL(cont)
+}
+
+function renderCrearTorneoRL(cont) {
+  const d = rlCreando
+  const fmtBtns = ['liga','eliminatorias','grupos'].map(f => {
+    const labels = { liga:'🔄 Liga', eliminatorias:'⚔️ Eliminatorias', grupos:'🌍 Grupos+Elim' }
+    const on = d.formato === f
+    return `<button onclick="rlSetFormato('${f}')" style="padding:8px 14px;border-radius:8px;border:2px solid ${on?'var(--dorado2)':'var(--border)'};background:${on?'rgba(245,166,35,0.1)':'var(--azul2)'};color:${on?'var(--dorado2)':'var(--gris)'};cursor:pointer;font-weight:${on?700:400};font-size:13px;">${labels[f]}</button>`
+  }).join('')
+
+  const gruposConf = d.formato==='grupos' ? `
+    <div style="display:flex;gap:16px;flex-wrap:wrap;margin-top:10px;">
+      <div><label style="display:block;font-size:12px;color:var(--gris);margin-bottom:4px;">Grupos</label>
+        <select onchange="rlCreando.numGrupos=+this.value" style="padding:7px;border-radius:6px;border:1px solid var(--border);background:var(--azul2);color:var(--texto);">
+          ${[2,3,4,6,8].map(n=>`<option value="${n}" ${d.numGrupos===n?'selected':''}>${n}</option>`).join('')}
+        </select></div>
+      <div><label style="display:block;font-size:12px;color:var(--gris);margin-bottom:4px;">Clasifican por grupo</label>
+        <select onchange="rlCreando.clasificadosPorGrupo=+this.value" style="padding:7px;border-radius:6px;border:1px solid var(--border);background:var(--azul2);color:var(--texto);">
+          ${[1,2,3,4].map(n=>`<option value="${n}" ${d.clasificadosPorGrupo===n?'selected':''}>${n}</option>`).join('')}
+        </select></div>
+    </div>` : ''
+
+  const equiposHTML = d.equipos.map((eq,i) => `
+    <div style="display:flex;gap:8px;align-items:center;margin-bottom:8px;flex-wrap:wrap;">
+      <input value="${eq.nombre}" oninput="rlCreando.equipos[${i}].nombre=this.value" placeholder="Equipo ${i+1}"
+        style="flex:1;min-width:110px;padding:7px 10px;border-radius:6px;border:1px solid var(--border);background:var(--azul2);color:var(--texto);font-size:13px;">
+      <input value="${eq.dueno}" oninput="rlCreando.equipos[${i}].dueno=this.value" placeholder="Dueño"
+        style="width:85px;padding:7px 10px;border-radius:6px;border:1px solid var(--border);background:var(--azul2);color:var(--texto);font-size:13px;">
+      <button onclick="rlQuitarEquipo(${i})" style="background:#fee2e2;color:#dc2626;border:none;border-radius:6px;padding:4px 8px;cursor:pointer;font-weight:700;font-size:12px;">✕</button>
+    </div>`).join('')
+
+  cont.innerHTML = `
+    <div style="display:flex;align-items:center;gap:10px;margin-bottom:16px;">
+      <button class="btn btn-secondary btn-sm" onclick="volverListaRL()">← Volver</button>
+      <span style="font-weight:700;font-size:16px;">Nuevo torneo</span>
+    </div>
+    <div class="card" style="margin-bottom:12px;">
+      <div class="card-titulo" style="margin-bottom:12px;">⚙️ Configuración</div>
+      <div style="margin-bottom:12px;">
+        <label style="display:block;font-size:13px;font-weight:600;color:var(--gris);margin-bottom:4px;">Nombre</label>
+        <input id="rl-nombre" value="${d.nombre}" oninput="rlCreando.nombre=this.value" placeholder="Copa Verano 2026…"
+          style="width:100%;padding:9px 12px;border-radius:8px;border:1px solid var(--border);background:var(--azul2);color:var(--texto);font-size:14px;">
+      </div>
+      <div>
+        <label style="display:block;font-size:13px;font-weight:600;color:var(--gris);margin-bottom:8px;">Formato</label>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;">${fmtBtns}</div>
+        ${gruposConf}
+      </div>
+    </div>
+    <div class="card" style="margin-bottom:12px;">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
+        <div class="card-titulo">👥 Equipos (${d.equipos.length})</div>
+        <button class="btn btn-secondary btn-sm" onclick="rlAgregarEquipo()">+ Agregar</button>
+      </div>
+      ${!d.equipos.length ? `<p class="text-gris" style="font-size:13px;">Agregá los equipos del torneo.</p>` : ''}
+      ${equiposHTML}
+    </div>
+    <div style="display:flex;gap:10px;">
+      <button class="btn btn-primary" onclick="confirmarCrearTorneoRL()">⚡ Crear torneo</button>
+      <button class="btn btn-secondary" onclick="volverListaRL()">Cancelar</button>
+    </div>`
+}
+
+function rlSetFormato(f) { rlCreando.formato=f; renderCrearTorneoRL(document.getElementById('relampago-contenido')) }
+function rlAgregarEquipo() { rlCreando.equipos.push({id:rlId(),nombre:'',dueno:''}); renderCrearTorneoRL(document.getElementById('relampago-contenido')) }
+function rlQuitarEquipo(i) { rlCreando.equipos.splice(i,1); renderCrearTorneoRL(document.getElementById('relampago-contenido')) }
+
+async function confirmarCrearTorneoRL() {
+  const d = rlCreando
+  if (!d.nombre.trim()) { toast('Ponele un nombre al torneo',true); return }
+  if (d.equipos.length < 2) { toast('Necesitás al menos 2 equipos',true); return }
+  if (d.equipos.some(e=>!e.nombre.trim())) { toast('Todos los equipos necesitan nombre',true); return }
+  const equipos = d.equipos.map(e=>({...e, nombre:e.nombre.trim(), dueno:e.dueno.trim()}))
+  const torneo = { id:rlId(), nombre:d.nombre.trim(), formato:d.formato, equipos, creadoEn:new Date().toISOString(), campeon:null }
+  if (d.formato==='liga') torneo.partidos = rlGenerarLiga(equipos)
+  else if (d.formato==='eliminatorias') torneo.rondas = rlGenerarBracket(equipos)
+  else { torneo.numGrupos=d.numGrupos; torneo.clasificadosPorGrupo=d.clasificadosPorGrupo; torneo.grupos=rlGenerarGrupos(equipos,d.numGrupos); torneo.rondas=null; torneo.faseGrupos=true }
+  if (!estado.torneosRelampago) estado.torneosRelampago=[]
+  estado.torneosRelampago.push(torneo)
+  await guardarEstado()
+  rlCreando = { nombre:'', formato:'liga', equipos:[], clasificadosPorGrupo:2, numGrupos:2 }
+  const cont = document.getElementById('relampago-contenido')
+  cont.dataset.torneoActivo = torneo.id
+  delete cont.dataset.creando
+  renderRelampago()
+  toast('¡Torneo creado!')
+}
+
+async function eliminarTorneoRL(id) {
+  if (!confirm('¿Eliminar este torneo?')) return
+  estado.torneosRelampago = estado.torneosRelampago.filter(t=>t.id!==id)
+  await guardarEstado()
+  volverListaRL()
+  toast('Torneo eliminado')
+}
+
+// ─── Fixture generators ───────────────────────────
+
+function rlGenerarLiga(equipos) {
+  const lista = equipos.length%2===0 ? equipos.map(e=>e.id) : [...equipos.map(e=>e.id),'bye']
+  const n = lista.length, rondas = n-1, partidos = []
+  let pid=1
+  for (let r=0;r<rondas;r++) {
+    for (let i=0;i<n/2;i++) {
+      const l=lista[i], v=lista[n-1-i]
+      if (l!=='bye'&&v!=='bye') partidos.push({id:`rlp_${pid++}`,jornada:r+1,local:l,visitante:v,golesLocal:null,golesVisitante:null})
+    }
+    lista.splice(1,0,lista.pop())
+  }
+  return partidos
+}
+
+function rlNombresRondas(slots) {
+  const map = {2:'final',4:'semis',8:'cuartos',16:'octavos',32:'dieciseisavos'}
+  const nombres=[]
+  let s=slots
+  while(s>1){ nombres.push(map[s]||`r${s}`); s/=2 }
+  return nombres.reverse()
+}
+
+function rlAvanzarGanadores(bracket, nombres) {
+  for (let i=0;i<nombres.length-1;i++) {
+    const ronda=bracket[nombres[i]], sig=bracket[nombres[i+1]]
+    for (let j=0;j<ronda.length;j++) {
+      if (!ronda[j].ganador) continue
+      const ci=Math.floor(j/2)
+      if (j%2===0) sig[ci].local=ronda[j].ganador; else sig[ci].visitante=ronda[j].ganador
+      const c=sig[ci]
+      if (c.local&&!c.visitante) c.ganador=c.local
+      if (c.visitante&&!c.local) c.ganador=c.visitante
+    }
+  }
+}
+
+function rlGenerarBracket(equipos) {
+  let slots=2; while(slots<equipos.length) slots*=2
+  const mezcla=[...equipos].sort(()=>Math.random()-0.5)
+  const nombres=rlNombresRondas(slots)
+  const bracket={}
+  const r1=[]
+  for (let i=0;i<slots/2;i++) {
+    const l=mezcla[i*2]||null, v=mezcla[i*2+1]||null
+    const c={id:rlId(),local:l?.id||null,visitante:v?.id||null,golesLocal:null,golesVisitante:null,ganador:null}
+    if (l&&!v) c.ganador=l.id
+    if (v&&!l) c.ganador=v.id
+    r1.push(c)
+  }
+  bracket[nombres[0]]=r1
+  for (let i=1;i<nombres.length;i++) {
+    bracket[nombres[i]]=Array.from({length:bracket[nombres[i-1]].length/2},()=>({id:rlId(),local:null,visitante:null,golesLocal:null,golesVisitante:null,ganador:null}))
+  }
+  rlAvanzarGanadores(bracket,nombres)
+  return {rondas:bracket,nombres}
+}
+
+function rlGenerarGrupos(equipos, numGrupos) {
+  const mezcla=[...equipos].sort(()=>Math.random()-0.5)
+  const grupos=Array.from({length:numGrupos},(_,i)=>({id:rlId(),nombre:`Grupo ${String.fromCharCode(65+i)}`,equiposIds:[],partidos:[]}))
+  mezcla.forEach((eq,i)=>grupos[i%numGrupos].equiposIds.push(eq.id))
+  grupos.forEach(g=>{ g.partidos=rlGenerarLiga(g.equiposIds.map(id=>({id}))) })
+  return grupos
+}
+
+// ─── Helpers ──────────────────────────────────────
+
+function rlNombre(t,id){ return t.equipos.find(e=>e.id===id)?.nombre||id }
+function rlDueno(t,id){ return t.equipos.find(e=>e.id===id)?.dueno||'' }
+function rlColor(dueno) {
+  if (!dueno) return 'var(--texto)'
+  const d=dueno.toLowerCase()
+  if (d==='santi') return '#4a9eff'
+  if (d==='luciano') return '#ff6b6b'
+  let h=0; for (const c of dueno) h=(h*31+c.charCodeAt(0))&0xffff
+  return `hsl(${h%360},65%,62%)`
+}
+
+function rlHeaderHTML(t) {
+  const fmt={liga:'🔄 Liga',eliminatorias:'⚔️ Eliminatorias',grupos:'🌍 Grupos+Elim'}
+  return `<div style="display:flex;align-items:center;gap:10px;margin-bottom:16px;flex-wrap:wrap;">
+    <button class="btn btn-secondary btn-sm" onclick="volverListaRL()">← Torneos</button>
+    <div><div style="font-weight:700;font-size:17px;">${t.nombre}</div>
+    <span class="clasifica-badge">${fmt[t.formato]||t.formato}</span></div>
+    ${esAdmin?`<button class="btn btn-danger btn-sm" style="margin-left:auto;" onclick="eliminarTorneoRL('${t.id}')">✕ Eliminar</button>`:''}
+  </div>`
+}
+
+function rlPartidoRowHTML(t, p, onchangeFn, waFn) {
+  const lN=rlNombre(t,p.local), vN=rlNombre(t,p.visitante)
+  const lC=rlColor(rlDueno(t,p.local)), vC=rlColor(rlDueno(t,p.visitante))
+  const jug=p.golesLocal!==null
+  const ganL=jug&&p.golesLocal>p.golesVisitante, ganV=jug&&p.golesVisitante>p.golesLocal
+  const waBtn=jug&&waFn?`<button onclick="event.stopPropagation();${waFn}" style="background:none;border:none;cursor:pointer;font-size:14px;padding:2px 4px;">📤</button>`:''
+  if (esAdmin) {
+    return `<div class="partido-row">
+      <div class="partido-equipo" style="color:${lC};font-weight:${ganL?700:400};">${lN}</div>
+      <div class="partido-score">
+        <input class="input score-input" type="number" min="0" max="99" value="${jug?p.golesLocal:''}" placeholder="-" id="rli_${p.id}_l" onchange="${onchangeFn}">
+        <span class="score-sep">-</span>
+        <input class="input score-input" type="number" min="0" max="99" value="${jug?p.golesVisitante:''}" placeholder="-" id="rli_${p.id}_v" onchange="${onchangeFn}">
+      </div>
+      <div class="partido-equipo derecha" style="color:${vC};font-weight:${ganV?700:400};">${vN}</div>${waBtn}
+    </div>`
+  }
+  const sc=jug?`<span style="font-size:15px;font-weight:800;color:var(--dorado2);">${p.golesLocal} - ${p.golesVisitante}</span>`:`<span style="color:var(--gris);">vs</span>`
+  return `<div class="partido-row">
+    <div class="partido-equipo" style="color:${lC};font-weight:${ganL?700:400};">${lN}</div>
+    <div style="flex-shrink:0;padding:0 10px;">${sc}</div>
+    <div class="partido-equipo derecha" style="color:${vC};font-weight:${ganV?700:400};">${vN}</div>${waBtn}
+  </div>`
+}
+
+// ─── Detalle torneo ────────────────────────────────
+
+function renderTorneoRLDetalle(cont,t) {
+  if (t.formato==='liga') renderTorneoRLLiga(cont,t)
+  else if (t.formato==='eliminatorias') renderTorneoRLElim(cont,t)
+  else renderTorneoRLGrupos(cont,t)
+}
+
+// ─── Liga ─────────────────────────────────────────
+
+function rlTabla(t, partidos) {
+  const tb={}
+  t.equipos.forEach(eq=>{ tb[eq.id]={id:eq.id,dueno:eq.dueno,pj:0,pg:0,pe:0,pp:0,gf:0,gc:0,pts:0} })
+  ;(partidos||[]).forEach(p=>{
+    if (p.golesLocal===null) return
+    const gl=p.golesLocal,gv=p.golesVisitante
+    if (!tb[p.local]||!tb[p.visitante]) return
+    tb[p.local].pj++;tb[p.visitante].pj++
+    tb[p.local].gf+=gl;tb[p.local].gc+=gv;tb[p.visitante].gf+=gv;tb[p.visitante].gc+=gl
+    if (gl>gv){tb[p.local].pg++;tb[p.local].pts+=3;tb[p.visitante].pp++}
+    else if(gv>gl){tb[p.visitante].pg++;tb[p.visitante].pts+=3;tb[p.local].pp++}
+    else{tb[p.local].pe++;tb[p.local].pts++;tb[p.visitante].pe++;tb[p.visitante].pts++}
+  })
+  return Object.values(tb).sort((a,b)=>b.pts-a.pts||(b.gf-b.gc)-(a.gf-a.gc)||b.gf-a.gf)
+}
+
+function rlTablaHTML(t, tabla) {
+  return `<div class="tabla-pos-wrap"><table class="tabla-pos" style="min-width:360px;">
+    <thead><tr><th>#</th><th style="text-align:left">Equipo</th><th>PJ</th><th>PG</th><th>PE</th><th>PP</th><th>GF</th><th>GC</th><th>DG</th><th>PTS</th></tr></thead>
+    <tbody>${tabla.map((eq,i)=>{
+      const dg=eq.gf-eq.gc, c=rlColor(eq.dueno)
+      return `<tr><td><span class="pos-num">${i+1}</span></td>
+        <td><div style="display:flex;align-items:center;gap:6px;">
+          <div style="width:8px;height:8px;border-radius:50%;background:${c};flex-shrink:0;"></div>
+          <strong>${rlNombre(t,eq.id)}</strong>
+          ${eq.dueno?`<span style="font-size:10px;color:${c};font-weight:700;">${eq.dueno}</span>`:''}
+        </div></td>
+        <td>${eq.pj}</td><td>${eq.pg}</td><td>${eq.pe}</td><td>${eq.pp}</td>
+        <td>${eq.gf}</td><td>${eq.gc}</td>
+        <td style="color:${dg>0?'#2ecc71':dg<0?'#e74c3c':'var(--gris)'}">${dg>0?'+':''}${dg}</td>
+        <td class="pts-cell">${eq.pts}</td></tr>`
+    }).join('')}</tbody>
+  </table></div>`
+}
+
+function renderTorneoRLLiga(cont,t) {
+  const tabla=rlTabla(t,t.partidos)
+  const total=(t.partidos||[]).length, jug=(t.partidos||[]).filter(p=>p.golesLocal!==null).length
+  if (jug===total&&total>0&&!t.campeon) { t.campeon=rlNombre(t,tabla[0].id); guardarEstado(); verificarCampeonRL(t) }
+  const jornadas=[...new Set((t.partidos||[]).map(p=>p.jornada))].sort((a,b)=>a-b)
+  let html=rlHeaderHTML(t)
+  if (t.campeon) html+=`<div class="card" style="text-align:center;margin-bottom:12px;padding:16px;"><div style="font-size:32px;">🏆</div><div style="font-size:18px;font-weight:900;color:var(--dorado2);">${t.campeon}</div></div>`
+  html+=`<div class="card" style="margin-bottom:12px;"><div class="card-titulo">📊 Tabla — ${jug}/${total} partidos</div>${rlTablaHTML(t,tabla)}</div>`
+  html+=`<div class="card">`
+  jornadas.forEach(j=>{
+    html+=`<div style="margin-bottom:10px;"><div style="font-size:12px;font-weight:700;color:var(--gris);text-transform:uppercase;margin-bottom:6px;">Jornada ${j}</div>`
+    ;(t.partidos||[]).filter(p=>p.jornada===j).forEach(p=>{
+      html+=rlPartidoRowHTML(t,p,`guardarPartidoRL('${t.id}','${p.id}')`,`rlCompartirLiga('${t.id}','${p.id}')`)
+    })
+    html+='</div>'
+  })
+  html+=`</div>`
+  cont.innerHTML=html
+}
+
+async function guardarPartidoRL(tid,pid) {
+  const t=estado.torneosRelampago.find(x=>x.id===tid); if(!t)return
+  const p=t.partidos.find(x=>x.id===pid); if(!p)return
+  const lEl=document.getElementById(`rli_${pid}_l`), vEl=document.getElementById(`rli_${pid}_v`)
+  if(!lEl||!vEl)return
+  p.golesLocal=lEl.value!==''?parseInt(lEl.value):null
+  p.golesVisitante=vEl.value!==''?parseInt(vEl.value):null
+  await guardarEstado()
+  renderTorneoRLLiga(document.getElementById('relampago-contenido'),t)
+}
+
+// ─── Eliminatorias ────────────────────────────────
+
+function rlBracketColHTML(t, cruces, ronda, titulo) {
+  const labels={final:'Final',semis:'Semis',cuartos:'Cuartos',octavos:'Octavos',dieciseisavos:'1/16'}
+  let html=`<div style="display:flex;flex-direction:column;width:160px;flex-shrink:0;">
+    <div class="bracket-ronda-titulo">${labels[ronda]||titulo}</div>
+    <div style="flex:1;display:flex;flex-direction:column;justify-content:space-around;">`
+  cruces.forEach(c=>{
+    const gan=c.ganador, jug=c.golesLocal!==null&&c.golesVisitante!==null
+    const lN=c.local?rlNombre(t,c.local):'—', vN=c.visitante?rlNombre(t,c.visitante):'—'
+    const lC=rlColor(rlDueno(t,c.local)), vC=rlColor(rlDueno(t,c.visitante))
+    const click=esAdmin&&c.local&&c.visitante?`onclick="abrirModalRLElim('${t.id}','${c.id}','${ronda}')" style="cursor:pointer;margin:3px 0;"`:'style="margin:3px 0;"'
+    html+=`<div ${click}>
+      <div class="bracket-cruce">
+        <div class="bracket-equipo${gan===c.local?' ganador':gan&&c.local?' perdedor':''}" style="border-radius:6px 6px 0 0;border-bottom:1px solid var(--azul3);color:${lC};">
+          <span class="bracket-nombre">${lN}</span>${jug?`<span class="bracket-goles">${c.golesLocal}</span>`:''}
+        </div>
+        <div class="bracket-equipo${gan===c.visitante?' ganador':gan&&c.visitante?' perdedor':''}" style="border-radius:0 0 6px 6px;color:${vC};">
+          <span class="bracket-nombre">${vN}</span>${jug?`<span class="bracket-goles">${c.golesVisitante}</span>`:''}
+        </div>
+      </div>
+      ${jug?`<div style="text-align:center;margin-top:2px;"><button onclick="event.stopPropagation();rlCompartirCruce('${t.id}','${c.id}','${ronda}')" style="background:none;border:none;cursor:pointer;font-size:12px;color:var(--gris);">📤</button></div>`:''}
+    </div>`
+  })
+  return html+`</div></div>`
+}
+
+function renderTorneoRLElim(cont,t) {
+  const {rondas:bracket,nombres}=t.rondas
+  rlAvanzarGanadores(bracket,nombres)
+  const campId=bracket['final']?.[0]?.ganador
+  if (campId&&!t.campeon) { t.campeon=rlNombre(t,campId); guardarEstado(); verificarCampeonRL(t) }
+  let html=rlHeaderHTML(t)
+  if (t.campeon) html+=`<div class="card" style="text-align:center;margin-bottom:12px;padding:16px;"><div style="font-size:32px;">🏆</div><div style="font-size:18px;font-weight:900;color:var(--dorado2);">${t.campeon}</div></div>`
+  html+=`<div class="bracket-scroll"><div style="display:flex;gap:0;align-items:stretch;padding:8px 0;">`
+  nombres.forEach((r,i)=>{
+    html+=rlBracketColHTML(t,bracket[r]||[],r,r)
+    if(i<nombres.length-1) html+=connectorHTML((bracket[r]||[]).length,'right')
+  })
+  html+=`</div></div><div id="rl-elim-modal"></div>`
+  cont.innerHTML=html
+}
+
+function abrirModalRLElim(tid,cid,ronda) {
+  const t=estado.torneosRelampago.find(x=>x.id===tid); if(!t)return
+  const c=t.rondas.rondas[ronda]?.find(x=>x.id===cid); if(!c)return
+  rlModalTorneoId=tid; rlModalCruceId=cid; rlModalRonda=ronda
+  const lN=rlNombre(t,c.local), vN=rlNombre(t,c.visitante)
+  const labels={final:'Final',semis:'Semifinal',cuartos:'Cuartos',octavos:'Octavos',dieciseisavos:'1/16'}
+  document.getElementById('rl-elim-modal').innerHTML=`
+    <div style="position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.6);z-index:500;display:flex;align-items:center;justify-content:center;" onclick="cerrarModalRLElim()">
+      <div class="card" style="width:300px;max-width:90vw;" onclick="event.stopPropagation()">
+        <div class="card-titulo" style="margin-bottom:12px;">${labels[ronda]||ronda}</div>
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:12px;">
+          <span style="flex:1;font-weight:600;font-size:14px;text-align:right;">${lN}</span>
+          <div style="display:flex;gap:6px;align-items:center;">
+            <input id="rl_gl" type="number" min="0" max="99" value="${c.golesLocal??''}" style="width:44px;padding:6px;text-align:center;border-radius:6px;border:1px solid var(--border);background:var(--azul2);color:var(--texto);">
+            <span>-</span>
+            <input id="rl_gv" type="number" min="0" max="99" value="${c.golesVisitante??''}" style="width:44px;padding:6px;text-align:center;border-radius:6px;border:1px solid var(--border);background:var(--azul2);color:var(--texto);">
+          </div>
+          <span style="flex:1;font-weight:600;font-size:14px;">${vN}</span>
+        </div>
+        <div style="font-size:12px;color:var(--gris);margin-bottom:8px;">Empate → elegí el ganador:</div>
+        <div style="display:flex;gap:8px;margin-bottom:14px;">
+          <button onclick="rlSetGanManual('${c.local}')" style="flex:1;padding:7px;border-radius:6px;border:2px solid ${c.ganador===c.local?'#4a9eff':'var(--border)'};background:${c.ganador===c.local?'rgba(74,158,255,0.15)':'var(--azul2)'};color:var(--texto);cursor:pointer;font-size:12px;">${lN}</button>
+          <button onclick="rlSetGanManual('${c.visitante}')" style="flex:1;padding:7px;border-radius:6px;border:2px solid ${c.ganador===c.visitante?'#ff6b6b':'var(--border)'};background:${c.ganador===c.visitante?'rgba(255,107,107,0.15)':'var(--azul2)'};color:var(--texto);cursor:pointer;font-size:12px;">${vN}</button>
+        </div>
+        <div style="display:flex;gap:8px;">
+          <button class="btn btn-primary" style="flex:1" onclick="guardarResultadoRLElim()">✅ Guardar</button>
+          <button class="btn btn-secondary" onclick="cerrarModalRLElim()">Cancelar</button>
+        </div>
+      </div>
+    </div>`
+}
+
+function rlSetGanManual(id) {
+  const t=estado.torneosRelampago.find(x=>x.id===rlModalTorneoId); if(!t)return
+  const c=t.rondas.rondas[rlModalRonda]?.find(x=>x.id===rlModalCruceId); if(!c)return
+  c.ganador=id; abrirModalRLElim(rlModalTorneoId,rlModalCruceId,rlModalRonda)
+}
+function cerrarModalRLElim() { const el=document.getElementById('rl-elim-modal'); if(el)el.innerHTML='' }
+
+async function guardarResultadoRLElim() {
+  const t=estado.torneosRelampago.find(x=>x.id===rlModalTorneoId); if(!t)return
+  const c=t.rondas.rondas[rlModalRonda]?.find(x=>x.id===rlModalCruceId); if(!c)return
+  const gl=document.getElementById('rl_gl').value, gv=document.getElementById('rl_gv').value
+  c.golesLocal=gl!==''?parseInt(gl):null; c.golesVisitante=gv!==''?parseInt(gv):null
+  if (c.golesLocal!==null&&c.golesVisitante!==null&&!c.ganador) {
+    if (c.golesLocal>c.golesVisitante) c.ganador=c.local
+    else if (c.golesVisitante>c.golesLocal) c.ganador=c.visitante
+  }
+  rlAvanzarGanadores(t.rondas.rondas,t.rondas.nombres)
+  await guardarEstado()
+  cerrarModalRLElim()
+  renderTorneoRLElim(document.getElementById('relampago-contenido'),t)
+  toast('Resultado guardado ✓')
+}
+
+// ─── Grupos + Eliminatorias ───────────────────────
+
+function renderTorneoRLGrupos(cont,t) {
+  // Check if all groups done → generate bracket
+  const todosTerminados=t.grupos.every(g=>g.partidos.every(p=>p.golesLocal!==null))
+  if (t.faseGrupos&&todosTerminados&&!t.rondas) {
+    const clasif=[]
+    t.grupos.forEach(g=>{
+      const tb=rlTablaGrupo(t,g)
+      tb.slice(0,t.clasificadosPorGrupo).forEach(eq=>clasif.push(t.equipos.find(e=>e.id===eq.id)))
+    })
+    t.rondas=rlGenerarBracket(clasif.filter(Boolean))
+    t.faseGrupos=false
+    guardarEstado()
+  }
+  let html=rlHeaderHTML(t)
+  // Bracket campeon banner
+  if (t.rondas) {
+    const {rondas:bracket,nombres}=t.rondas
+    rlAvanzarGanadores(bracket,nombres)
+    const campId=bracket['final']?.[0]?.ganador
+    if (campId&&!t.campeon) { t.campeon=rlNombre(t,campId); guardarEstado(); verificarCampeonRL(t) }
+    if (t.campeon) html+=`<div class="card" style="text-align:center;margin-bottom:12px;padding:16px;"><div style="font-size:32px;">🏆</div><div style="font-size:18px;font-weight:900;color:var(--dorado2);">${t.campeon}</div></div>`
+  }
+  // Groups
+  if (t.faseGrupos||!t.rondas) {
+    t.grupos.forEach(g=>{
+      const tb=rlTablaGrupo(t,g)
+      html+=`<div class="card" style="margin-bottom:12px;">
+        <div class="card-titulo" style="margin-bottom:10px;">📊 ${g.nombre}</div>
+        <div class="tabla-pos-wrap"><table class="tabla-pos" style="min-width:300px;"><thead><tr><th>#</th><th style="text-align:left">Equipo</th><th>PJ</th><th>PG</th><th>PE</th><th>PP</th><th>PTS</th></tr></thead>
+        <tbody>${tb.map((eq,i)=>{
+          const cl=i<t.clasificadosPorGrupo
+          return `<tr class="${cl?'clasifica':''}"><td><span class="pos-num">${i+1}</span></td>
+            <td><div style="display:flex;align-items:center;gap:6px;">
+              <div style="width:8px;height:8px;border-radius:50%;background:${rlColor(rlDueno(t,eq.id))};flex-shrink:0;"></div>
+              <strong>${rlNombre(t,eq.id)}</strong>${cl?'<span class="clasifica-badge">CLASIF.</span>':''}
+            </div></td>
+            <td>${eq.pj}</td><td>${eq.pg}</td><td>${eq.pe}</td><td>${eq.pp}</td><td class="pts-cell">${eq.pts}</td></tr>`
+        }).join('')}</tbody></table></div>
+        <div style="margin-top:10px;">${g.partidos.map(p=>rlPartidoRowHTML(t,p,`guardarPartidoRLGrupo('${t.id}','${g.id}','${p.id}')`,null)).join('')}</div>
+      </div>`
+    })
+    if (todosTerminados&&!t.rondas) {
+      html+=`<div class="card" style="text-align:center;padding:16px;"><p class="text-gris">Todos los grupos terminados. Generando fase eliminatoria…</p></div>`
+    }
+  }
+  // Bracket
+  if (t.rondas) {
+    const {rondas:bracket,nombres}=t.rondas
+    html+=`<div class="card" style="margin-bottom:12px;"><div class="card-titulo" style="margin-bottom:10px;">⚔️ Fase eliminatoria</div>
+      <div class="bracket-scroll"><div style="display:flex;gap:0;align-items:stretch;padding:8px 0;">`
+    nombres.forEach((r,i)=>{
+      html+=rlBracketColHTML(t,bracket[r]||[],r,r)
+      if(i<nombres.length-1) html+=connectorHTML((bracket[r]||[]).length,'right')
+    })
+    html+=`</div></div></div><div id="rl-elim-modal"></div>`
+  }
+  cont.innerHTML=html
+}
+
+function rlTablaGrupo(t,g) {
+  const tb={}
+  g.equiposIds.forEach(id=>{ tb[id]={id,pj:0,pg:0,pe:0,pp:0,gf:0,gc:0,pts:0} })
+  g.partidos.forEach(p=>{
+    if(p.golesLocal===null)return
+    const gl=p.golesLocal,gv=p.golesVisitante
+    if(!tb[p.local]||!tb[p.visitante])return
+    tb[p.local].pj++;tb[p.visitante].pj++
+    tb[p.local].gf+=gl;tb[p.local].gc+=gv;tb[p.visitante].gf+=gv;tb[p.visitante].gc+=gl
+    if(gl>gv){tb[p.local].pg++;tb[p.local].pts+=3;tb[p.visitante].pp++}
+    else if(gv>gl){tb[p.visitante].pg++;tb[p.visitante].pts+=3;tb[p.local].pp++}
+    else{tb[p.local].pe++;tb[p.local].pts++;tb[p.visitante].pe++;tb[p.visitante].pts++}
+  })
+  return Object.values(tb).sort((a,b)=>b.pts-a.pts||(b.gf-b.gc)-(a.gf-a.gc)||b.gf-a.gf)
+}
+
+async function guardarPartidoRLGrupo(tid,gid,pid) {
+  const t=estado.torneosRelampago.find(x=>x.id===tid); if(!t)return
+  const g=t.grupos.find(x=>x.id===gid); if(!g)return
+  const p=g.partidos.find(x=>x.id===pid); if(!p)return
+  const lEl=document.getElementById(`rli_${pid}_l`), vEl=document.getElementById(`rli_${pid}_v`)
+  if(!lEl||!vEl)return
+  p.golesLocal=lEl.value!==''?parseInt(lEl.value):null
+  p.golesVisitante=vEl.value!==''?parseInt(vEl.value):null
+  await guardarEstado()
+  renderTorneoRLGrupos(document.getElementById('relampago-contenido'),t)
+}
+
+// ─── Compartir ────────────────────────────────────
+
+function rlCompartirLiga(tid,pid) {
+  const t=estado.torneosRelampago.find(x=>x.id===tid); if(!t)return
+  const p=t.partidos.find(x=>x.id===pid); if(!p||p.golesLocal===null)return
+  const lN=rlNombre(t,p.local),vN=rlNombre(t,p.visitante)
+  const res=p.golesLocal>p.golesVisitante?`🏆 Ganó ${lN}`:p.golesVisitante>p.golesLocal?`🏆 Ganó ${vN}`:'🤝 Empate'
+  const txt=`⚽ *${t.nombre} — Jornada ${p.jornada}*\n${lN} *${p.golesLocal}* - *${p.golesVisitante}* ${vN}\n${res}\n\n⚡ Torneo de Campeones\nhttps://santiagomillan1984mm.github.io/mundial-clubes/`
+  window.open('https://wa.me/?text='+encodeURIComponent(txt),'_blank')
+}
+
+function rlCompartirCruce(tid,cid,ronda) {
+  const t=estado.torneosRelampago.find(x=>x.id===tid); if(!t)return
+  const c=t.rondas.rondas[ronda]?.find(x=>x.id===cid); if(!c||c.golesLocal===null)return
+  const labels={final:'Final',semis:'Semifinal',cuartos:'Cuartos',octavos:'Octavos',dieciseisavos:'1/16'}
+  const gan=c.ganador?`🏆 Avanzó ${rlNombre(t,c.ganador)}`:''
+  const txt=`⚽ *${t.nombre} — ${labels[ronda]||ronda}*\n${rlNombre(t,c.local)} *${c.golesLocal}* - *${c.golesVisitante}* ${rlNombre(t,c.visitante)}\n${gan}\n\n⚡ Torneo de Campeones\nhttps://santiagomillan1984mm.github.io/mundial-clubes/`
+  window.open('https://wa.me/?text='+encodeURIComponent(txt),'_blank')
+}
+
+// ─── Campeón ──────────────────────────────────────
+
+function verificarCampeonRL(t) {
+  if (!t.campeon) return
+  const dueno=t.equipos.find(e=>e.nombre===t.campeon)?.dueno||''
+  const key=`rl_${t.id}`
+  if (!campeonesYaCelebrados.has(key)) { campeonesYaCelebrados.add(key); mostrarCampeon(t.campeon,null,dueno,`⚡ ${t.nombre}`) }
 }
 
 // ══════════════════════════════════════════════

@@ -456,8 +456,13 @@ async function guardarEstado() {
   const token = getToken()
   estado.ultimaActualizacion = new Date().toISOString()
   const contenido = btoa(unescape(encodeURIComponent(JSON.stringify(estado, null, 2))))
+
+  // Siempre obtener el SHA fresco antes de guardar
+  if (!fileSha) await obtenerSha()
+
   const body = { message: 'Actualizar estado torneo', content: contenido }
   if (fileSha) body.sha = fileSha
+
   try {
     const res = await fetch(GH_API, {
       method: 'PUT',

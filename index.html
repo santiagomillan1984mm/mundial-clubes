@@ -975,7 +975,7 @@ function actualizarUIAdmin() {
 // ══════════════════════════════════════════════
 async function cargarEstado() {
   try {
-    const res = await fetch(GH_RAW + '?t=' + Date.now())
+    const res = await fetch(GH_RAW + '?t=' + Date.now(), { cache: 'no-store' })
     if (res.status === 404) {
       estado = JSON.parse(JSON.stringify(ESTADO_INICIAL))
       renderTodo()
@@ -1028,6 +1028,7 @@ async function guardarEstado() {
     if (res.ok) {
       const data = await res.json()
       fileSha = data.content.sha
+      ultimaActualizacionConocida = estado.ultimaActualizacion
       toast('¡Guardado!')
     } else if (res.status === 409) {
       // SHA desactualizado — reintentar una vez con SHA fresco
@@ -1041,6 +1042,7 @@ async function guardarEstado() {
       if (res2.ok) {
         const data2 = await res2.json()
         fileSha = data2.content.sha
+        ultimaActualizacionConocida = estado.ultimaActualizacion
         toast('¡Guardado!')
       } else {
         toast('Error al guardar (reintento fallido)', true)
@@ -3298,7 +3300,9 @@ function startPolling() {
       if (!res.ok) return
       const data = await res.json()
       if (!ultimaActualizacionConocida) { ultimaActualizacionConocida = data.ultimaActualizacion; return }
-      if (data.ultimaActualizacion && data.ultimaActualizacion !== ultimaActualizacionConocida) {
+      const esNuevo = data.ultimaActualizacion && ultimaActualizacionConocida &&
+        new Date(data.ultimaActualizacion) > new Date(ultimaActualizacionConocida)
+      if (esNuevo) {
         ultimaActualizacionConocida = data.ultimaActualizacion
         estado = data
         renderTodo()

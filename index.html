@@ -870,6 +870,7 @@ function activarAdmin() {
   localStorage.setItem('mc_token', t)
   esAdmin = true
   actualizarUIAdmin()
+  renderTodo()
   document.getElementById('admin-msg').innerHTML = '<span style="color:#2ecc71">✓ Modo admin activado.</span>'
   toast('Modo admin activado')
 }

@@ -1,6 +1,6 @@
 {
   "version": "1.0",
-  "ultimaActualizacion": "2026-06-10T00:00:25.206Z",
+  "ultimaActualizacion": "2026-06-10T00:04:31.134Z",
   "equiposArgentinos": [
     {
       "id": "arg1",
@@ -44,9 +44,154 @@
     }
   ],
   "sorteo": {
-    "realizado": false,
-    "confirmado": false,
-    "internacionales": []
+    "realizado": true,
+    "confirmado": true,
+    "internacionales": [
+      {
+        "id": "int_s1",
+        "nombre": "NAC Breda",
+        "liga": "Países Bajos - Eredivisie",
+        "dueno": "santi"
+      },
+      {
+        "id": "int_s2",
+        "nombre": "Gangwon FC",
+        "liga": "Corea del Sur - K League 1",
+        "dueno": "santi"
+      },
+      {
+        "id": "int_s3",
+        "nombre": "Wisła Płock",
+        "liga": "Polonia - Ekstraklasa",
+        "dueno": "santi"
+      },
+      {
+        "id": "int_s4",
+        "nombre": "IF Brommapojkarna",
+        "liga": "Suecia - Allsvenskan",
+        "dueno": "santi"
+      },
+      {
+        "id": "int_s5",
+        "nombre": "Malmö FF",
+        "liga": "Suecia - Allsvenskan",
+        "dueno": "santi"
+      },
+      {
+        "id": "int_s6",
+        "nombre": "SC Braga",
+        "liga": "Portugal - Liga Portugal",
+        "dueno": "santi"
+      },
+      {
+        "id": "int_s7",
+        "nombre": "Hibernian",
+        "liga": "Escocia - Premiership",
+        "dueno": "santi"
+      },
+      {
+        "id": "int_s8",
+        "nombre": "Girona FC",
+        "liga": "España - LaLiga",
+        "dueno": "santi"
+      },
+      {
+        "id": "int_s9",
+        "nombre": "AD Alcorcón",
+        "liga": "España - LaLiga Hypermotion",
+        "dueno": "santi"
+      },
+      {
+        "id": "int_s10",
+        "nombre": "CD Eldense",
+        "liga": "España - LaLiga Hypermotion",
+        "dueno": "santi"
+      },
+      {
+        "id": "int_s11",
+        "nombre": "Racing de Ferrol",
+        "liga": "España - LaLiga Hypermotion",
+        "dueno": "santi"
+      },
+      {
+        "id": "int_s12",
+        "nombre": "Punjab FC",
+        "liga": "India - ISL",
+        "dueno": "santi"
+      },
+      {
+        "id": "int_s13",
+        "nombre": "West Bromwich Albion",
+        "liga": "Inglaterra - Championship",
+        "dueno": "santi"
+      },
+      {
+        "id": "int_l1",
+        "nombre": "Perth Glory",
+        "liga": "Australia - A-League",
+        "dueno": "luciano"
+      },
+      {
+        "id": "int_l2",
+        "nombre": "BK Häcken",
+        "liga": "Suecia - Allsvenskan",
+        "dueno": "luciano"
+      },
+      {
+        "id": "int_l3",
+        "nombre": "Silkeborg IF",
+        "liga": "Dinamarca - Superliga",
+        "dueno": "luciano"
+      },
+      {
+        "id": "int_l4",
+        "nombre": "AZ Alkmaar",
+        "liga": "Países Bajos - Eredivisie",
+        "dueno": "luciano"
+      },
+      {
+        "id": "int_l5",
+        "nombre": "Fortuna Sittard",
+        "liga": "Países Bajos - Eredivisie",
+        "dueno": "luciano"
+      },
+      {
+        "id": "int_l6",
+        "nombre": "Wolfsberger AC",
+        "liga": "Austria - Bundesliga",
+        "dueno": "luciano"
+      },
+      {
+        "id": "int_l7",
+        "nombre": "Motor Lublin",
+        "liga": "Polonia - Ekstraklasa",
+        "dueno": "luciano"
+      },
+      {
+        "id": "int_l8",
+        "nombre": "Westerlo",
+        "liga": "Bélgica - Pro League",
+        "dueno": "luciano"
+      },
+      {
+        "id": "int_l9",
+        "nombre": "Changchun Yatai",
+        "liga": "China - Super League",
+        "dueno": "luciano"
+      },
+      {
+        "id": "int_l10",
+        "nombre": "Bologna FC 1909",
+        "liga": "Italia - Serie A",
+        "dueno": "luciano"
+      },
+      {
+        "id": "int_l11",
+        "nombre": "Al-Okhdood",
+        "liga": "Arabia Saudita - Pro League",
+        "dueno": "luciano"
+      }
+    ]
   },
   "bracket": {
     "dieciseisavos": [],

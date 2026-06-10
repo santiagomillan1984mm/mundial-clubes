@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Mundial de Clubes</title>
+  <title>Torneo de Campeones</title>
   <link rel="manifest" href="manifest.json" />
   <meta name="theme-color" content="#1a1a2e" />
   <style>
@@ -577,13 +577,45 @@
     .pool-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; background: var(--border); }
     .pool-dot.santi { background: #4a9eff; }
     .pool-dot.luciano { background: #ff6b6b; }
+
+    /* LOGOS */
+    .eq-logo {
+      width: 28px; height: 28px;
+      object-fit: contain;
+      flex-shrink: 0;
+      border-radius: 2px;
+    }
+    .eq-logo-sm {
+      width: 20px; height: 20px;
+      object-fit: contain;
+      flex-shrink: 0;
+    }
+    .eq-logo-lg {
+      width: 36px; height: 36px;
+      object-fit: contain;
+      flex-shrink: 0;
+    }
+    .logo-init {
+      display: flex; align-items: center; justify-content: center;
+      border-radius: 50%;
+      background: var(--azul3);
+      color: var(--dorado2);
+      font-weight: 800;
+      flex-shrink: 0;
+      line-height: 1;
+    }
+    /* Mejoras visuales generales */
+    .card { box-shadow: 0 2px 12px rgba(0,0,0,0.3); }
+    header { box-shadow: 0 2px 10px rgba(0,0,0,0.4); }
+    .bracket-equipo { transition: background 0.15s, opacity 0.15s; }
+    .bracket-equipo.ganador { box-shadow: inset 0 0 8px rgba(46,204,113,0.2); }
   </style>
 </head>
 <body>
 
 <header>
   <div class="header-title">
-    <span>🏆</span> Mundial de Clubes
+    <span>🏆</span> Torneo de Campeones
   </div>
   <div id="admin-status" style="font-size:12px; color: var(--gris);">Solo lectura</div>
 </header>
@@ -705,37 +737,38 @@ let fileSha = null
 let esAdmin = false
 let poolClubes = []
 
+const W = 'https://en.wikipedia.org/wiki/Special:FilePath/'
 const POOL_ARG = [
-  { id:'pa1',  nombre:'Boca Juniors' },
-  { id:'pa2',  nombre:'River Plate' },
-  { id:'pa3',  nombre:'Racing Club' },
-  { id:'pa4',  nombre:'Rosario Central' },
-  { id:'pa5',  nombre:'Estudiantes' },
-  { id:'pa6',  nombre:'Vélez Sarsfield' },
-  { id:'pa7',  nombre:'Lanús' },
-  { id:'pa8',  nombre:'Argentinos Juniors' },
-  { id:'pa9',  nombre:'Talleres' },
-  { id:'pa10', nombre:'Independiente' },
-  { id:'pa11', nombre:'Belgrano' },
-  { id:'pa12', nombre:'San Lorenzo' },
-  { id:'pa13', nombre:'Independiente Rivadavia' },
-  { id:'pa14', nombre:'Defensa y Justicia' },
-  { id:'pa15', nombre:'Huracán' },
-  { id:'pa16', nombre:'Platense' },
-  { id:'pa17', nombre:'Instituto' },
-  { id:'pa18', nombre:'Atlético Tucumán' },
-  { id:'pa19', nombre:'Tigre' },
-  { id:'pa20', nombre:'Unión de Santa Fe' },
-  { id:'pa21', nombre:'Barracas Central' },
-  { id:'pa22', nombre:'Banfield' },
-  { id:'pa23', nombre:"Newell's Old Boys" },
-  { id:'pa24', nombre:'Aldosivi' },
-  { id:'pa25', nombre:'Gimnasia La Plata' },
-  { id:'pa26', nombre:'Sarmiento' },
-  { id:'pa27', nombre:'Godoy Cruz' },
-  { id:'pa28', nombre:'Central Córdoba' },
-  { id:'pa29', nombre:'Deportivo Riestra' },
-  { id:'pa30', nombre:'San Martín de San Juan' },
+  { id:'pa1',  nombre:'Boca Juniors',            logo: W+'Club_Atlético_Boca_Juniors_logo.svg' },
+  { id:'pa2',  nombre:'River Plate',             logo: W+'Escudo_del_Club_Atletico_River_Plate.svg' },
+  { id:'pa3',  nombre:'Racing Club',             logo: W+'Racing_Club_de_Avellaneda_Logo.svg' },
+  { id:'pa4',  nombre:'Rosario Central',         logo: W+'Rosario_Central_logo.svg' },
+  { id:'pa5',  nombre:'Estudiantes',             logo: W+'Estudiantes_de_La_Plata_logo.svg' },
+  { id:'pa6',  nombre:'Vélez Sarsfield',         logo: W+'Vélez_Sársfield_logo.svg' },
+  { id:'pa7',  nombre:'Lanús',                   logo: W+'Club_Atlético_Lanús_logo.svg' },
+  { id:'pa8',  nombre:'Argentinos Juniors',      logo: W+'Argentinos_Juniors_logo.svg' },
+  { id:'pa9',  nombre:'Talleres',                logo: W+'Club_Atlético_Talleres_(Córdoba)_logo.svg' },
+  { id:'pa10', nombre:'Independiente',           logo: W+'Club_Atlético_Independiente_logo.svg' },
+  { id:'pa11', nombre:'Belgrano',                logo: W+'Club_Atlético_Belgrano_(Córdoba)_logo.svg' },
+  { id:'pa12', nombre:'San Lorenzo',             logo: W+'San_Lorenzo_de_Almagro_logo.svg' },
+  { id:'pa13', nombre:'Indep. Rivadavia',        logo: W+'Independiente_Rivadavia_logo.svg' },
+  { id:'pa14', nombre:'Defensa y Justicia',      logo: W+'Defensa_y_Justicia_logo.svg' },
+  { id:'pa15', nombre:'Huracán',                 logo: W+'Club_Atlético_Huracán_(Argentina)_logo.svg' },
+  { id:'pa16', nombre:'Platense',                logo: W+'Club_Atlético_Platense_logo.svg' },
+  { id:'pa17', nombre:'Instituto',               logo: W+'Instituto_Atlético_Central_Córdoba_logo.svg' },
+  { id:'pa18', nombre:'Atlético Tucumán',        logo: W+'Club_Atlético_Tucumán_logo.svg' },
+  { id:'pa19', nombre:'Tigre',                   logo: W+'Club_Atlético_Tigre_logo.svg' },
+  { id:'pa20', nombre:'Unión de Santa Fe',       logo: W+'Club_Unión_(Santa_Fe)_logo.svg' },
+  { id:'pa21', nombre:'Barracas Central',        logo: W+'Barracas_Central_logo.svg' },
+  { id:'pa22', nombre:'Banfield',                logo: W+'Club_Atlético_Banfield_logo.svg' },
+  { id:'pa23', nombre:"Newell's",                logo: W+"Newell's_Old_Boys_Logo.svg" },
+  { id:'pa24', nombre:'Aldosivi',                logo: W+'Club_Atlético_Aldosivi_logo.svg' },
+  { id:'pa25', nombre:'Gimnasia LP',             logo: W+'Gimnasia_y_Esgrima_La_Plata_logo.svg' },
+  { id:'pa26', nombre:'Sarmiento',               logo: W+'Club_Atlético_Sarmiento_(Junín)_logo.svg' },
+  { id:'pa27', nombre:'Godoy Cruz',              logo: W+'Godoy_Cruz_Antonio_Tomba_logo.svg' },
+  { id:'pa28', nombre:'Central Córdoba',         logo: W+'Central_Córdoba_(Santiago_del_Estero)_logo.svg' },
+  { id:'pa29', nombre:'Dep. Riestra',            logo: W+'Club_Deportivo_Riestra_logo.svg' },
+  { id:'pa30', nombre:'San Martín SJ',           logo: W+'San_Martín_(San_Juan)_logo.svg' },
 ]
 
 const ESTADO_INICIAL = {
@@ -1264,8 +1297,10 @@ function renderEquipoCard(eqId, goles, ganador, esTop) {
   if (ganador && ganador === eqId) cls += ' ganador'
   else if (ganador && ganador !== eqId && eqId) cls += ' perdedor'
   const radio = esTop ? 'border-radius:6px 6px 0 0;border-bottom:1px solid var(--azul3);' : 'border-radius:0 0 6px 6px;'
+  // Mostrar logo si el id es del pool argentino (pa*)
+  const logoTag = eqId && eqId.startsWith('pa') ? `<span style="display:flex;align-items:center;margin-right:5px;flex-shrink:0;">${logoHTML(eqId, 18)}</span>` : ''
   return `<div class="${cls}" style="${radio}">
-    <span class="bracket-nombre">${nombre}</span>
+    ${logoTag}<span class="bracket-nombre">${nombre}</span>
     ${goles !== null && goles !== undefined && goles !== '' ? `<span class="bracket-goles">${goles}</span>` : ''}
   </div>`
 }
@@ -1505,6 +1540,24 @@ function getPoolNombre(id) {
   return p ? p.nombre : id
 }
 
+function getPoolLogo(id) {
+  const p = (estado.poolArgentino || POOL_ARG).find(e => e.id === id)
+  return p ? p.logo : null
+}
+
+function logoHTML(id, size = 28) {
+  const logo = getPoolLogo(id)
+  const nombre = getPoolNombre(id)
+  const ini = nombre.split(' ').map(w => w[0]).filter(Boolean).slice(0, 2).join('').toUpperCase()
+  const fs = Math.max(8, Math.floor(size * 0.34))
+  if (logo) {
+    return `<img class="eq-logo" style="width:${size}px;height:${size}px;" src="${logo}" alt="${nombre}"
+      onerror="this.style.display='none';this.nextSibling.style.display='flex';">
+      <div class="logo-init" style="width:${size}px;height:${size}px;font-size:${fs}px;display:none;">${ini}</div>`
+  }
+  return `<div class="logo-init" style="width:${size}px;height:${size}px;font-size:${fs}px;">${ini}</div>`
+}
+
 function calcularTablaLiga() {
   const tabla = {}
   for (const eq of (estado.ligaAfa.equipos || [])) {
@@ -1580,9 +1633,11 @@ function renderLiga() {
           return `<tr class="${clasifica ? 'clasifica' : ''}">
             <td><span class="pos-num">${i+1}</span></td>
             <td>
-              <span class="badge-${eq.dueno}" style="font-size:10px;padding:1px 6px;margin-right:4px;">${eq.dueno === 'santi' ? 'S' : 'L'}</span>
-              <strong>${getPoolNombre(eq.id)}</strong>
-              ${clasifica ? '<span class="clasifica-badge">TOP 8</span>' : ''}
+              <div style="display:flex;align-items:center;gap:6px;">
+                ${logoHTML(eq.id, 22)}
+                <strong>${getPoolNombre(eq.id)}</strong>
+                ${clasifica ? '<span class="clasifica-badge">TOP 8</span>' : ''}
+              </div>
             </td>
             <td>${eq.pj}</td><td>${eq.pg}</td><td>${eq.pe}</td><td>${eq.pp}</td>
             <td>${eq.gf}</td><td>${eq.gc}</td>
@@ -1616,20 +1671,28 @@ function renderLiga() {
         const esGanadorVisit = p.golesVisitante !== null && p.golesVisitante > p.golesLocal
         if (esAdmin) {
           return `<div class="partido-row">
-            <span class="partido-equipo" style="color:${dLocal==='santi'?'#4a9eff':'#ff6b6b'};font-weight:${esGanadorLocal?'700':'400'}">${localN}</span>
+            <div class="partido-equipo" style="display:flex;align-items:center;gap:6px;color:${dLocal==='santi'?'#4a9eff':'#ff6b6b'};font-weight:${esGanadorLocal?'700':'400'}">
+              ${logoHTML(p.local, 20)}<span>${localN}</span>
+            </div>
             <div class="partido-score">
               <input class="input score-input" type="number" min="0" max="99" value="${gl}" placeholder="-" id="gl_${p.id}" onchange="guardarPartidoLiga('${p.id}')">
               <span class="score-sep">-</span>
               <input class="input score-input" type="number" min="0" max="99" value="${gv}" placeholder="-" id="gv_${p.id}" onchange="guardarPartidoLiga('${p.id}')">
             </div>
-            <span class="partido-equipo derecha" style="color:${dVisit==='santi'?'#4a9eff':'#ff6b6b'};font-weight:${esGanadorVisit?'700':'400'}">${visitN}</span>
+            <div class="partido-equipo derecha" style="display:flex;align-items:center;justify-content:flex-end;gap:6px;color:${dVisit==='santi'?'#4a9eff':'#ff6b6b'};font-weight:${esGanadorVisit?'700':'400'}">
+              <span>${visitN}</span>${logoHTML(p.visitante, 20)}
+            </div>
           </div>`
         } else {
           const sc = p.golesLocal !== null ? `${p.golesLocal} - ${p.golesVisitante}` : 'vs'
           return `<div class="partido-row">
-            <span class="partido-equipo" style="color:${dLocal==='santi'?'#4a9eff':'#ff6b6b'};font-weight:${esGanadorLocal?'700':'400'}">${localN}</span>
+            <div class="partido-equipo" style="display:flex;align-items:center;gap:6px;color:${dLocal==='santi'?'#4a9eff':'#ff6b6b'};font-weight:${esGanadorLocal?'700':'400'}">
+              ${logoHTML(p.local, 20)}<span>${localN}</span>
+            </div>
             <span style="flex-shrink:0;font-weight:700;color:var(--dorado2);padding:0 10px;">${sc}</span>
-            <span class="partido-equipo derecha" style="color:${dVisit==='santi'?'#4a9eff':'#ff6b6b'};font-weight:${esGanadorVisit?'700':'400'}">${visitN}</span>
+            <div class="partido-equipo derecha" style="display:flex;align-items:center;justify-content:flex-end;gap:6px;color:${dVisit==='santi'?'#4a9eff':'#ff6b6b'};font-weight:${esGanadorVisit?'700':'400'}">
+              <span>${visitN}</span>${logoHTML(p.visitante, 20)}
+            </div>
           </div>`
         }
       }).join('')}
@@ -1666,10 +1729,11 @@ function renderLigaConfig(cont) {
         if (isLuc) cls += ' seleccionado-luciano'
         const dotCls = isSanti ? 'santi' : isLuc ? 'luciano' : ''
         return `<div class="${cls}" id="pi_${eq.id}" onclick="togglePoolLiga('${eq.id}')">
-          <div class="pool-dot ${dotCls}" id="dot_${eq.id}"></div>
-          <span>${eq.nombre}</span>
-          ${isSanti ? '<span class="badge-santi" style="font-size:10px;margin-left:auto;">S</span>' : ''}
-          ${isLuc ? '<span class="badge-luciano" style="font-size:10px;margin-left:auto;">L</span>' : ''}
+          <div class="pool-dot ${dotCls}" id="dot_${eq.id}" style="display:none;"></div>
+          ${logoHTML(eq.id, 26)}
+          <span style="flex:1;">${eq.nombre}</span>
+          ${isSanti ? '<span class="badge-santi" style="font-size:10px;padding:1px 7px;">S</span>' : ''}
+          ${isLuc ? '<span class="badge-luciano" style="font-size:10px;padding:1px 7px;">L</span>' : ''}
         </div>`
       }).join('')}
     </div>
@@ -1767,11 +1831,11 @@ function actualizarTablaLigaDOM(tabla) {
     const clasifica = i < 8
     return `<tr class="${clasifica ? 'clasifica' : ''}">
       <td><span class="pos-num">${i+1}</span></td>
-      <td>
-        <span class="badge-${eq.dueno}" style="font-size:10px;padding:1px 6px;margin-right:4px;">${eq.dueno === 'santi' ? 'S' : 'L'}</span>
+      <td><div style="display:flex;align-items:center;gap:6px;">
+        ${logoHTML(eq.id, 22)}
         <strong>${getPoolNombre(eq.id)}</strong>
         ${clasifica ? '<span class="clasifica-badge">TOP 8</span>' : ''}
-      </td>
+      </div></td>
       <td>${eq.pj}</td><td>${eq.pg}</td><td>${eq.pe}</td><td>${eq.pp}</td>
       <td>${eq.gf}</td><td>${eq.gc}</td>
       <td style="color:${dg>0?'#2ecc71':dg<0?'#e74c3c':'var(--gris)'}">${dg>0?'+':''}${dg}</td>
@@ -1810,11 +1874,10 @@ async function resetLiga() {
 function renderClasifItems(tabla, n) {
   if (!tabla.length) return '<p class="text-gris">Aún no hay partidos jugados.</p>'
   return tabla.slice(0, n).map((eq, i) => {
-    const dg = eq.gf - eq.gc
     return `<div class="clasif-item">
       <span class="clasif-pos">${i+1}</span>
-      <span class="pool-dot ${eq.dueno}" style="width:8px;height:8px;flex-shrink:0;border-radius:50%;"></span>
-      <span class="clasif-nombre">${getPoolNombre(eq.id)}</span>
+      ${logoHTML(eq.id, 22)}
+      <span class="clasif-nombre" style="color:${eq.dueno==='santi'?'#4a9eff':'#ff6b6b'}">${getPoolNombre(eq.id)}</span>
       <span style="font-size:11px;color:var(--gris);margin-right:6px;">${eq.pj}PJ</span>
       <span class="clasif-pts">${eq.pts}pts</span>
     </div>`
@@ -1888,10 +1951,10 @@ function renderCopaConfig(cont) {
         const isLuc = extrasLuciano.includes(eq.id)
         let cls = 'pool-item' + (isSanti ? ' seleccionado-santi' : isLuc ? ' seleccionado-luciano' : '')
         return `<div class="${cls}" id="cpi_${eq.id}" onclick="togglePoolCopa('${eq.id}')">
-          <div class="pool-dot ${isSanti ? 'santi' : isLuc ? 'luciano' : ''}" id="cdot_${eq.id}"></div>
-          <span>${eq.nombre}</span>
-          ${isSanti ? '<span class="badge-santi" style="font-size:10px;margin-left:auto;">S</span>' : ''}
-          ${isLuc ? '<span class="badge-luciano" style="font-size:10px;margin-left:auto;">L</span>' : ''}
+          ${logoHTML(eq.id, 26)}
+          <span style="flex:1;">${eq.nombre}</span>
+          ${isSanti ? '<span class="badge-santi" style="font-size:10px;padding:1px 7px;">S</span>' : ''}
+          ${isLuc ? '<span class="badge-luciano" style="font-size:10px;padding:1px 7px;">L</span>' : ''}
         </div>`
       }).join('')}
     </div>
@@ -2054,8 +2117,9 @@ function renderCopaBracket(cont) {
     if (ganador && ganador === id) cls += ' ganador'
     else if (ganador && ganador !== id && id) cls += ' perdedor'
     const radio = esTop ? 'border-radius:6px 6px 0 0;border-bottom:1px solid var(--azul3);' : 'border-radius:0 0 6px 6px;'
+    const logoTag = id && id.startsWith('pa') ? `<span style="display:flex;align-items:center;margin-right:5px;flex-shrink:0;">${logoHTML(id, 18)}</span>` : ''
     return `<div class="${cls}" style="${radio}">
-      <span class="bracket-nombre">${nombre}</span>
+      ${logoTag}<span class="bracket-nombre">${nombre}</span>
       ${goles !== null && goles !== undefined ? `<span class="bracket-goles">${goles}</span>` : ''}
     </div>`
   }

@@ -1,6 +1,6 @@
 {
   "version": "1.0",
-  "ultimaActualizacion": "2026-06-10T00:11:09.417Z",
+  "ultimaActualizacion": "2026-06-10T00:15:41.377Z",
   "equiposArgentinos": [
     {
       "id": "arg1",
@@ -44,9 +44,154 @@
     }
   ],
   "sorteo": {
-    "realizado": false,
-    "confirmado": false,
-    "internacionales": []
+    "realizado": true,
+    "confirmado": true,
+    "internacionales": [
+      {
+        "id": "int_s1",
+        "nombre": "St Mirren",
+        "liga": "Escocia - Premiership",
+        "dueno": "santi"
+      },
+      {
+        "id": "int_s2",
+        "nombre": "Malmö FF",
+        "liga": "Suecia - Allsvenskan",
+        "dueno": "santi"
+      },
+      {
+        "id": "int_s3",
+        "nombre": "Gil Vicente",
+        "liga": "Portugal - Liga Portugal",
+        "dueno": "santi"
+      },
+      {
+        "id": "int_s4",
+        "nombre": "Columbus Crew",
+        "liga": "Estados Unidos - MLS",
+        "dueno": "santi"
+      },
+      {
+        "id": "int_s5",
+        "nombre": "Al-Ettifaq",
+        "liga": "Arabia Saudita - Pro League",
+        "dueno": "santi"
+      },
+      {
+        "id": "int_s6",
+        "nombre": "Drogheda United",
+        "liga": "Irlanda - Premier Division",
+        "dueno": "santi"
+      },
+      {
+        "id": "int_s7",
+        "nombre": "CA Osasuna",
+        "liga": "España - LaLiga",
+        "dueno": "santi"
+      },
+      {
+        "id": "int_s8",
+        "nombre": "Al-Fayha",
+        "liga": "Arabia Saudita - Pro League",
+        "dueno": "santi"
+      },
+      {
+        "id": "int_s9",
+        "nombre": "Nashville SC",
+        "liga": "Estados Unidos - MLS",
+        "dueno": "santi"
+      },
+      {
+        "id": "int_s10",
+        "nombre": "Atalanta",
+        "liga": "Italia - Serie A",
+        "dueno": "santi"
+      },
+      {
+        "id": "int_s11",
+        "nombre": "Sepsi OSK",
+        "liga": "Rumania - SuperLiga",
+        "dueno": "santi"
+      },
+      {
+        "id": "int_s12",
+        "nombre": "Çaykur Rizespor",
+        "liga": "Turquía - Süper Lig",
+        "dueno": "santi"
+      },
+      {
+        "id": "int_s13",
+        "nombre": "Damac",
+        "liga": "Arabia Saudita - Pro League",
+        "dueno": "santi"
+      },
+      {
+        "id": "int_l1",
+        "nombre": "Lechia Gdańsk",
+        "liga": "Polonia - Ekstraklasa",
+        "dueno": "luciano"
+      },
+      {
+        "id": "int_l2",
+        "nombre": "SCR Altach",
+        "liga": "Austria - Bundesliga",
+        "dueno": "luciano"
+      },
+      {
+        "id": "int_l3",
+        "nombre": "BK Häcken",
+        "liga": "Suecia - Allsvenskan",
+        "dueno": "luciano"
+      },
+      {
+        "id": "int_l4",
+        "nombre": "Girondins de Bordeaux",
+        "liga": "Francia - Ligue 1",
+        "dueno": "luciano"
+      },
+      {
+        "id": "int_l5",
+        "nombre": "Hatayspor",
+        "liga": "Turquía - Süper Lig",
+        "dueno": "luciano"
+      },
+      {
+        "id": "int_l6",
+        "nombre": "Crawley Town",
+        "liga": "Inglaterra - League One",
+        "dueno": "luciano"
+      },
+      {
+        "id": "int_l7",
+        "nombre": "CD Nacional",
+        "liga": "Portugal - Liga Portugal",
+        "dueno": "luciano"
+      },
+      {
+        "id": "int_l8",
+        "nombre": "Cardiff City",
+        "liga": "Inglaterra - Championship",
+        "dueno": "luciano"
+      },
+      {
+        "id": "int_l9",
+        "nombre": "FC Voluntari",
+        "liga": "Rumania - SuperLiga",
+        "dueno": "luciano"
+      },
+      {
+        "id": "int_l10",
+        "nombre": "Bristol City",
+        "liga": "Inglaterra - Championship",
+        "dueno": "luciano"
+      },
+      {
+        "id": "int_l11",
+        "nombre": "Stoke City",
+        "liga": "Inglaterra - Championship",
+        "dueno": "luciano"
+      }
+    ]
   },
   "bracket": {
     "dieciseisavos": [],

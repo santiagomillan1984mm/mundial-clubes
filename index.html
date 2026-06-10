@@ -985,7 +985,17 @@ function actualizarUIAdmin() {
 // ══════════════════════════════════════════════
 async function cargarEstado() {
   try {
-    const res = await fetch(GH_RAW + '?t=' + Date.now(), { cache: 'no-store' })
+    const token = getToken()
+    let res
+    if (token) {
+      // Admin: usar API (no tiene caché de CDN)
+      res = await fetch(GH_API, {
+        cache: 'no-store',
+        headers: { 'Authorization': `token ${token}`, 'Accept': 'application/vnd.github.v3.raw' }
+      })
+    } else {
+      res = await fetch(GH_RAW + '?t=' + Date.now(), { cache: 'no-store' })
+    }
     if (res.status === 404) {
       estado = JSON.parse(JSON.stringify(ESTADO_INICIAL))
       renderTodo()
@@ -993,7 +1003,7 @@ async function cargarEstado() {
     }
     estado = await res.json()
     ultimaActualizacionConocida = estado.ultimaActualizacion || null
-    if (esAdmin) await obtenerSha()
+    if (token) await obtenerSha()
     renderTodo()
   } catch(e) {
     console.error(e)

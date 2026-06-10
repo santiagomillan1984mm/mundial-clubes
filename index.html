@@ -628,7 +628,11 @@
   <div class="header-title">
     <span>🏆</span> Torneo de Campeones
   </div>
-  <div id="admin-status" style="font-size:12px; color: var(--gris);">Solo lectura</div>
+  <div style="display:flex;align-items:center;gap:10px;">
+    <button id="btn-notif" onclick="solicitarNotificaciones()" title="Activar notificaciones"
+      style="background:none;border:none;font-size:18px;cursor:pointer;color:var(--gris);padding:4px;">🔕</button>
+    <div id="admin-status" style="font-size:12px; color: var(--gris);">Solo lectura</div>
+  </div>
 </header>
 
 <nav>
@@ -735,6 +739,8 @@ let estado = null
 let fileSha = null
 let esAdmin = false
 let poolClubes = []
+let ultimaActualizacionConocida = null
+let pollingInterval = null
 
 // Artículo de Wikipedia para cada club (usado para obtener el logo vía REST API)
 const WIKI_ARTICLES = {
@@ -927,6 +933,7 @@ async function cargarEstado() {
       return
     }
     estado = await res.json()
+    ultimaActualizacionConocida = estado.ultimaActualizacion || null
     if (esAdmin) await obtenerSha()
     renderTodo()
   } catch(e) {
@@ -3134,6 +3141,58 @@ function toast(msg, error = false) {
 }
 
 // ══════════════════════════════════════════════
+// POLLING — ACTUALIZACIONES EN VIVO
+// ══════════════════════════════════════════════
+function startPolling() {
+  if (pollingInterval) clearInterval(pollingInterval)
+  pollingInterval = setInterval(async () => {
+    try {
+      const res = await fetch(GH_RAW + '?t=' + Date.now())
+      if (!res.ok) return
+      const data = await res.json()
+      if (!ultimaActualizacionConocida) { ultimaActualizacionConocida = data.ultimaActualizacion; return }
+      if (data.ultimaActualizacion && data.ultimaActualizacion !== ultimaActualizacionConocida) {
+        ultimaActualizacionConocida = data.ultimaActualizacion
+        estado = data
+        renderTodo()
+        toast('🔔 ¡Nuevo resultado disponible!')
+        if (Notification.permission === 'granted') {
+          new Notification('Torneo de Campeones', { body: '¡Se cargó un nuevo resultado!', icon: '/mundial-clubes/icon-192.png' })
+        }
+      }
+    } catch(e) {}
+  }, 30000)
+}
+
+function solicitarNotificaciones() {
+  if (!('Notification' in window)) { toast('Tu navegador no soporta notificaciones', true); return }
+  if (Notification.permission === 'granted') { toast('Las notificaciones ya están activas ✓'); return }
+  Notification.requestPermission().then(p => {
+    if (p === 'granted') {
+      toast('🔔 Notificaciones activadas')
+      actualizarBtnNotif()
+    } else {
+      toast('Permiso denegado', true)
+    }
+  })
+}
+
+function actualizarBtnNotif() {
+  const btn = document.getElementById('btn-notif')
+  if (!btn) return
+  if (!('Notification' in window)) { btn.style.display = 'none'; return }
+  if (Notification.permission === 'granted') {
+    btn.textContent = '🔔'
+    btn.title = 'Notificaciones activas'
+    btn.style.color = 'var(--dorado2)'
+  } else {
+    btn.textContent = '🔕'
+    btn.title = 'Activar notificaciones'
+    btn.style.color = 'var(--gris)'
+  }
+}
+
+// ══════════════════════════════════════════════
 // INIT
 // ══════════════════════════════════════════════
 async function init() {
@@ -3142,6 +3201,8 @@ async function init() {
   await cargarPool()
   await cargarEstado()
   actualizarUIAdmin()
+  actualizarBtnNotif()
+  startPolling()
   // Cargar logos en segundo plano; re-renderizar cuando terminen
   renderTodo()
   loadLogos().then(() => renderTodo())

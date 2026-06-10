@@ -737,39 +737,99 @@ let fileSha = null
 let esAdmin = false
 let poolClubes = []
 
-const W = 'https://en.wikipedia.org/wiki/Special:FilePath/'
+// Artículo de Wikipedia para cada club (usado para obtener el logo vía REST API)
+const WIKI_ARTICLES = {
+  pa1:  'Club_Atlético_Boca_Juniors',
+  pa2:  'Club_Atlético_River_Plate',
+  pa3:  'Racing_Club_de_Avellaneda',
+  pa4:  'Rosario_Central',
+  pa5:  'Estudiantes_de_La_Plata',
+  pa6:  'Vélez_Sársfield',
+  pa7:  'Club_Atlético_Lanús',
+  pa8:  'Argentinos_Juniors',
+  pa9:  'Club_Atlético_Talleres_(Córdoba)',
+  pa10: 'Club_Atlético_Independiente',
+  pa11: 'Club_Atlético_Belgrano_(Córdoba)',
+  pa12: 'San_Lorenzo_de_Almagro',
+  pa13: 'Independiente_Rivadavia',
+  pa14: 'Defensa_y_Justicia',
+  pa15: 'Club_Atlético_Huracán',
+  pa16: 'Club_Atlético_Platense',
+  pa17: 'Instituto_de_Córdoba',
+  pa18: 'Club_Atlético_Tucumán',
+  pa19: 'Club_Atlético_Tigre',
+  pa20: 'Club_Unión_(Santa_Fe)',
+  pa21: 'Barracas_Central',
+  pa22: 'Club_Atlético_Banfield',
+  pa23: "Newell's_Old_Boys",
+  pa24: 'Club_Atlético_Aldosivi',
+  pa25: 'Gimnasia_y_Esgrima_La_Plata',
+  pa26: 'Club_Atlético_Sarmiento_(Junín)',
+  pa27: 'Godoy_Cruz_Antonio_Tomba',
+  pa28: 'Central_Córdoba_(Santiago_del_Estero)',
+  pa29: 'Deportivo_Riestra',
+  pa30: 'San_Martín_(San_Juan)',
+}
+
 const POOL_ARG = [
-  { id:'pa1',  nombre:'Boca Juniors',            logo: W+'Club_Atlético_Boca_Juniors_logo.svg' },
-  { id:'pa2',  nombre:'River Plate',             logo: W+'Escudo_del_Club_Atletico_River_Plate.svg' },
-  { id:'pa3',  nombre:'Racing Club',             logo: W+'Racing_Club_de_Avellaneda_Logo.svg' },
-  { id:'pa4',  nombre:'Rosario Central',         logo: W+'Rosario_Central_logo.svg' },
-  { id:'pa5',  nombre:'Estudiantes',             logo: W+'Estudiantes_de_La_Plata_logo.svg' },
-  { id:'pa6',  nombre:'Vélez Sarsfield',         logo: W+'Vélez_Sársfield_logo.svg' },
-  { id:'pa7',  nombre:'Lanús',                   logo: W+'Club_Atlético_Lanús_logo.svg' },
-  { id:'pa8',  nombre:'Argentinos Juniors',      logo: W+'Argentinos_Juniors_logo.svg' },
-  { id:'pa9',  nombre:'Talleres',                logo: W+'Club_Atlético_Talleres_(Córdoba)_logo.svg' },
-  { id:'pa10', nombre:'Independiente',           logo: W+'Club_Atlético_Independiente_logo.svg' },
-  { id:'pa11', nombre:'Belgrano',                logo: W+'Club_Atlético_Belgrano_(Córdoba)_logo.svg' },
-  { id:'pa12', nombre:'San Lorenzo',             logo: W+'San_Lorenzo_de_Almagro_logo.svg' },
-  { id:'pa13', nombre:'Indep. Rivadavia',        logo: W+'Independiente_Rivadavia_logo.svg' },
-  { id:'pa14', nombre:'Defensa y Justicia',      logo: W+'Defensa_y_Justicia_logo.svg' },
-  { id:'pa15', nombre:'Huracán',                 logo: W+'Club_Atlético_Huracán_(Argentina)_logo.svg' },
-  { id:'pa16', nombre:'Platense',                logo: W+'Club_Atlético_Platense_logo.svg' },
-  { id:'pa17', nombre:'Instituto',               logo: W+'Instituto_Atlético_Central_Córdoba_logo.svg' },
-  { id:'pa18', nombre:'Atlético Tucumán',        logo: W+'Club_Atlético_Tucumán_logo.svg' },
-  { id:'pa19', nombre:'Tigre',                   logo: W+'Club_Atlético_Tigre_logo.svg' },
-  { id:'pa20', nombre:'Unión de Santa Fe',       logo: W+'Club_Unión_(Santa_Fe)_logo.svg' },
-  { id:'pa21', nombre:'Barracas Central',        logo: W+'Barracas_Central_logo.svg' },
-  { id:'pa22', nombre:'Banfield',                logo: W+'Club_Atlético_Banfield_logo.svg' },
-  { id:'pa23', nombre:"Newell's",                logo: W+"Newell's_Old_Boys_Logo.svg" },
-  { id:'pa24', nombre:'Aldosivi',                logo: W+'Club_Atlético_Aldosivi_logo.svg' },
-  { id:'pa25', nombre:'Gimnasia LP',             logo: W+'Gimnasia_y_Esgrima_La_Plata_logo.svg' },
-  { id:'pa26', nombre:'Sarmiento',               logo: W+'Club_Atlético_Sarmiento_(Junín)_logo.svg' },
-  { id:'pa27', nombre:'Godoy Cruz',              logo: W+'Godoy_Cruz_Antonio_Tomba_logo.svg' },
-  { id:'pa28', nombre:'Central Córdoba',         logo: W+'Central_Córdoba_(Santiago_del_Estero)_logo.svg' },
-  { id:'pa29', nombre:'Dep. Riestra',            logo: W+'Club_Deportivo_Riestra_logo.svg' },
-  { id:'pa30', nombre:'San Martín SJ',           logo: W+'San_Martín_(San_Juan)_logo.svg' },
+  { id:'pa1',  nombre:'Boca Juniors' },
+  { id:'pa2',  nombre:'River Plate' },
+  { id:'pa3',  nombre:'Racing Club' },
+  { id:'pa4',  nombre:'Rosario Central' },
+  { id:'pa5',  nombre:'Estudiantes' },
+  { id:'pa6',  nombre:'Vélez Sarsfield' },
+  { id:'pa7',  nombre:'Lanús' },
+  { id:'pa8',  nombre:'Argentinos Juniors' },
+  { id:'pa9',  nombre:'Talleres' },
+  { id:'pa10', nombre:'Independiente' },
+  { id:'pa11', nombre:'Belgrano' },
+  { id:'pa12', nombre:'San Lorenzo' },
+  { id:'pa13', nombre:'Indep. Rivadavia' },
+  { id:'pa14', nombre:'Defensa y Justicia' },
+  { id:'pa15', nombre:'Huracán' },
+  { id:'pa16', nombre:'Platense' },
+  { id:'pa17', nombre:'Instituto' },
+  { id:'pa18', nombre:'Atlético Tucumán' },
+  { id:'pa19', nombre:'Tigre' },
+  { id:'pa20', nombre:'Unión de Santa Fe' },
+  { id:'pa21', nombre:'Barracas Central' },
+  { id:'pa22', nombre:'Banfield' },
+  { id:'pa23', nombre:"Newell's" },
+  { id:'pa24', nombre:'Aldosivi' },
+  { id:'pa25', nombre:'Gimnasia LP' },
+  { id:'pa26', nombre:'Sarmiento' },
+  { id:'pa27', nombre:'Godoy Cruz' },
+  { id:'pa28', nombre:'Central Córdoba' },
+  { id:'pa29', nombre:'Dep. Riestra' },
+  { id:'pa30', nombre:'San Martín SJ' },
 ]
+
+// Cache de logos resueltos vía Wikipedia API
+const LOGO_CACHE_KEY = 'tdc_logos_v2'
+let resolvedLogos = {}
+
+async function loadLogos() {
+  // Intentar cargar del cache local primero
+  try {
+    const cached = localStorage.getItem(LOGO_CACHE_KEY)
+    if (cached) { resolvedLogos = JSON.parse(cached); return }
+  } catch(e) {}
+
+  // Fetch en paralelo usando Wikipedia REST API (soporta CORS)
+  await Promise.all(POOL_ARG.map(async eq => {
+    const article = WIKI_ARTICLES[eq.id]
+    if (!article) return
+    try {
+      const res = await fetch(`https://en.wikipedia.org/api/rest_v1/page/summary/${article}`)
+      if (!res.ok) return
+      const data = await res.json()
+      const url = data.thumbnail?.source || data.originalimage?.source
+      if (url) resolvedLogos[eq.id] = url
+    } catch(e) {}
+  }))
+
+  try { localStorage.setItem(LOGO_CACHE_KEY, JSON.stringify(resolvedLogos)) } catch(e) {}
+}
 
 const ESTADO_INICIAL = {
   version: '2.0',
@@ -1541,8 +1601,7 @@ function getPoolNombre(id) {
 }
 
 function getPoolLogo(id) {
-  const p = (estado.poolArgentino || POOL_ARG).find(e => e.id === id)
-  return p ? p.logo : null
+  return resolvedLogos[id] || null
 }
 
 function logoHTML(id, size = 28) {
@@ -1551,9 +1610,8 @@ function logoHTML(id, size = 28) {
   const ini = nombre.split(' ').map(w => w[0]).filter(Boolean).slice(0, 2).join('').toUpperCase()
   const fs = Math.max(8, Math.floor(size * 0.34))
   if (logo) {
-    return `<img class="eq-logo" style="width:${size}px;height:${size}px;" src="${logo}" alt="${nombre}"
-      onerror="this.style.display='none';this.nextSibling.style.display='flex';">
-      <div class="logo-init" style="width:${size}px;height:${size}px;font-size:${fs}px;display:none;">${ini}</div>`
+    return `<img style="width:${size}px;height:${size}px;object-fit:contain;flex-shrink:0;border-radius:2px;" src="${logo}" alt="${nombre}"
+      onerror="this.style.display='none';this.insertAdjacentHTML('afterend','<div class=\\'logo-init\\' style=\\'width:${size}px;height:${size}px;font-size:${fs}px;\\'>${ini}</div>')">`
   }
   return `<div class="logo-init" style="width:${size}px;height:${size}px;font-size:${fs}px;">${ini}</div>`
 }
@@ -2272,12 +2330,13 @@ function toast(msg, error = false) {
 // INIT
 // ══════════════════════════════════════════════
 async function init() {
-  // Restaurar token si había
   const t = getToken()
   if (t) { esAdmin = true; actualizarUIAdmin() }
   await cargarPool()
   await cargarEstado()
   actualizarUIAdmin()
+  // Cargar logos en segundo plano; re-renderizar cuando terminen
+  loadLogos().then(() => renderTodo())
 }
 
 init()

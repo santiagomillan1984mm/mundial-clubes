@@ -634,28 +634,9 @@
 
   <!-- INICIO -->
   <div id="sec-inicio" class="seccion activa">
-    <div class="sec-titulo">🏆 Mundial de Clubes</div>
-    <div class="card">
-      <div class="card-titulo">Estado del torneo</div>
-      <div id="estado-torneo" class="loading">Cargando...</div>
-    </div>
-    <div id="card-marcador" class="card" style="display:none;">
-      <div class="card-titulo">Equipos en el torneo</div>
-      <div style="display:flex; gap:40px; justify-content:center; padding: 10px 0; flex-wrap:wrap;">
-        <div style="text-align:center;">
-          <div style="font-size:13px; margin-bottom:6px;" class="badge-santi">SANTI</div>
-          <div id="pts-santi" style="font-size:40px; font-weight:700; color:#4a9eff;">0</div>
-          <div class="text-gris">equipos</div>
-        </div>
-        <div style="text-align:center; align-self:center; font-size:24px; color:var(--gris);">vs</div>
-        <div style="text-align:center;">
-          <div style="font-size:13px; margin-bottom:6px;" class="badge-luciano">LUCIANO</div>
-          <div id="pts-luciano" style="font-size:40px; font-weight:700; color:#ff6b6b;">0</div>
-          <div class="text-gris">equipos</div>
-        </div>
-      </div>
-    </div>
-    <div class="flex-gap">
+    <div class="sec-titulo">🏆 Torneo de Campeones</div>
+    <div id="inicio-contenido"><div class="loading">Cargando...</div></div>
+    <div class="flex-gap mt">
       <button class="btn btn-secondary" onclick="cargarEstado()">🔄 Actualizar</button>
     </div>
   </div>
@@ -1018,36 +999,208 @@ function renderTodo() {
   renderBracket()
 }
 
+// ── Stats helpers ──────────────────────────────
+function getFaseLiga() {
+  const liga = estado?.ligaAfa
+  if (!liga?.configurado) return { label: 'Sin configurar', sub: '' }
+  const jugados = (liga.partidos || []).filter(p => p.golesLocal !== null).length
+  const jornada = getLigaJornadaActual ? getLigaJornadaActual() : 1
+  if (jugados === 100) return { label: 'Finalizada', sub: '100/100 partidos' }
+  return { label: `Jornada ${jornada}`, sub: `${jugados}/100 partidos jugados` }
+}
+
+function getFaseCopa() {
+  const copa = estado?.copaArgentina
+  if (!copa?.configurado) return { label: 'Sin configurar', sub: '' }
+  const b = copa.bracket
+  if (b.final?.[0]?.ganador) return { label: '¡Finalizada!', sub: 'Campeón definido' }
+  if (b.semis?.length) return { label: 'Semifinales', sub: '' }
+  if (b.cuartos?.length) return { label: 'Cuartos de final', sub: '' }
+  if (b.r2?.length) return { label: 'Octavos de final', sub: '' }
+  if (b.r1?.length) return { label: 'Ronda 1', sub: `${b.r1.filter(c=>c.ganador).length}/${b.r1.length} definidos` }
+  return { label: 'Bracket por generar', sub: '' }
+}
+
+function getFaseMundial() {
+  if (!estado?.sorteo?.confirmado) return { label: 'Sorteo pendiente', sub: '' }
+  const b = estado.bracket
+  if (b.final?.[0]?.ganador) return { label: '¡Finalizado!', sub: 'Campeón definido' }
+  if (b.semis?.length) return { label: 'Semifinales', sub: '' }
+  if (b.cuartos?.length) return { label: 'Cuartos de final', sub: '' }
+  if (b.octavos?.length) return { label: 'Octavos de final', sub: '' }
+  if (b.dieciseisavos?.length) return { label: 'Dieciseisavos', sub: `${b.dieciseisavos.filter(c=>c.ganador).length}/16 definidos` }
+  return { label: 'Bracket por generar', sub: '' }
+}
+
+function getEquipoMasGoleador() {
+  if (!estado?.ligaAfa?.configurado) return null
+  const tabla = calcularTablaLiga().sort((a,b) => b.gf - a.gf)
+  if (!tabla.length || tabla[0].gf === 0) return null
+  return tabla[0]
+}
+
+function getMejorPartido() {
+  if (!estado?.ligaAfa?.configurado) return null
+  const partidos = (estado.ligaAfa.partidos || []).filter(p => p.golesLocal !== null)
+  if (!partidos.length) return null
+  // Partido con más goles totales
+  return partidos.reduce((best, p) => {
+    const total = p.golesLocal + p.golesVisitante
+    const bestTotal = best.golesLocal + best.golesVisitante
+    return total > bestTotal ? p : best
+  })
+}
+
+function getUltimosResultados(n = 5) {
+  if (!estado?.ligaAfa?.configurado) return []
+  return (estado.ligaAfa.partidos || [])
+    .filter(p => p.golesLocal !== null)
+    .slice(-n)
+    .reverse()
+}
+
+function getLigaLider() {
+  if (!estado?.ligaAfa?.configurado) return null
+  const tabla = calcularTablaLiga()
+  return tabla.find(e => e.pj > 0) || null
+}
+
 function renderEstadoInicio() {
   if (!estado) return
-  const fase = getFaseActual()
-  document.getElementById('estado-torneo').innerHTML = `
-    <div class="estado-badge">${fase}</div>
-    <p class="text-gris">Última actualización: ${estado.ultimaActualizacion ? new Date(estado.ultimaActualizacion).toLocaleString('es-MX') : 'Nunca'}</p>
-  `
-  // Marcador: solo mostrar cuando el sorteo esté confirmado
-  const cardMarcador = document.getElementById('card-marcador')
-  if (estado.sorteo.confirmado) {
-    const todos = getTodosEquipos()
-    const santi = todos.filter(e => e.dueno === 'santi').length
-    const luciano = todos.filter(e => e.dueno === 'luciano').length
-    document.getElementById('pts-santi').textContent = santi
-    document.getElementById('pts-luciano').textContent = luciano
-    cardMarcador.style.display = ''
-  } else {
-    cardMarcador.style.display = 'none'
+  const cont = document.getElementById('inicio-contenido')
+  if (!cont) return
+
+  const faseLiga = getFaseLiga()
+  const faseCopa = getFaseCopa()
+  const faseMundial = getFaseMundial()
+  const lider = getLigaLider()
+  const masGoleador = getEquipoMasGoleador()
+  const mejorPartido = getMejorPartido()
+  const ultimos = getUltimosResultados(5)
+  const tabla = estado?.ligaAfa?.configurado ? calcularTablaLiga() : []
+  const ultima = estado.ultimaActualizacion ? new Date(estado.ultimaActualizacion).toLocaleString('es-AR') : 'Nunca'
+
+  // ── Fila 1: Estado de las 3 competencias ──
+  function compCard(emoji, titulo, fase, sub, color) {
+    return `<div style="flex:1;min-width:160px;background:var(--card);border:1px solid var(--border);border-top:3px solid ${color};border-radius:10px;padding:14px 16px;">
+      <div style="font-size:11px;color:var(--gris);text-transform:uppercase;letter-spacing:1px;margin-bottom:6px;">${emoji} ${titulo}</div>
+      <div style="font-size:15px;font-weight:700;color:var(--texto);">${fase}</div>
+      ${sub ? `<div style="font-size:11px;color:var(--gris);margin-top:3px;">${sub}</div>` : ''}
+    </div>`
   }
+
+  // ── Equipo más goleador ──
+  let goleadorHTML = ''
+  if (masGoleador) {
+    const dueno = masGoleador.dueno
+    goleadorHTML = `<div style="flex:1;min-width:200px;background:var(--card);border:1px solid var(--border);border-radius:10px;padding:16px;display:flex;align-items:center;gap:14px;">
+      <div>${logoHTML(masGoleador.id, 52)}</div>
+      <div>
+        <div style="font-size:11px;color:var(--gris);text-transform:uppercase;letter-spacing:1px;margin-bottom:4px;">⚽ Equipo más goleador</div>
+        <div style="font-size:16px;font-weight:700;color:${dueno==='santi'?'#4a9eff':'#ff6b6b'};">${getPoolNombre(masGoleador.id)}</div>
+        <div style="font-size:24px;font-weight:800;color:var(--dorado2);line-height:1.2;">${masGoleador.gf} <span style="font-size:13px;color:var(--gris);font-weight:400;">goles</span></div>
+        <div style="font-size:11px;color:var(--gris);">${masGoleador.pj} partidos jugados</div>
+      </div>
+    </div>`
+  }
+
+  // ── Mejor partido ──
+  let mejorHTML = ''
+  if (mejorPartido) {
+    const total = mejorPartido.golesLocal + mejorPartido.golesVisitante
+    const dL = estado.ligaAfa.equipos.find(e => e.id === mejorPartido.local)?.dueno || ''
+    const dV = estado.ligaAfa.equipos.find(e => e.id === mejorPartido.visitante)?.dueno || ''
+    mejorHTML = `<div style="flex:1;min-width:200px;background:var(--card);border:1px solid var(--border);border-radius:10px;padding:16px;">
+      <div style="font-size:11px;color:var(--gris);text-transform:uppercase;letter-spacing:1px;margin-bottom:12px;">🔥 Mejor partido — ${total} goles</div>
+      <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;">
+        <div style="display:flex;flex-direction:column;align-items:center;gap:6px;flex:1;">
+          ${logoHTML(mejorPartido.local, 44)}
+          <span style="font-size:11px;text-align:center;color:${dL==='santi'?'#4a9eff':'#ff6b6b'};font-weight:600;">${getPoolNombre(mejorPartido.local)}</span>
+        </div>
+        <div style="text-align:center;flex-shrink:0;">
+          <div style="font-size:28px;font-weight:800;color:var(--dorado2);">${mejorPartido.golesLocal} - ${mejorPartido.golesVisitante}</div>
+          <div style="font-size:10px;color:var(--gris);">J${mejorPartido.jornada}</div>
+        </div>
+        <div style="display:flex;flex-direction:column;align-items:center;gap:6px;flex:1;">
+          ${logoHTML(mejorPartido.visitante, 44)}
+          <span style="font-size:11px;text-align:center;color:${dV==='santi'?'#4a9eff':'#ff6b6b'};font-weight:600;">${getPoolNombre(mejorPartido.visitante)}</span>
+        </div>
+      </div>
+    </div>`
+  }
+
+  // ── Top 5 Liga ──
+  let top5HTML = ''
+  if (tabla.length && tabla.some(e => e.pj > 0)) {
+    top5HTML = `<div class="card">
+      <div class="card-titulo">📊 Liga AFA — Top 5</div>
+      <table class="tabla-pos">
+        <thead><tr><th>#</th><th style="text-align:left">Equipo</th><th>PJ</th><th>GF</th><th>PTS</th></tr></thead>
+        <tbody>
+          ${tabla.slice(0,5).map((eq,i) => `<tr class="${i<8?'clasifica':''}">
+            <td><span class="pos-num">${i+1}</span></td>
+            <td><div style="display:flex;align-items:center;gap:6px;">${logoHTML(eq.id,20)}<strong>${getPoolNombre(eq.id)}</strong>${i<8?'<span class="clasifica-badge">TOP8</span>':''}</div></td>
+            <td>${eq.pj}</td><td>${eq.gf}</td><td class="pts-cell">${eq.pts}</td>
+          </tr>`).join('')}
+        </tbody>
+      </table>
+    </div>`
+  }
+
+  // ── Últimos resultados ──
+  let ultimosHTML = ''
+  if (ultimos.length) {
+    ultimosHTML = `<div class="card">
+      <div class="card-titulo">📋 Últimos resultados — Liga AFA</div>
+      ${ultimos.map(p => {
+        const dL = estado.ligaAfa.equipos.find(e=>e.id===p.local)?.dueno||''
+        const dV = estado.ligaAfa.equipos.find(e=>e.id===p.visitante)?.dueno||''
+        const esGanL = p.golesLocal > p.golesVisitante
+        const esGanV = p.golesVisitante > p.golesLocal
+        return `<div style="display:flex;align-items:center;gap:8px;padding:7px 0;border-bottom:1px solid var(--border);">
+          <div style="display:flex;align-items:center;gap:6px;flex:1;overflow:hidden;">
+            ${logoHTML(p.local,20)}
+            <span style="font-size:12px;font-weight:${esGanL?700:400};color:${dL==='santi'?'#4a9eff':'#ff6b6b'};overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${getPoolNombre(p.local)}</span>
+          </div>
+          <div style="font-size:14px;font-weight:800;color:var(--dorado2);flex-shrink:0;min-width:40px;text-align:center;">${p.golesLocal} - ${p.golesVisitante}</div>
+          <div style="display:flex;align-items:center;gap:6px;flex:1;justify-content:flex-end;overflow:hidden;">
+            <span style="font-size:12px;font-weight:${esGanV?700:400};color:${dV==='santi'?'#4a9eff':'#ff6b6b'};overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${getPoolNombre(p.visitante)}</span>
+            ${logoHTML(p.visitante,20)}
+          </div>
+          <span style="font-size:10px;color:var(--gris);flex-shrink:0;margin-left:4px;">J${p.jornada}</span>
+        </div>`
+      }).join('')}
+    </div>`
+  }
+
+  cont.innerHTML = `
+    <!-- Competencias -->
+    <div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:14px;">
+      ${compCard('🇦🇷','Liga AFA', faseLiga.label, faseLiga.sub, '#4a9eff')}
+      ${compCard('🏆','Copa Argentina', faseCopa.label, faseCopa.sub, '#f5a623')}
+      ${compCard('⚽','Mundial Clubes', faseMundial.label, faseMundial.sub, '#e94560')}
+    </div>
+
+    <!-- Stats grandes -->
+    ${(goleadorHTML || mejorHTML) ? `<div style="display:flex;gap:12px;flex-wrap:wrap;margin-bottom:14px;">${goleadorHTML}${mejorHTML}</div>` : ''}
+
+    <!-- Top 5 + Últimos -->
+    ${top5HTML}
+    ${ultimosHTML}
+
+    <div style="font-size:11px;color:var(--gris);margin-top:8px;">Actualizado: ${ultima}</div>
+  `
 }
 
 function getFaseActual() {
   if (!estado) return 'Sin datos'
-  if (!estado.sorteo.realizado) return 'Pendiente de sorteo'
-  if (!estado.sorteo.confirmado) return 'Sorteo en curso'
-  if (estado.bracket.final.length && estado.bracket.final[0]?.ganador) return '¡Torneo finalizado!'
-  if (estado.bracket.semis.length) return 'Semifinales'
-  if (estado.bracket.cuartos.length) return 'Cuartos de final'
-  if (estado.bracket.octavos.length) return 'Octavos de final'
-  if (estado.bracket.dieciseisavos.length) return 'Dieciseisavos de final'
+  if (!estado.sorteo?.realizado) return 'Pendiente de sorteo'
+  if (!estado.sorteo?.confirmado) return 'Sorteo en curso'
+  if (estado.bracket?.final?.[0]?.ganador) return '¡Torneo finalizado!'
+  if (estado.bracket?.semis?.length) return 'Semifinales'
+  if (estado.bracket?.cuartos?.length) return 'Cuartos de final'
+  if (estado.bracket?.octavos?.length) return 'Octavos de final'
+  if (estado.bracket?.dieciseisavos?.length) return 'Dieciseisavos de final'
   return 'Bracket por generar'
 }
 

@@ -1,6 +1,6 @@
 {
   "version": "1.0",
-  "ultimaActualizacion": "2026-06-10T00:52:15.858Z",
+  "ultimaActualizacion": "2026-06-10T00:53:59.425Z",
   "equiposArgentinos": [
     {
       "id": "arg1",
@@ -221,14 +221,6 @@
         "dueno": "santi"
       },
       {
-        "id": "pa21",
-        "dueno": "luciano"
-      },
-      {
-        "id": "pa22",
-        "dueno": "luciano"
-      },
-      {
         "id": "pa20",
         "dueno": "luciano"
       },
@@ -241,11 +233,11 @@
         "dueno": "luciano"
       },
       {
-        "id": "pa12",
+        "id": "pa14",
         "dueno": "luciano"
       },
       {
-        "id": "pa14",
+        "id": "pa12",
         "dueno": "luciano"
       },
       {
@@ -259,6 +251,14 @@
       {
         "id": "pa6",
         "dueno": "luciano"
+      },
+      {
+        "id": "pa4",
+        "dueno": "luciano"
+      },
+      {
+        "id": "pa2",
+        "dueno": "luciano"
       }
     ],
     "partidos": [
@@ -266,15 +266,15 @@
         "id": "liga_1",
         "jornada": 1,
         "local": "pa1",
-        "visitante": "pa21",
-        "golesLocal": 0,
+        "visitante": "pa20",
+        "golesLocal": null,
         "golesVisitante": null
       },
       {
         "id": "liga_2",
         "jornada": 1,
         "local": "pa3",
-        "visitante": "pa22",
+        "visitante": "pa18",
         "golesLocal": null,
         "golesVisitante": null
       },
@@ -282,7 +282,7 @@
         "id": "liga_3",
         "jornada": 1,
         "local": "pa5",
-        "visitante": "pa20",
+        "visitante": "pa16",
         "golesLocal": null,
         "golesVisitante": null
       },
@@ -290,7 +290,7 @@
         "id": "liga_4",
         "jornada": 1,
         "local": "pa7",
-        "visitante": "pa18",
+        "visitante": "pa14",
         "golesLocal": null,
         "golesVisitante": null
       },
@@ -298,7 +298,7 @@
         "id": "liga_5",
         "jornada": 1,
         "local": "pa9",
-        "visitante": "pa16",
+        "visitante": "pa12",
         "golesLocal": null,
         "golesVisitante": null
       },
@@ -306,7 +306,7 @@
         "id": "liga_6",
         "jornada": 1,
         "local": "pa11",
-        "visitante": "pa12",
+        "visitante": "pa10",
         "golesLocal": null,
         "golesVisitante": null
       },
@@ -314,7 +314,7 @@
         "id": "liga_7",
         "jornada": 1,
         "local": "pa13",
-        "visitante": "pa14",
+        "visitante": "pa8",
         "golesLocal": null,
         "golesVisitante": null
       },
@@ -322,7 +322,7 @@
         "id": "liga_8",
         "jornada": 1,
         "local": "pa15",
-        "visitante": "pa10",
+        "visitante": "pa6",
         "golesLocal": null,
         "golesVisitante": null
       },
@@ -330,7 +330,7 @@
         "id": "liga_9",
         "jornada": 1,
         "local": "pa17",
-        "visitante": "pa8",
+        "visitante": "pa4",
         "golesLocal": null,
         "golesVisitante": null
       },
@@ -338,7 +338,7 @@
         "id": "liga_10",
         "jornada": 1,
         "local": "pa19",
-        "visitante": "pa6",
+        "visitante": "pa2",
         "golesLocal": null,
         "golesVisitante": null
       },
@@ -346,7 +346,7 @@
         "id": "liga_11",
         "jornada": 2,
         "local": "pa1",
-        "visitante": "pa22",
+        "visitante": "pa18",
         "golesLocal": null,
         "golesVisitante": null
       },
@@ -354,7 +354,7 @@
         "id": "liga_12",
         "jornada": 2,
         "local": "pa3",
-        "visitante": "pa20",
+        "visitante": "pa16",
         "golesLocal": null,
         "golesVisitante": null
       },
@@ -362,7 +362,7 @@
         "id": "liga_13",
         "jornada": 2,
         "local": "pa5",
-        "visitante": "pa18",
+        "visitante": "pa14",
         "golesLocal": null,
         "golesVisitante": null
       },
@@ -370,7 +370,7 @@
         "id": "liga_14",
         "jornada": 2,
         "local": "pa7",
-        "visitante": "pa16",
+        "visitante": "pa12",
         "golesLocal": null,
         "golesVisitante": null
       },
@@ -378,7 +378,7 @@
         "id": "liga_15",
         "jornada": 2,
         "local": "pa9",
-        "visitante": "pa12",
+        "visitante": "pa10",
         "golesLocal": null,
         "golesVisitante": null
       },
@@ -386,7 +386,7 @@
         "id": "liga_16",
         "jornada": 2,
         "local": "pa11",
-        "visitante": "pa14",
+        "visitante": "pa8",
         "golesLocal": null,
         "golesVisitante": null
       },
@@ -394,7 +394,7 @@
         "id": "liga_17",
         "jornada": 2,
         "local": "pa13",
-        "visitante": "pa10",
+        "visitante": "pa6",
         "golesLocal": null,
         "golesVisitante": null
       },
@@ -402,7 +402,7 @@
         "id": "liga_18",
         "jornada": 2,
         "local": "pa15",
-        "visitante": "pa8",
+        "visitante": "pa4",
         "golesLocal": null,
         "golesVisitante": null
       },
@@ -410,7 +410,7 @@
         "id": "liga_19",
         "jornada": 2,
         "local": "pa17",
-        "visitante": "pa6",
+        "visitante": "pa2",
         "golesLocal": null,
         "golesVisitante": null
       },
@@ -418,7 +418,7 @@
         "id": "liga_20",
         "jornada": 2,
         "local": "pa19",
-        "visitante": "pa21",
+        "visitante": "pa20",
         "golesLocal": null,
         "golesVisitante": null
       },
@@ -426,7 +426,7 @@
         "id": "liga_21",
         "jornada": 3,
         "local": "pa1",
-        "visitante": "pa20",
+        "visitante": "pa16",
         "golesLocal": null,
         "golesVisitante": null
       },
@@ -434,7 +434,7 @@
         "id": "liga_22",
         "jornada": 3,
         "local": "pa3",
-        "visitante": "pa18",
+        "visitante": "pa14",
         "golesLocal": null,
         "golesVisitante": null
       },
@@ -442,7 +442,7 @@
         "id": "liga_23",
         "jornada": 3,
         "local": "pa5",
-        "visitante": "pa16",
+        "visitante": "pa12",
         "golesLocal": null,
         "golesVisitante": null
       },
@@ -450,7 +450,7 @@
         "id": "liga_24",
         "jornada": 3,
         "local": "pa7",
-        "visitante": "pa12",
+        "visitante": "pa10",
         "golesLocal": null,
         "golesVisitante": null
       },
@@ -458,7 +458,7 @@
         "id": "liga_25",
         "jornada": 3,
         "local": "pa9",
-        "visitante": "pa14",
+        "visitante": "pa8",
         "golesLocal": null,
         "golesVisitante": null
       },
@@ -466,7 +466,7 @@
         "id": "liga_26",
         "jornada": 3,
         "local": "pa11",
-        "visitante": "pa10",
+        "visitante": "pa6",
         "golesLocal": null,
         "golesVisitante": null
       },
@@ -474,7 +474,7 @@
         "id": "liga_27",
         "jornada": 3,
         "local": "pa13",
-        "visitante": "pa8",
+        "visitante": "pa4",
         "golesLocal": null,
         "golesVisitante": null
       },
@@ -482,7 +482,7 @@
         "id": "liga_28",
         "jornada": 3,
         "local": "pa15",
-        "visitante": "pa6",
+        "visitante": "pa2",
         "golesLocal": null,
         "golesVisitante": null
       },
@@ -490,7 +490,7 @@
         "id": "liga_29",
         "jornada": 3,
         "local": "pa17",
-        "visitante": "pa21",
+        "visitante": "pa20",
         "golesLocal": null,
         "golesVisitante": null
       },
@@ -498,7 +498,7 @@
         "id": "liga_30",
         "jornada": 3,
         "local": "pa19",
-        "visitante": "pa22",
+        "visitante": "pa18",
         "golesLocal": null,
         "golesVisitante": null
       },
@@ -506,7 +506,7 @@
         "id": "liga_31",
         "jornada": 4,
         "local": "pa1",
-        "visitante": "pa18",
+        "visitante": "pa14",
         "golesLocal": null,
         "golesVisitante": null
       },
@@ -514,7 +514,7 @@
         "id": "liga_32",
         "jornada": 4,
         "local": "pa3",
-        "visitante": "pa16",
+        "visitante": "pa12",
         "golesLocal": null,
         "golesVisitante": null
       },
@@ -522,7 +522,7 @@
         "id": "liga_33",
         "jornada": 4,
         "local": "pa5",
-        "visitante": "pa12",
+        "visitante": "pa10",
         "golesLocal": null,
         "golesVisitante": null
       },
@@ -530,7 +530,7 @@
         "id": "liga_34",
         "jornada": 4,
         "local": "pa7",
-        "visitante": "pa14",
+        "visitante": "pa8",
         "golesLocal": null,
         "golesVisitante": null
       },
@@ -538,7 +538,7 @@
         "id": "liga_35",
         "jornada": 4,
         "local": "pa9",
-        "visitante": "pa10",
+        "visitante": "pa6",
         "golesLocal": null,
         "golesVisitante": null
       },
@@ -546,7 +546,7 @@
         "id": "liga_36",
         "jornada": 4,
         "local": "pa11",
-        "visitante": "pa8",
+        "visitante": "pa4",
         "golesLocal": null,
         "golesVisitante": null
       },
@@ -554,7 +554,7 @@
         "id": "liga_37",
         "jornada": 4,
         "local": "pa13",
-        "visitante": "pa6",
+        "visitante": "pa2",
         "golesLocal": null,
         "golesVisitante": null
       },
@@ -562,7 +562,7 @@
         "id": "liga_38",
         "jornada": 4,
         "local": "pa15",
-        "visitante": "pa21",
+        "visitante": "pa20",
         "golesLocal": null,
         "golesVisitante": null
       },
@@ -570,7 +570,7 @@
         "id": "liga_39",
         "jornada": 4,
         "local": "pa17",
-        "visitante": "pa22",
+        "visitante": "pa18",
         "golesLocal": null,
         "golesVisitante": null
       },
@@ -578,7 +578,7 @@
         "id": "liga_40",
         "jornada": 4,
         "local": "pa19",
-        "visitante": "pa20",
+        "visitante": "pa16",
         "golesLocal": null,
         "golesVisitante": null
       },
@@ -586,7 +586,7 @@
         "id": "liga_41",
         "jornada": 5,
         "local": "pa1",
-        "visitante": "pa16",
+        "visitante": "pa12",
         "golesLocal": null,
         "golesVisitante": null
       },
@@ -594,7 +594,7 @@
         "id": "liga_42",
         "jornada": 5,
         "local": "pa3",
-        "visitante": "pa12",
+        "visitante": "pa10",
         "golesLocal": null,
         "golesVisitante": null
       },
@@ -602,7 +602,7 @@
         "id": "liga_43",
         "jornada": 5,
         "local": "pa5",
-        "visitante": "pa14",
+        "visitante": "pa8",
         "golesLocal": null,
         "golesVisitante": null
       },
@@ -610,7 +610,7 @@
         "id": "liga_44",
         "jornada": 5,
         "local": "pa7",
-        "visitante": "pa10",
+        "visitante": "pa6",
         "golesLocal": null,
         "golesVisitante": null
       },
@@ -618,7 +618,7 @@
         "id": "liga_45",
         "jornada": 5,
         "local": "pa9",
-        "visitante": "pa8",
+        "visitante": "pa4",
         "golesLocal": null,
         "golesVisitante": null
       },
@@ -626,7 +626,7 @@
         "id": "liga_46",
         "jornada": 5,
         "local": "pa11",
-        "visitante": "pa6",
+        "visitante": "pa2",
         "golesLocal": null,
         "golesVisitante": null
       },
@@ -634,7 +634,7 @@
         "id": "liga_47",
         "jornada": 5,
         "local": "pa13",
-        "visitante": "pa21",
+        "visitante": "pa20",
         "golesLocal": null,
         "golesVisitante": null
       },
@@ -642,7 +642,7 @@
         "id": "liga_48",
         "jornada": 5,
         "local": "pa15",
-        "visitante": "pa22",
+        "visitante": "pa18",
         "golesLocal": null,
         "golesVisitante": null
       },
@@ -650,7 +650,7 @@
         "id": "liga_49",
         "jornada": 5,
         "local": "pa17",
-        "visitante": "pa20",
+        "visitante": "pa16",
         "golesLocal": null,
         "golesVisitante": null
       },
@@ -658,7 +658,7 @@
         "id": "liga_50",
         "jornada": 5,
         "local": "pa19",
-        "visitante": "pa18",
+        "visitante": "pa14",
         "golesLocal": null,
         "golesVisitante": null
       },
@@ -666,7 +666,7 @@
         "id": "liga_51",
         "jornada": 6,
         "local": "pa1",
-        "visitante": "pa12",
+        "visitante": "pa10",
         "golesLocal": null,
         "golesVisitante": null
       },
@@ -674,7 +674,7 @@
         "id": "liga_52",
         "jornada": 6,
         "local": "pa3",
-        "visitante": "pa14",
+        "visitante": "pa8",
         "golesLocal": null,
         "golesVisitante": null
       },
@@ -682,7 +682,7 @@
         "id": "liga_53",
         "jornada": 6,
         "local": "pa5",
-        "visitante": "pa10",
+        "visitante": "pa6",
         "golesLocal": null,
         "golesVisitante": null
       },
@@ -690,7 +690,7 @@
         "id": "liga_54",
         "jornada": 6,
         "local": "pa7",
-        "visitante": "pa8",
+        "visitante": "pa4",
         "golesLocal": null,
         "golesVisitante": null
       },
@@ -698,7 +698,7 @@
         "id": "liga_55",
         "jornada": 6,
         "local": "pa9",
-        "visitante": "pa6",
+        "visitante": "pa2",
         "golesLocal": null,
         "golesVisitante": null
       },
@@ -706,7 +706,7 @@
         "id": "liga_56",
         "jornada": 6,
         "local": "pa11",
-        "visitante": "pa21",
+        "visitante": "pa20",
         "golesLocal": null,
         "golesVisitante": null
       },
@@ -714,7 +714,7 @@
         "id": "liga_57",
         "jornada": 6,
         "local": "pa13",
-        "visitante": "pa22",
+        "visitante": "pa18",
         "golesLocal": null,
         "golesVisitante": null
       },
@@ -722,7 +722,7 @@
         "id": "liga_58",
         "jornada": 6,
         "local": "pa15",
-        "visitante": "pa20",
+        "visitante": "pa16",
         "golesLocal": null,
         "golesVisitante": null
       },
@@ -730,7 +730,7 @@
         "id": "liga_59",
         "jornada": 6,
         "local": "pa17",
-        "visitante": "pa18",
+        "visitante": "pa14",
         "golesLocal": null,
         "golesVisitante": null
       },
@@ -738,7 +738,7 @@
         "id": "liga_60",
         "jornada": 6,
         "local": "pa19",
-        "visitante": "pa16",
+        "visitante": "pa12",
         "golesLocal": null,
         "golesVisitante": null
       },
@@ -746,7 +746,7 @@
         "id": "liga_61",
         "jornada": 7,
         "local": "pa1",
-        "visitante": "pa14",
+        "visitante": "pa8",
         "golesLocal": null,
         "golesVisitante": null
       },
@@ -754,7 +754,7 @@
         "id": "liga_62",
         "jornada": 7,
         "local": "pa3",
-        "visitante": "pa10",
+        "visitante": "pa6",
         "golesLocal": null,
         "golesVisitante": null
       },
@@ -762,7 +762,7 @@
         "id": "liga_63",
         "jornada": 7,
         "local": "pa5",
-        "visitante": "pa8",
+        "visitante": "pa4",
         "golesLocal": null,
         "golesVisitante": null
       },
@@ -770,7 +770,7 @@
         "id": "liga_64",
         "jornada": 7,
         "local": "pa7",
-        "visitante": "pa6",
+        "visitante": "pa2",
         "golesLocal": null,
         "golesVisitante": null
       },
@@ -778,7 +778,7 @@
         "id": "liga_65",
         "jornada": 7,
         "local": "pa9",
-        "visitante": "pa21",
+        "visitante": "pa20",
         "golesLocal": null,
         "golesVisitante": null
       },
@@ -786,7 +786,7 @@
         "id": "liga_66",
         "jornada": 7,
         "local": "pa11",
-        "visitante": "pa22",
+        "visitante": "pa18",
         "golesLocal": null,
         "golesVisitante": null
       },
@@ -794,7 +794,7 @@
         "id": "liga_67",
         "jornada": 7,
         "local": "pa13",
-        "visitante": "pa20",
+        "visitante": "pa16",
         "golesLocal": null,
         "golesVisitante": null
       },
@@ -802,7 +802,7 @@
         "id": "liga_68",
         "jornada": 7,
         "local": "pa15",
-        "visitante": "pa18",
+        "visitante": "pa14",
         "golesLocal": null,
         "golesVisitante": null
       },
@@ -810,7 +810,7 @@
         "id": "liga_69",
         "jornada": 7,
         "local": "pa17",
-        "visitante": "pa16",
+        "visitante": "pa12",
         "golesLocal": null,
         "golesVisitante": null
       },
@@ -818,7 +818,7 @@
         "id": "liga_70",
         "jornada": 7,
         "local": "pa19",
-        "visitante": "pa12",
+        "visitante": "pa10",
         "golesLocal": null,
         "golesVisitante": null
       },
@@ -826,7 +826,7 @@
         "id": "liga_71",
         "jornada": 8,
         "local": "pa1",
-        "visitante": "pa10",
+        "visitante": "pa6",
         "golesLocal": null,
         "golesVisitante": null
       },
@@ -834,7 +834,7 @@
         "id": "liga_72",
         "jornada": 8,
         "local": "pa3",
-        "visitante": "pa8",
+        "visitante": "pa4",
         "golesLocal": null,
         "golesVisitante": null
       },
@@ -842,7 +842,7 @@
         "id": "liga_73",
         "jornada": 8,
         "local": "pa5",
-        "visitante": "pa6",
+        "visitante": "pa2",
         "golesLocal": null,
         "golesVisitante": null
       },
@@ -850,7 +850,7 @@
         "id": "liga_74",
         "jornada": 8,
         "local": "pa7",
-        "visitante": "pa21",
+        "visitante": "pa20",
         "golesLocal": null,
         "golesVisitante": null
       },
@@ -858,7 +858,7 @@
         "id": "liga_75",
         "jornada": 8,
         "local": "pa9",
-        "visitante": "pa22",
+        "visitante": "pa18",
         "golesLocal": null,
         "golesVisitante": null
       },
@@ -866,7 +866,7 @@
         "id": "liga_76",
         "jornada": 8,
         "local": "pa11",
-        "visitante": "pa20",
+        "visitante": "pa16",
         "golesLocal": null,
         "golesVisitante": null
       },
@@ -874,7 +874,7 @@
         "id": "liga_77",
         "jornada": 8,
         "local": "pa13",
-        "visitante": "pa18",
+        "visitante": "pa14",
         "golesLocal": null,
         "golesVisitante": null
       },
@@ -882,7 +882,7 @@
         "id": "liga_78",
         "jornada": 8,
         "local": "pa15",
-        "visitante": "pa16",
+        "visitante": "pa12",
         "golesLocal": null,
         "golesVisitante": null
       },
@@ -890,7 +890,7 @@
         "id": "liga_79",
         "jornada": 8,
         "local": "pa17",
-        "visitante": "pa12",
+        "visitante": "pa10",
         "golesLocal": null,
         "golesVisitante": null
       },
@@ -898,7 +898,7 @@
         "id": "liga_80",
         "jornada": 8,
         "local": "pa19",
-        "visitante": "pa14",
+        "visitante": "pa8",
         "golesLocal": null,
         "golesVisitante": null
       },
@@ -906,7 +906,7 @@
         "id": "liga_81",
         "jornada": 9,
         "local": "pa1",
-        "visitante": "pa8",
+        "visitante": "pa4",
         "golesLocal": null,
         "golesVisitante": null
       },
@@ -914,7 +914,7 @@
         "id": "liga_82",
         "jornada": 9,
         "local": "pa3",
-        "visitante": "pa6",
+        "visitante": "pa2",
         "golesLocal": null,
         "golesVisitante": null
       },
@@ -922,7 +922,7 @@
         "id": "liga_83",
         "jornada": 9,
         "local": "pa5",
-        "visitante": "pa21",
+        "visitante": "pa20",
         "golesLocal": null,
         "golesVisitante": null
       },
@@ -930,7 +930,7 @@
         "id": "liga_84",
         "jornada": 9,
         "local": "pa7",
-        "visitante": "pa22",
+        "visitante": "pa18",
         "golesLocal": null,
         "golesVisitante": null
       },
@@ -938,7 +938,7 @@
         "id": "liga_85",
         "jornada": 9,
         "local": "pa9",
-        "visitante": "pa20",
+        "visitante": "pa16",
         "golesLocal": null,
         "golesVisitante": null
       },
@@ -946,7 +946,7 @@
         "id": "liga_86",
         "jornada": 9,
         "local": "pa11",
-        "visitante": "pa18",
+        "visitante": "pa14",
         "golesLocal": null,
         "golesVisitante": null
       },
@@ -954,7 +954,7 @@
         "id": "liga_87",
         "jornada": 9,
         "local": "pa13",
-        "visitante": "pa16",
+        "visitante": "pa12",
         "golesLocal": null,
         "golesVisitante": null
       },
@@ -962,7 +962,7 @@
         "id": "liga_88",
         "jornada": 9,
         "local": "pa15",
-        "visitante": "pa12",
+        "visitante": "pa10",
         "golesLocal": null,
         "golesVisitante": null
       },
@@ -970,7 +970,7 @@
         "id": "liga_89",
         "jornada": 9,
         "local": "pa17",
-        "visitante": "pa14",
+        "visitante": "pa8",
         "golesLocal": null,
         "golesVisitante": null
       },
@@ -978,7 +978,7 @@
         "id": "liga_90",
         "jornada": 9,
         "local": "pa19",
-        "visitante": "pa10",
+        "visitante": "pa6",
         "golesLocal": null,
         "golesVisitante": null
       },
@@ -986,7 +986,7 @@
         "id": "liga_91",
         "jornada": 10,
         "local": "pa1",
-        "visitante": "pa6",
+        "visitante": "pa2",
         "golesLocal": null,
         "golesVisitante": null
       },
@@ -994,7 +994,7 @@
         "id": "liga_92",
         "jornada": 10,
         "local": "pa3",
-        "visitante": "pa21",
+        "visitante": "pa20",
         "golesLocal": null,
         "golesVisitante": null
       },
@@ -1002,7 +1002,7 @@
         "id": "liga_93",
         "jornada": 10,
         "local": "pa5",
-        "visitante": "pa22",
+        "visitante": "pa18",
         "golesLocal": null,
         "golesVisitante": null
       },
@@ -1010,7 +1010,7 @@
         "id": "liga_94",
         "jornada": 10,
         "local": "pa7",
-        "visitante": "pa20",
+        "visitante": "pa16",
         "golesLocal": null,
         "golesVisitante": null
       },
@@ -1018,7 +1018,7 @@
         "id": "liga_95",
         "jornada": 10,
         "local": "pa9",
-        "visitante": "pa18",
+        "visitante": "pa14",
         "golesLocal": null,
         "golesVisitante": null
       },
@@ -1026,7 +1026,7 @@
         "id": "liga_96",
         "jornada": 10,
         "local": "pa11",
-        "visitante": "pa16",
+        "visitante": "pa12",
         "golesLocal": null,
         "golesVisitante": null
       },
@@ -1034,7 +1034,7 @@
         "id": "liga_97",
         "jornada": 10,
         "local": "pa13",
-        "visitante": "pa12",
+        "visitante": "pa10",
         "golesLocal": null,
         "golesVisitante": null
       },
@@ -1042,7 +1042,7 @@
         "id": "liga_98",
         "jornada": 10,
         "local": "pa15",
-        "visitante": "pa14",
+        "visitante": "pa8",
         "golesLocal": null,
         "golesVisitante": null
       },
@@ -1050,7 +1050,7 @@
         "id": "liga_99",
         "jornada": 10,
         "local": "pa17",
-        "visitante": "pa10",
+        "visitante": "pa6",
         "golesLocal": null,
         "golesVisitante": null
       },
@@ -1058,7 +1058,7 @@
         "id": "liga_100",
         "jornada": 10,
         "local": "pa19",
-        "visitante": "pa8",
+        "visitante": "pa4",
         "golesLocal": null,
         "golesVisitante": null
       }

@@ -230,6 +230,68 @@
     .flex-gap { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
     .mt { margin-top: 14px; }
     .text-gris { color: var(--gris); font-size: 13px; }
+
+    /* BOLILLERO */
+    .bolillero-wrap {
+      text-align: center;
+      padding: 10px 0 20px;
+    }
+    .bolillero-esfera {
+      width: 140px; height: 140px;
+      border-radius: 50%;
+      background: radial-gradient(circle at 35% 35%, #2a5caa, #0a1a3a);
+      border: 3px solid var(--dorado2);
+      margin: 0 auto 16px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      box-shadow: 0 0 30px rgba(245,166,35,0.3), inset 0 0 20px rgba(0,0,0,0.5);
+    }
+    .bolillero-esfera.girando {
+      animation: girar 0.6s linear infinite;
+    }
+    .bolillero-esfera.saliendo {
+      animation: salir 0.4s ease-out forwards;
+    }
+    @keyframes girar {
+      0% { box-shadow: 0 0 30px rgba(245,166,35,0.3), inset 0 0 20px rgba(0,0,0,0.5); }
+      50% { box-shadow: 0 0 50px rgba(245,166,35,0.7), inset 0 0 20px rgba(0,0,0,0.5); }
+      100% { box-shadow: 0 0 30px rgba(245,166,35,0.3), inset 0 0 20px rgba(0,0,0,0.5); }
+    }
+    @keyframes salir {
+      0% { transform: scale(1); }
+      50% { transform: scale(1.2); box-shadow: 0 0 60px rgba(245,166,35,0.9); }
+      100% { transform: scale(1); }
+    }
+    .bolillero-texto {
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--dorado2);
+      text-align: center;
+      padding: 0 10px;
+      line-height: 1.3;
+    }
+    .bolillero-numero {
+      font-size: 11px;
+      color: var(--gris);
+      margin-bottom: 4px;
+    }
+    .bolilla-item {
+      animation: aparecer 0.4s ease-out;
+    }
+    @keyframes aparecer {
+      from { opacity: 0; transform: translateY(-10px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    .sorteo-col-titulo {
+      font-size: 13px;
+      font-weight: 700;
+      padding: 6px 10px;
+      border-radius: 6px;
+      margin-bottom: 10px;
+      text-align: center;
+    }
   </style>
 </head>
 <body>
@@ -640,38 +702,150 @@ function renderSorteo() {
   }
 
   // No se sorteó aún
+  const argSanti = estado.equiposArgentinos.filter(e => e.dueno === 'santi').length
+  const argLuciano = estado.equiposArgentinos.filter(e => e.dueno === 'luciano').length
+  const intSanti = 16 - argSanti
+  const intLuciano = 16 - argLuciano
   cont.innerHTML = `
     <div class="card">
-      <div class="card-titulo">Sorteo de 24 equipos internacionales</div>
-      <p class="text-gris">Se sortearán 24 equipos del pool de ${poolClubes.length} clubes. 12 para Santi y 12 para Luciano. Ningún cruce en primera ronda será del mismo dueño.</p>
-      ${esAdmin ? `
-        <div class="mt">
-          <button class="btn btn-primary" onclick="hacerSorteo()">🎲 Sortear ahora</button>
+      <div class="card-titulo">Sorteo de equipos internacionales</div>
+      <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-bottom:16px;">
+        <div style="background:var(--azul3); border-radius:8px; padding:12px; text-align:center;">
+          <div class="badge-santi" style="display:inline-block; margin-bottom:6px;">SANTI</div>
+          <div style="font-size:22px; font-weight:700;">${argSanti} 🇦🇷 + ${intSanti} 🌍</div>
+          <div class="text-gris">= 16 equipos</div>
         </div>
-      ` : '<p class="text-gris mt">Solo Santi puede realizar el sorteo.</p>'}
+        <div style="background:var(--azul3); border-radius:8px; padding:12px; text-align:center;">
+          <div class="badge-luciano" style="display:inline-block; margin-bottom:6px;">LUCIANO</div>
+          <div style="font-size:22px; font-weight:700;">${argLuciano} 🇦🇷 + ${intLuciano} 🌍</div>
+          <div class="text-gris">= 16 equipos</div>
+        </div>
+      </div>
+      <p class="text-gris" style="margin-bottom:14px;">Pool disponible: ${poolClubes.length} clubes internacionales. El sorteo garantiza que ningún cruce de primera ronda sea entre el mismo dueño.</p>
+      ${esAdmin ? `
+        <button class="btn btn-primary" onclick="hacerSorteo()">🎲 Iniciar bolillero</button>
+      ` : '<p class="text-gris">Solo Santi puede realizar el sorteo.</p>'}
+    </div>
+    <div id="bolillero-container" style="display:none;">
+      <div class="card">
+        <div class="bolillero-wrap">
+          <div class="bolillero-esfera" id="bolillero-esfera">
+            <div id="bolillero-inner">
+              <div class="bolillero-numero" id="bol-numero"></div>
+              <div class="bolillero-texto" id="bol-texto">Listo</div>
+            </div>
+          </div>
+          <div id="bol-dueno" style="font-size:13px; min-height:24px;"></div>
+        </div>
+        <div class="sorteo-grid">
+          <div>
+            <div class="sorteo-col-titulo badge-santi">SANTI — <span id="cnt-santi">0</span>/${intSanti}</div>
+            <div id="col-santi"></div>
+          </div>
+          <div>
+            <div class="sorteo-col-titulo badge-luciano">LUCIANO — <span id="cnt-luciano">0</span>/${intLuciano}</div>
+            <div id="col-luciano"></div>
+          </div>
+        </div>
+        <div id="bol-botones" class="flex-gap mt" style="display:none;">
+          <button class="btn btn-gold" onclick="confirmarSorteo()">✅ Confirmar sorteo</button>
+          <button class="btn btn-secondary" onclick="hacerSorteo()">🔀 Sortear de nuevo</button>
+        </div>
+      </div>
     </div>
   `
 }
 
 function hacerSorteo() {
-  if (poolClubes.length < 24) { toast('Pool de clubes no cargado', true); return }
-  // Mezclar pool
+  if (poolClubes.length < 10) { toast('Pool de clubes no cargado', true); return }
+
+  // Calcular cuántos necesita cada uno
+  const argSanti = estado.equiposArgentinos.filter(e => e.dueno === 'santi').length
+  const argLuciano = estado.equiposArgentinos.filter(e => e.dueno === 'luciano').length
+  const intSanti = 16 - argSanti
+  const intLuciano = 16 - argLuciano
+  const totalInt = intSanti + intLuciano
+
+  // Mezclar pool y seleccionar
   const mezclado = [...poolClubes].sort(() => Math.random() - 0.5)
-  const seleccionados = mezclado.slice(0, 24)
-  // Repartir 12/12 alternando
-  const internacionales = seleccionados.map((club, i) => ({
-    id: `int${i + 1}`,
-    nombre: club.nombre,
-    liga: club.liga,
-    dueno: i < 12 ? 'santi' : 'luciano'
+  const seleccionados = mezclado.slice(0, totalInt)
+
+  // Repartir
+  const santiTeams = seleccionados.slice(0, intSanti).map((club, i) => ({
+    id: `int_s${i+1}`, nombre: club.nombre, liga: club.liga, dueno: 'santi'
   }))
-  // Mezclar dentro de cada grupo para variedad
-  const santiTeams = internacionales.filter(e => e.dueno === 'santi').sort(() => Math.random() - 0.5)
-  const lucianoTeams = internacionales.filter(e => e.dueno === 'luciano').sort(() => Math.random() - 0.5)
+  const lucianoTeams = seleccionados.slice(intSanti).map((club, i) => ({
+    id: `int_l${i+1}`, nombre: club.nombre, liga: club.liga, dueno: 'luciano'
+  }))
+
+  // Mezclar el orden para el bolillero (alternando dueños)
+  const bolillas = []
+  const maxLen = Math.max(santiTeams.length, lucianoTeams.length)
+  for (let i = 0; i < maxLen; i++) {
+    if (i < santiTeams.length) bolillas.push(santiTeams[i])
+    if (i < lucianoTeams.length) bolillas.push(lucianoTeams[i])
+  }
+
   estado.sorteo.internacionales = [...santiTeams, ...lucianoTeams]
   estado.sorteo.realizado = true
   estado.sorteo.confirmado = false
-  renderSorteo()
+
+  // Mostrar bolillero
+  document.getElementById('bolillero-container').style.display = 'block'
+  document.getElementById('bol-botones').style.display = 'none'
+  document.getElementById('col-santi').innerHTML = ''
+  document.getElementById('col-luciano').innerHTML = ''
+  document.getElementById('cnt-santi').textContent = '0'
+  document.getElementById('cnt-luciano').textContent = '0'
+
+  animarBolillero(bolillas, 0)
+}
+
+function animarBolillero(bolillas, idx) {
+  const esfera = document.getElementById('bolillero-esfera')
+  const textoEl = document.getElementById('bol-texto')
+  const numEl = document.getElementById('bol-numero')
+  const duenoEl = document.getElementById('bol-dueno')
+
+  if (idx >= bolillas.length) {
+    // Terminó
+    esfera.classList.remove('girando')
+    textoEl.textContent = '¡Listo!'
+    numEl.textContent = ''
+    duenoEl.innerHTML = ''
+    document.getElementById('bol-botones').style.display = 'flex'
+    return
+  }
+
+  const club = bolillas[idx]
+  esfera.classList.add('girando')
+  textoEl.textContent = '...'
+  numEl.textContent = `${idx + 1} / ${bolillas.length}`
+  duenoEl.innerHTML = ''
+
+  // Después de girar un momento, mostrar el equipo
+  setTimeout(() => {
+    esfera.classList.remove('girando')
+    esfera.classList.add('saliendo')
+    textoEl.textContent = club.nombre
+    numEl.textContent = `${idx + 1} / ${bolillas.length}`
+    duenoEl.innerHTML = `<span class="badge-${club.dueno}" style="font-size:13px;">${club.dueno === 'santi' ? 'Santi' : 'Luciano'}</span>`
+
+    // Agregar a la columna correspondiente
+    const col = document.getElementById(`col-${club.dueno}`)
+    const cntEl = document.getElementById(`cnt-${club.dueno}`)
+    const div = document.createElement('div')
+    div.className = 'equipo-row bolilla-item'
+    div.innerHTML = `<span class="equipo-nombre">${club.nombre}</span><span class="equipo-liga">${club.liga}</span>`
+    col.appendChild(div)
+    cntEl.textContent = col.children.length
+
+    setTimeout(() => {
+      esfera.classList.remove('saliendo')
+      // Siguiente bolilla
+      setTimeout(() => animarBolillero(bolillas, idx + 1), 300)
+    }, 800)
+  }, 600)
 }
 
 async function confirmarSorteo() {

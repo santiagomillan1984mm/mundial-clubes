@@ -509,6 +509,13 @@
       border-radius: 6px;
     }
     .score-sep { color: var(--gris); font-weight: 700; }
+    .btn-filtro-liga {
+      padding: 5px 12px; border-radius: 16px; border: 1px solid var(--border);
+      background: var(--card); color: var(--gris); font-size: 12px; cursor: pointer;
+      font-weight: 600; transition: all 0.15s;
+    }
+    .btn-filtro-liga.activo { background: var(--azul3); color: var(--texto); border-color: #4a9eff; }
+    .jornada-bloque { margin-bottom: 4px; }
     .jornada-header {
       background: var(--azul3);
       border-radius: 8px;
@@ -2203,62 +2210,165 @@ function renderLiga() {
     </table></div>
   </div>`
 
-  // Jornadas
-  for (let j = 1; j <= 10; j++) {
-    const partidos = liga.partidos.filter(p => p.jornada === j)
-    const jugados = partidos.filter(p => p.golesLocal !== null).length
-    const completa = jugados === 10
+  // Stats Santi vs Luciano
+  const jugados = liga.partidos.filter(p => p.golesLocal !== null)
+  let wSanti=0, wLuciano=0, empates=0, gSanti=0, gLuciano=0
+  for (const p of jugados) {
+    const dL = liga.equipos.find(e=>e.id===p.local)?.dueno||''
+    const dV = liga.equipos.find(e=>e.id===p.visitante)?.dueno||''
+    if (dL==='santi') gSanti += p.golesLocal; else gLuciano += p.golesLocal
+    if (dV==='santi') gSanti += p.golesVisitante; else gLuciano += p.golesVisitante
+    if (p.golesLocal > p.golesVisitante) { if(dL==='santi') wSanti++; else wLuciano++ }
+    else if (p.golesVisitante > p.golesLocal) { if(dV==='santi') wSanti++; else wLuciano++ }
+    else empates++
+  }
+  const total = wSanti + wLuciano + empates
+  const pctS = total ? Math.round(wSanti/total*100) : 0
+  const pctL = total ? Math.round(wLuciano/total*100) : 0
 
-    html += `<div class="card" style="padding:14px 16px;">
-      <div class="jornada-header">
-        <span>Jornada ${j}</span>
-        <span class="jornada-completada">${completa ? '✓ Completa' : `${jugados}/10`}</span>
+  if (jugados.length > 0) {
+    html += `<div class="card" style="margin-bottom:14px;">
+      <div class="card-titulo">⚔️ Santi vs Luciano — ${total} partidos jugados</div>
+      <div style="display:flex;gap:8px;align-items:center;margin-bottom:12px;flex-wrap:wrap;">
+        <div style="flex:1;text-align:center;min-width:80px;">
+          <div style="font-size:28px;font-weight:800;color:#4a9eff;">${wSanti}</div>
+          <div style="font-size:12px;color:var(--gris);">Victorias Santi</div>
+          <div style="font-size:11px;color:#4a9eff;">${pctS}%</div>
+        </div>
+        <div style="flex:1;text-align:center;min-width:60px;">
+          <div style="font-size:22px;font-weight:700;color:var(--gris);">${empates}</div>
+          <div style="font-size:11px;color:var(--gris);">Empates</div>
+        </div>
+        <div style="flex:1;text-align:center;min-width:80px;">
+          <div style="font-size:28px;font-weight:800;color:#ff6b6b;">${wLuciano}</div>
+          <div style="font-size:12px;color:var(--gris);">Victorias Luciano</div>
+          <div style="font-size:11px;color:#ff6b6b;">${pctL}%</div>
+        </div>
       </div>
-      ${partidos.map(p => {
-        const gl = p.golesLocal !== null ? p.golesLocal : ''
-        const gv = p.golesVisitante !== null ? p.golesVisitante : ''
-        const localN = getPoolNombre(p.local)
-        const visitN = getPoolNombre(p.visitante)
-        const dLocal = estado.ligaAfa.equipos.find(e => e.id === p.local)?.dueno || ''
-        const dVisit = estado.ligaAfa.equipos.find(e => e.id === p.visitante)?.dueno || ''
-        const esGanadorLocal = p.golesLocal !== null && p.golesLocal > p.golesVisitante
-        const esGanadorVisit = p.golesVisitante !== null && p.golesVisitante > p.golesLocal
-        if (esAdmin) {
-          return `<div class="partido-row">
-            <div class="partido-equipo" style="display:flex;align-items:center;gap:6px;color:${dLocal==='santi'?'#4a9eff':'#ff6b6b'};font-weight:${esGanadorLocal?'700':'400'}">
-              ${logoHTML(p.local, 20)}<span>${localN}</span>
-            </div>
-            <div class="partido-score">
-              <input class="input score-input" type="number" min="0" max="99" value="${gl}" placeholder="-" id="gl_${p.id}" onchange="guardarPartidoLiga('${p.id}')">
-              <span class="score-sep">-</span>
-              <input class="input score-input" type="number" min="0" max="99" value="${gv}" placeholder="-" id="gv_${p.id}" onchange="guardarPartidoLiga('${p.id}')">
-            </div>
-            <div class="partido-equipo derecha" style="display:flex;align-items:center;justify-content:flex-end;gap:6px;color:${dVisit==='santi'?'#4a9eff':'#ff6b6b'};font-weight:${esGanadorVisit?'700':'400'}">
-              <span>${visitN}</span>${logoHTML(p.visitante, 20)}
-            </div>
-          </div>`
-        } else {
-          const sc = p.golesLocal !== null ? `${p.golesLocal} - ${p.golesVisitante}` : 'vs'
-          return `<div class="partido-row">
-            <div class="partido-equipo" style="display:flex;align-items:center;gap:6px;color:${dLocal==='santi'?'#4a9eff':'#ff6b6b'};font-weight:${esGanadorLocal?'700':'400'}">
-              ${logoHTML(p.local, 20)}<span>${localN}</span>
-            </div>
-            <span style="flex-shrink:0;font-weight:700;color:var(--dorado2);padding:0 10px;">${sc}</span>
-            <div class="partido-equipo derecha" style="display:flex;align-items:center;justify-content:flex-end;gap:6px;color:${dVisit==='santi'?'#4a9eff':'#ff6b6b'};font-weight:${esGanadorVisit?'700':'400'}">
-              <span>${visitN}</span>${logoHTML(p.visitante, 20)}
-            </div>
-          </div>`
-        }
-      }).join('')}
+      <div style="display:flex;height:8px;border-radius:4px;overflow:hidden;gap:2px;">
+        <div style="flex:${wSanti||0.1};background:#4a9eff;border-radius:4px 0 0 4px;"></div>
+        <div style="flex:${empates||0.1};background:var(--gris);"></div>
+        <div style="flex:${wLuciano||0.1};background:#ff6b6b;border-radius:0 4px 4px 0;"></div>
+      </div>
+      <div style="display:flex;justify-content:space-between;margin-top:6px;font-size:11px;color:var(--gris);">
+        <span>⚽ Goles Santi: <strong style="color:#4a9eff">${gSanti}</strong></span>
+        <span>⚽ Goles Luciano: <strong style="color:#ff6b6b">${gLuciano}</strong></span>
+      </div>
     </div>`
   }
 
-  // Botón resetear (admin)
+  // Filtros de jornada
+  html += `<div class="card" style="padding:14px 16px;">
+    <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-bottom:14px;">
+      <span style="font-size:12px;color:var(--gris);font-weight:600;">FILTRAR:</span>
+      <button class="btn-filtro-liga activo" onclick="filtrarLiga('todos',this)">Todos</button>
+      <button class="btn-filtro-liga" onclick="filtrarLiga('santi',this)" style="color:#4a9eff;">Santi</button>
+      <button class="btn-filtro-liga" onclick="filtrarLiga('luciano',this)" style="color:#ff6b6b;">Luciano</button>
+      <button class="btn-filtro-liga" onclick="filtrarLiga('pendientes',this)">Pendientes</button>
+      <button class="btn-filtro-liga" onclick="filtrarLiga('jugados',this)">Jugados</button>
+    </div>
+    <div id="liga-jornadas">`
+
+  for (let j = 1; j <= 10; j++) {
+    const partidos = liga.partidos.filter(p => p.jornada === j)
+    const jugadosJ = partidos.filter(p => p.golesLocal !== null).length
+    const completa = jugadosJ === 10
+    const esActual = j === jornadaActual
+
+    html += `<div class="jornada-bloque" data-jornada="${j}">
+      <div class="jornada-header" onclick="toggleJornada(${j})" style="cursor:pointer;user-select:none;">
+        <span>Jornada ${j}${esActual && !completa ? ' <span style="font-size:10px;background:#1e3a8a;color:#4a9eff;border-radius:4px;padding:1px 6px;margin-left:4px;">EN CURSO</span>' : ''}</span>
+        <div style="display:flex;align-items:center;gap:8px;">
+          <span class="jornada-completada">${completa ? '✓ Completa' : `${jugadosJ}/10`}</span>
+          <span id="chevron-j${j}" style="color:var(--gris);transition:transform 0.2s;">${esActual ? '▲' : '▼'}</span>
+        </div>
+      </div>
+      <div id="jornada-body-${j}" style="display:${esActual ? 'block' : 'none'};">
+        ${partidos.map(p => renderPartidoLigaHTML(p)).join('')}
+      </div>
+    </div>`
+  }
+
+  html += `</div></div>`
+
   if (esAdmin) {
     html += `<div class="flex-gap mt"><button class="btn btn-danger btn-sm" onclick="resetLiga()">↺ Reconfigurar liga</button></div>`
   }
 
   cont.innerHTML = html
+}
+
+function renderPartidoLigaHTML(p) {
+  const gl = p.golesLocal !== null ? p.golesLocal : ''
+  const gv = p.golesVisitante !== null ? p.golesVisitante : ''
+  const localN = getPoolNombre(p.local)
+  const visitN = getPoolNombre(p.visitante)
+  const dLocal = estado.ligaAfa.equipos.find(e => e.id === p.local)?.dueno || ''
+  const dVisit = estado.ligaAfa.equipos.find(e => e.id === p.visitante)?.dueno || ''
+  const esGanL = p.golesLocal !== null && p.golesLocal > p.golesVisitante
+  const esGanV = p.golesVisitante !== null && p.golesVisitante > p.golesLocal
+  const esEmpate = p.golesLocal !== null && p.golesLocal === p.golesVisitante
+  if (esAdmin) {
+    return `<div class="partido-row" data-local="${dLocal}" data-visita="${dVisit}" data-jugado="${p.golesLocal !== null}">
+      <div class="partido-equipo" style="display:flex;align-items:center;gap:6px;color:${dLocal==='santi'?'#4a9eff':'#ff6b6b'};font-weight:${esGanL?700:400}">${logoHTML(p.local,20)}<span>${localN}</span></div>
+      <div class="partido-score">
+        <input class="input score-input" type="number" min="0" max="99" value="${gl}" placeholder="-" id="gl_${p.id}" onchange="guardarPartidoLiga('${p.id}')">
+        <span class="score-sep">-</span>
+        <input class="input score-input" type="number" min="0" max="99" value="${gv}" placeholder="-" id="gv_${p.id}" onchange="guardarPartidoLiga('${p.id}')">
+      </div>
+      <div class="partido-equipo derecha" style="display:flex;align-items:center;justify-content:flex-end;gap:6px;color:${dVisit==='santi'?'#4a9eff':'#ff6b6b'};font-weight:${esGanV?700:400}"><span>${visitN}</span>${logoHTML(p.visitante,20)}</div>
+    </div>`
+  } else {
+    const sc = p.golesLocal !== null ? `<span style="font-size:15px;font-weight:800;color:${esEmpate?'var(--gris)':'var(--dorado2)'};">${p.golesLocal} - ${p.golesVisitante}</span>` : `<span style="color:var(--gris);font-size:13px;">vs</span>`
+    return `<div class="partido-row" data-local="${dLocal}" data-visita="${dVisit}" data-jugado="${p.golesLocal !== null}">
+      <div class="partido-equipo" style="display:flex;align-items:center;gap:6px;color:${dLocal==='santi'?'#4a9eff':'#ff6b6b'};font-weight:${esGanL?700:400}">${logoHTML(p.local,20)}<span>${localN}</span></div>
+      <div style="flex-shrink:0;padding:0 10px;">${sc}</div>
+      <div class="partido-equipo derecha" style="display:flex;align-items:center;justify-content:flex-end;gap:6px;color:${dVisit==='santi'?'#4a9eff':'#ff6b6b'};font-weight:${esGanV?700:400}"><span>${visitN}</span>${logoHTML(p.visitante,20)}</div>
+    </div>`
+  }
+}
+
+function toggleJornada(j) {
+  const body = document.getElementById(`jornada-body-${j}`)
+  const chevron = document.getElementById(`chevron-j${j}`)
+  if (!body) return
+  const abierto = body.style.display !== 'none'
+  body.style.display = abierto ? 'none' : 'block'
+  if (chevron) chevron.textContent = abierto ? '▼' : '▲'
+}
+
+function filtrarLiga(filtro, btn) {
+  // Actualizar botones activos
+  document.querySelectorAll('.btn-filtro-liga').forEach(b => b.classList.remove('activo'))
+  if (btn) btn.classList.add('activo')
+
+  // Expandir todas las jornadas cuando hay filtro activo
+  const abrirTodo = filtro !== 'todos'
+  for (let j = 1; j <= 10; j++) {
+    const body = document.getElementById(`jornada-body-${j}`)
+    const chevron = document.getElementById(`chevron-j${j}`)
+    if (body && abrirTodo) { body.style.display = 'block'; if(chevron) chevron.textContent = '▲' }
+  }
+
+  document.querySelectorAll('.partido-row').forEach(row => {
+    const local = row.dataset.local
+    const visita = row.dataset.visita
+    const jugado = row.dataset.jugado === 'true'
+    let visible = true
+    if (filtro === 'santi') visible = local === 'santi' || visita === 'santi'
+    else if (filtro === 'luciano') visible = local === 'luciano' || visita === 'luciano'
+    else if (filtro === 'pendientes') visible = !jugado
+    else if (filtro === 'jugados') visible = jugado
+    row.style.display = visible ? '' : 'none'
+  })
+
+  // Ocultar jornadas vacías después del filtro
+  for (let j = 1; j <= 10; j++) {
+    const bloque = document.querySelector(`.jornada-bloque[data-jornada="${j}"]`)
+    if (!bloque) continue
+    const visibles = bloque.querySelectorAll('.partido-row:not([style*="none"])')
+    bloque.style.display = visibles.length === 0 && filtro !== 'todos' ? 'none' : ''
+  }
 }
 
 function renderLigaConfig(cont) {

@@ -630,7 +630,8 @@
   <button class="nav-btn" onclick="mostrarSeccion('copa')">🏆 Copa Arg.</button>
   <button class="nav-btn" onclick="mostrarSeccion('argentinos')">Mundial Arg.</button>
   <button class="nav-btn" onclick="mostrarSeccion('sorteo')">Sorteo</button>
-  <button class="nav-btn" onclick="mostrarSeccion('bracket')">Bracket</button>
+  <button class="nav-btn" onclick="mostrarSeccion('bracket')">Eliminatorias</button>
+  <button class="nav-btn" onclick="mostrarSeccion('historial')">🏅 Historial</button>
   <button class="nav-btn" onclick="mostrarSeccion('admin')">Admin</button>
 </nav>
 
@@ -677,7 +678,7 @@
 
   <!-- BRACKET -->
   <div id="sec-bracket" class="seccion">
-    <div class="sec-titulo">⚽ Bracket</div>
+    <div class="sec-titulo">⚽ Eliminatorias</div>
     <div id="bracket-contenido">
       <div class="card">
         <p class="text-gris">El bracket se genera automáticamente cuando se confirme el sorteo.</p>
@@ -686,6 +687,12 @@
   </div>
 
   <!-- ADMIN -->
+  <!-- HISTORIAL -->
+  <div id="sec-historial" class="seccion">
+    <div class="sec-titulo">🏅 Historial de Campeones</div>
+    <div id="historial-contenido"></div>
+  </div>
+
   <div id="sec-admin" class="seccion">
     <div class="sec-titulo">🔐 Modo Admin</div>
     <div class="card">
@@ -857,7 +864,8 @@ const ESTADO_INICIAL = {
     { id: 'arg8', nombre: 'Equipo 8', dueno: 'santi' },
   ],
   sorteo: { realizado: false, confirmado: false, internacionales: [] },
-  bracket: { dieciseisavos: [], octavos: [], cuartos: [], semis: [], final: [] }
+  bracket: { dieciseisavos: [], octavos: [], cuartos: [], semis: [], final: [] },
+  historial: []
 }
 
 // ══════════════════════════════════════════════
@@ -1002,17 +1010,139 @@ async function cargarPool() {
 // ══════════════════════════════════════════════
 // RENDER GENERAL
 // ══════════════════════════════════════════════
+// ══════════════════════════════════════════════
+// HISTORIAL
+// ══════════════════════════════════════════════
+const COMPETENCIAS_LABEL = { liga: 'Liga AFA', copa: 'Copa Argentina', mundial: 'Mundial de Clubes' }
+const MEDALLAS = ['🥇','🥈','🥉']
+
+function renderHistorial() {
+  const cont = document.getElementById('historial-contenido')
+  if (!cont) return
+  const historial = (estado.historial || []).slice().sort((a,b) => b.temporada - a.temporada)
+
+  // Agrupar por temporada
+  const porTemporada = {}
+  for (const h of historial) {
+    if (!porTemporada[h.temporada]) porTemporada[h.temporada] = []
+    porTemporada[h.temporada].push(h)
+  }
+
+  // Contar títulos por equipo
+  const titulos = {}
+  for (const h of historial) {
+    if (!titulos[h.campeon]) titulos[h.campeon] = 0
+    titulos[h.campeon]++
+  }
+  const rankTitulos = Object.entries(titulos).sort((a,b) => b[1]-a[1]).slice(0,5)
+
+  const adminBtn = esAdmin ? `
+    <div class="card" style="margin-bottom:14px;">
+      <div class="card-titulo">➕ Registrar campeón</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr auto;gap:10px;align-items:end;flex-wrap:wrap;">
+        <div>
+          <label style="font-size:12px;color:var(--gris);display:block;margin-bottom:4px;">Temporada</label>
+          <input type="number" id="hist-temp" placeholder="2024" min="2020" max="2030" style="width:100%;padding:8px;border-radius:6px;border:1px solid var(--border);background:var(--azul2);color:var(--texto);" />
+        </div>
+        <div>
+          <label style="font-size:12px;color:var(--gris);display:block;margin-bottom:4px;">Competencia</label>
+          <select id="hist-comp" style="width:100%;padding:8px;border-radius:6px;border:1px solid var(--border);background:var(--azul2);color:var(--texto);">
+            <option value="liga">Liga AFA</option>
+            <option value="copa">Copa Argentina</option>
+            <option value="mundial">Mundial de Clubes</option>
+          </select>
+        </div>
+        <div>
+          <label style="font-size:12px;color:var(--gris);display:block;margin-bottom:4px;">Campeón</label>
+          <input type="text" id="hist-campeon" placeholder="Nombre del equipo" style="width:100%;padding:8px;border-radius:6px;border:1px solid var(--border);background:var(--azul2);color:var(--texto);" />
+        </div>
+        <div>
+          <label style="font-size:12px;color:var(--gris);display:block;margin-bottom:4px;">Dueño</label>
+          <select id="hist-dueno" style="width:100%;padding:8px;border-radius:6px;border:1px solid var(--border);background:var(--azul2);color:var(--texto);">
+            <option value="santi">Santi</option>
+            <option value="luciano">Luciano</option>
+          </select>
+        </div>
+      </div>
+      <div style="margin-top:10px;">
+        <button class="btn btn-primary" onclick="agregarHistorial()">Guardar campeón</button>
+      </div>
+    </div>` : ''
+
+  const temporadasHTML = Object.keys(porTemporada).sort((a,b)=>b-a).map(temp => {
+    const items = porTemporada[temp]
+    return `<div class="card" style="margin-bottom:12px;">
+      <div class="card-titulo">📅 Temporada ${temp}</div>
+      ${items.map(h => {
+        const d = h.dueno
+        const idPool = (estado.poolArgentino||[]).find(e => e.nombre === h.campeon)?.id
+        return `<div style="display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid var(--border);">
+          <div style="font-size:28px;">🏆</div>
+          ${idPool ? logoHTML(idPool, 36) : `<div style="width:36px;height:36px;border-radius:50%;background:var(--azul3);display:flex;align-items:center;justify-content:center;font-size:16px;">⚽</div>`}
+          <div style="flex:1;">
+            <div style="font-size:11px;color:var(--gris);text-transform:uppercase;letter-spacing:1px;">${COMPETENCIAS_LABEL[h.competencia]||h.competencia}</div>
+            <div style="font-size:16px;font-weight:700;color:${d==='santi'?'#4a9eff':'#ff6b6b'};">${h.campeon}</div>
+            <div style="font-size:11px;color:var(--gris);">de ${d==='santi'?'Santi':'Luciano'}</div>
+          </div>
+          ${esAdmin ? `<button onclick="eliminarHistorial('${h.id}')" style="background:#fee2e2;color:#dc2626;border:none;border-radius:6px;padding:4px 8px;cursor:pointer;font-size:12px;">✕</button>` : ''}
+        </div>`
+      }).join('')}
+    </div>`
+  }).join('')
+
+  const rankHTML = rankTitulos.length ? `<div class="card" style="margin-bottom:14px;">
+    <div class="card-titulo">👑 Más campeones</div>
+    ${rankTitulos.map(([nombre, n], i) => {
+      const idPool = (estado.poolArgentino||[]).find(e => e.nombre === nombre)?.id
+      const d = historial.find(h=>h.campeon===nombre)?.dueno||''
+      return `<div style="display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--border);">
+        <div style="font-size:20px;width:28px;text-align:center;">${MEDALLAS[i]||`${i+1}.`}</div>
+        ${idPool ? logoHTML(idPool,28) : ''}
+        <div style="flex:1;font-weight:600;color:${d==='santi'?'#4a9eff':'#ff6b6b'};">${nombre}</div>
+        <div style="font-size:18px;font-weight:800;color:var(--dorado2);">${n} 🏆</div>
+      </div>`
+    }).join('')}
+  </div>` : ''
+
+  cont.innerHTML = historial.length === 0 && !esAdmin
+    ? `<div class="card"><p class="text-gris">Aún no hay campeones registrados.</p></div>`
+    : adminBtn + rankHTML + temporadasHTML
+}
+
+async function agregarHistorial() {
+  const temp = document.getElementById('hist-temp').value.trim()
+  const comp = document.getElementById('hist-comp').value
+  const campeon = document.getElementById('hist-campeon').value.trim()
+  const dueno = document.getElementById('hist-dueno').value
+  if (!temp || !campeon) { toast('Completá todos los campos', true); return }
+  if (!estado.historial) estado.historial = []
+  estado.historial.push({ id: Date.now().toString(), temporada: Number(temp), competencia: comp, campeon, dueno })
+  await guardarEstado()
+  renderHistorial()
+  document.getElementById('hist-temp').value = ''
+  document.getElementById('hist-campeon').value = ''
+  toast('¡Campeón registrado!')
+}
+
+async function eliminarHistorial(id) {
+  if (!confirm('¿Eliminar este registro?')) return
+  estado.historial = (estado.historial||[]).filter(h => h.id !== id)
+  await guardarEstado()
+  renderHistorial()
+}
+
 function renderTodo() {
-  // Migrar estado viejo que no tiene los campos nuevos
   if (!estado.poolArgentino) estado.poolArgentino = POOL_ARG.map(e => ({...e}))
   if (!estado.ligaAfa) estado.ligaAfa = { configurado: false, equipos: [], partidos: [] }
   if (!estado.copaArgentina) estado.copaArgentina = { configurado: false, equipos: [], bracket: { r1: [], r2: [], cuartos: [], semis: [], final: [] } }
+  if (!estado.historial) estado.historial = []
   renderEstadoInicio()
   renderLiga()
   renderCopa()
   renderArgentinos()
   renderSorteo()
   renderBracket()
+  renderHistorial()
 }
 
 // ── Stats helpers ──────────────────────────────

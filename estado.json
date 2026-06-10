@@ -1,6 +1,6 @@
 {
   "version": "1.0",
-  "ultimaActualizacion": "2026-06-10T01:17:51.433Z",
+  "ultimaActualizacion": "2026-06-10T01:18:05.334Z",
   "equiposArgentinos": [
     {
       "id": "arg1",
@@ -267,40 +267,40 @@
         "jornada": 1,
         "local": "pa1",
         "visitante": "pa20",
-        "golesLocal": 3,
-        "golesVisitante": 1
+        "golesLocal": 1,
+        "golesVisitante": null
       },
       {
         "id": "liga_2",
         "jornada": 1,
         "local": "pa3",
         "visitante": "pa18",
-        "golesLocal": 4,
-        "golesVisitante": 4
+        "golesLocal": null,
+        "golesVisitante": null
       },
       {
         "id": "liga_3",
         "jornada": 1,
         "local": "pa5",
         "visitante": "pa16",
-        "golesLocal": 2,
-        "golesVisitante": 11
+        "golesLocal": null,
+        "golesVisitante": null
       },
       {
         "id": "liga_4",
         "jornada": 1,
         "local": "pa7",
         "visitante": "pa14",
-        "golesLocal": 1,
-        "golesVisitante": 2
+        "golesLocal": null,
+        "golesVisitante": null
       },
       {
         "id": "liga_5",
         "jornada": 1,
         "local": "pa9",
         "visitante": "pa12",
-        "golesLocal": 0,
-        "golesVisitante": 4
+        "golesLocal": null,
+        "golesVisitante": null
       },
       {
         "id": "liga_6",

@@ -1,6 +1,6 @@
 {
   "version": "1.0",
-  "ultimaActualizacion": "2026-06-10T00:45:43.961Z",
+  "ultimaActualizacion": "2026-06-10T00:50:52.268Z",
   "equiposArgentinos": [
     {
       "id": "arg1",
@@ -58,153 +58,123 @@
   "poolArgentino": [
     {
       "id": "pa1",
-      "nombre": "Boca Juniors",
-      "logo": "https://en.wikipedia.org/wiki/Special:FilePath/Club_Atlético_Boca_Juniors_logo.svg"
+      "nombre": "Boca Juniors"
     },
     {
       "id": "pa2",
-      "nombre": "River Plate",
-      "logo": "https://en.wikipedia.org/wiki/Special:FilePath/Escudo_del_Club_Atletico_River_Plate.svg"
+      "nombre": "River Plate"
     },
     {
       "id": "pa3",
-      "nombre": "Racing Club",
-      "logo": "https://en.wikipedia.org/wiki/Special:FilePath/Racing_Club_de_Avellaneda_Logo.svg"
+      "nombre": "Racing Club"
     },
     {
       "id": "pa4",
-      "nombre": "Rosario Central",
-      "logo": "https://en.wikipedia.org/wiki/Special:FilePath/Rosario_Central_logo.svg"
+      "nombre": "Rosario Central"
     },
     {
       "id": "pa5",
-      "nombre": "Estudiantes",
-      "logo": "https://en.wikipedia.org/wiki/Special:FilePath/Estudiantes_de_La_Plata_logo.svg"
+      "nombre": "Estudiantes"
     },
     {
       "id": "pa6",
-      "nombre": "Vélez Sarsfield",
-      "logo": "https://en.wikipedia.org/wiki/Special:FilePath/Vélez_Sársfield_logo.svg"
+      "nombre": "Vélez Sarsfield"
     },
     {
       "id": "pa7",
-      "nombre": "Lanús",
-      "logo": "https://en.wikipedia.org/wiki/Special:FilePath/Club_Atlético_Lanús_logo.svg"
+      "nombre": "Lanús"
     },
     {
       "id": "pa8",
-      "nombre": "Argentinos Juniors",
-      "logo": "https://en.wikipedia.org/wiki/Special:FilePath/Argentinos_Juniors_logo.svg"
+      "nombre": "Argentinos Juniors"
     },
     {
       "id": "pa9",
-      "nombre": "Talleres",
-      "logo": "https://en.wikipedia.org/wiki/Special:FilePath/Club_Atlético_Talleres_(Córdoba)_logo.svg"
+      "nombre": "Talleres"
     },
     {
       "id": "pa10",
-      "nombre": "Independiente",
-      "logo": "https://en.wikipedia.org/wiki/Special:FilePath/Club_Atlético_Independiente_logo.svg"
+      "nombre": "Independiente"
     },
     {
       "id": "pa11",
-      "nombre": "Belgrano",
-      "logo": "https://en.wikipedia.org/wiki/Special:FilePath/Club_Atlético_Belgrano_(Córdoba)_logo.svg"
+      "nombre": "Belgrano"
     },
     {
       "id": "pa12",
-      "nombre": "San Lorenzo",
-      "logo": "https://en.wikipedia.org/wiki/Special:FilePath/San_Lorenzo_de_Almagro_logo.svg"
+      "nombre": "San Lorenzo"
     },
     {
       "id": "pa13",
-      "nombre": "Indep. Rivadavia",
-      "logo": "https://en.wikipedia.org/wiki/Special:FilePath/Independiente_Rivadavia_logo.svg"
+      "nombre": "Indep. Rivadavia"
     },
     {
       "id": "pa14",
-      "nombre": "Defensa y Justicia",
-      "logo": "https://en.wikipedia.org/wiki/Special:FilePath/Defensa_y_Justicia_logo.svg"
+      "nombre": "Defensa y Justicia"
     },
     {
       "id": "pa15",
-      "nombre": "Huracán",
-      "logo": "https://en.wikipedia.org/wiki/Special:FilePath/Club_Atlético_Huracán_(Argentina)_logo.svg"
+      "nombre": "Huracán"
     },
     {
       "id": "pa16",
-      "nombre": "Platense",
-      "logo": "https://en.wikipedia.org/wiki/Special:FilePath/Club_Atlético_Platense_logo.svg"
+      "nombre": "Platense"
     },
     {
       "id": "pa17",
-      "nombre": "Instituto",
-      "logo": "https://en.wikipedia.org/wiki/Special:FilePath/Instituto_Atlético_Central_Córdoba_logo.svg"
+      "nombre": "Instituto"
     },
     {
       "id": "pa18",
-      "nombre": "Atlético Tucumán",
-      "logo": "https://en.wikipedia.org/wiki/Special:FilePath/Club_Atlético_Tucumán_logo.svg"
+      "nombre": "Atlético Tucumán"
     },
     {
       "id": "pa19",
-      "nombre": "Tigre",
-      "logo": "https://en.wikipedia.org/wiki/Special:FilePath/Club_Atlético_Tigre_logo.svg"
+      "nombre": "Tigre"
     },
     {
       "id": "pa20",
-      "nombre": "Unión de Santa Fe",
-      "logo": "https://en.wikipedia.org/wiki/Special:FilePath/Club_Unión_(Santa_Fe)_logo.svg"
+      "nombre": "Unión de Santa Fe"
     },
     {
       "id": "pa21",
-      "nombre": "Barracas Central",
-      "logo": "https://en.wikipedia.org/wiki/Special:FilePath/Barracas_Central_logo.svg"
+      "nombre": "Barracas Central"
     },
     {
       "id": "pa22",
-      "nombre": "Banfield",
-      "logo": "https://en.wikipedia.org/wiki/Special:FilePath/Club_Atlético_Banfield_logo.svg"
+      "nombre": "Banfield"
     },
     {
       "id": "pa23",
-      "nombre": "Newell's",
-      "logo": "https://en.wikipedia.org/wiki/Special:FilePath/Newell's_Old_Boys_Logo.svg"
+      "nombre": "Newell's"
     },
     {
       "id": "pa24",
-      "nombre": "Aldosivi",
-      "logo": "https://en.wikipedia.org/wiki/Special:FilePath/Club_Atlético_Aldosivi_logo.svg"
+      "nombre": "Aldosivi"
     },
     {
       "id": "pa25",
-      "nombre": "Gimnasia LP",
-      "logo": "https://en.wikipedia.org/wiki/Special:FilePath/Gimnasia_y_Esgrima_La_Plata_logo.svg"
+      "nombre": "Gimnasia LP"
     },
     {
       "id": "pa26",
-      "nombre": "Sarmiento",
-      "logo": "https://en.wikipedia.org/wiki/Special:FilePath/Club_Atlético_Sarmiento_(Junín)_logo.svg"
+      "nombre": "Sarmiento"
     },
     {
       "id": "pa27",
-      "nombre": "Godoy Cruz",
-      "logo": "https://en.wikipedia.org/wiki/Special:FilePath/Godoy_Cruz_Antonio_Tomba_logo.svg"
+      "nombre": "Godoy Cruz"
     },
     {
       "id": "pa28",
-      "nombre": "Central Córdoba",
-      "logo": "https://en.wikipedia.org/wiki/Special:FilePath/Central_Córdoba_(Santiago_del_Estero)_logo.svg"
+      "nombre": "Central Córdoba"
     },
     {
       "id": "pa29",
-      "nombre": "Dep. Riestra",
-      "logo": "https://en.wikipedia.org/wiki/Special:FilePath/Club_Deportivo_Riestra_logo.svg"
+      "nombre": "Dep. Riestra"
     },
     {
       "id": "pa30",
-      "nombre": "San Martín SJ",
-      "logo": "https://en.wikipedia.org/wiki/Special:FilePath/San_Martín_(San_Juan)_logo.svg"
+      "nombre": "San Martín SJ"
     }
   ],
   "ligaAfa": {

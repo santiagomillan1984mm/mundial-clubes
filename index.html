@@ -899,25 +899,20 @@ function actualizarUIAdmin() {
 // GITHUB — LEER
 // ══════════════════════════════════════════════
 async function cargarEstado() {
-  document.getElementById('estado-torneo').innerHTML = '<span class="loading">Cargando desde GitHub...</span>'
   try {
     const res = await fetch(GH_RAW + '?t=' + Date.now())
     if (res.status === 404) {
-      // Primera vez — usar estado inicial
       estado = JSON.parse(JSON.stringify(ESTADO_INICIAL))
       renderTodo()
-      document.getElementById('estado-torneo').innerHTML = '<span style="color:var(--dorado2)">Torneo no iniciado. Configurá los argentinos y realizá el sorteo.</span>'
       return
     }
     estado = await res.json()
-    // Obtener SHA para poder escribir después
     if (esAdmin) await obtenerSha()
     renderTodo()
   } catch(e) {
     console.error(e)
     estado = JSON.parse(JSON.stringify(ESTADO_INICIAL))
     renderTodo()
-    document.getElementById('estado-torneo').innerHTML = '<span style="color:var(--gris)">Sin conexión. Usando datos locales.</span>'
   }
 }
 

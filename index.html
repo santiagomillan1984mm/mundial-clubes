@@ -442,26 +442,30 @@
     }
 
     /* TABLA POSICIONES */
+    .tabla-pos-wrap { overflow-x: auto; -webkit-overflow-scrolling: touch; }
     .tabla-pos {
       width: 100%;
+      min-width: 480px;
       border-collapse: collapse;
       font-size: 13px;
     }
     .tabla-pos th {
       text-align: center;
-      padding: 6px 4px;
+      padding: 6px 6px;
       color: var(--gris);
       font-size: 11px;
       text-transform: uppercase;
       letter-spacing: 0.5px;
       border-bottom: 1px solid var(--border);
+      white-space: nowrap;
     }
     .tabla-pos th:first-child { text-align: left; padding-left: 8px; }
     .tabla-pos td {
-      padding: 7px 4px;
+      padding: 7px 6px;
       text-align: center;
       border-bottom: 1px solid var(--border);
       vertical-align: middle;
+      white-space: nowrap;
     }
     .tabla-pos td:first-child { text-align: left; padding-left: 4px; }
     .tabla-pos tr:last-child td { border-bottom: none; }
@@ -1321,7 +1325,7 @@ function renderEstadoInicio() {
   if (tabla.length && tabla.some(e => e.pj > 0)) {
     top5HTML = `<div class="card">
       <div class="card-titulo">📊 Liga AFA — Top 5</div>
-      <table class="tabla-pos">
+      <div class="tabla-pos-wrap"><table class="tabla-pos">
         <thead><tr><th>#</th><th style="text-align:left">Equipo</th><th>PJ</th><th>GF</th><th>PTS</th></tr></thead>
         <tbody>
           ${tabla.slice(0,5).map((eq,i) => `<tr class="${i<8?'clasifica':''}">
@@ -1330,7 +1334,7 @@ function renderEstadoInicio() {
             <td>${eq.pj}</td><td>${eq.gf}</td><td class="pts-cell">${eq.pts}</td>
           </tr>`).join('')}
         </tbody>
-      </table>
+      </table></div>
     </div>`
   }
 
@@ -2042,7 +2046,7 @@ function renderLiga() {
   // Tabla de posiciones
   html += `<div class="card">
     <div class="card-titulo">📊 Tabla de posiciones — ${totalJugados}/100 partidos jugados</div>
-    <table class="tabla-pos">
+    <div class="tabla-pos-wrap"><table class="tabla-pos">
       <thead><tr>
         <th>#</th><th style="text-align:left">Equipo</th><th>PJ</th><th>PG</th><th>PE</th><th>PP</th><th>GF</th><th>GC</th><th>DG</th><th>PTS</th>
       </tr></thead>
@@ -2066,7 +2070,7 @@ function renderLiga() {
           </tr>`
         }).join('')}
       </tbody>
-    </table>
+    </table></div>
   </div>`
 
   // Jornadas

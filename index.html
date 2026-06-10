@@ -1039,11 +1039,8 @@ function getMejorPartido() {
   if (!estado?.ligaAfa?.configurado) return null
   const partidos = (estado.ligaAfa.partidos || []).filter(p => p.golesLocal !== null)
   if (!partidos.length) return null
-  // Partido con más goles totales
   return partidos.reduce((best, p) => {
-    const total = p.golesLocal + p.golesVisitante
-    const bestTotal = best.golesLocal + best.golesVisitante
-    return total > bestTotal ? p : best
+    return (p.golesLocal + p.golesVisitante) > (best.golesLocal + best.golesVisitante) ? p : best
   })
 }
 
@@ -1061,6 +1058,92 @@ function getLigaLider() {
   return tabla.find(e => e.pj > 0) || null
 }
 
+function getRachas() {
+  if (!estado?.ligaAfa?.configurado) return { mejor: null, peor: null }
+  const partidos = (estado.ligaAfa.partidos || []).filter(p => p.golesLocal !== null)
+  if (!partidos.length) return { mejor: null, peor: null }
+  const equipos = estado.ligaAfa.equipos || []
+  let mejor = null, mejorN = 1, peor = null, peorN = 1
+  for (const eq of equipos) {
+    const resultados = partidos
+      .filter(p => p.local === eq.id || p.visitante === eq.id)
+      .map(p => {
+        const esLocal = p.local === eq.id
+        const gf = esLocal ? p.golesLocal : p.golesVisitante
+        const gc = esLocal ? p.golesVisitante : p.golesLocal
+        return gf > gc ? 'W' : gf < gc ? 'L' : 'D'
+      })
+    if (!resultados.length) continue
+    let wins = 0, losses = 0
+    for (let i = resultados.length - 1; i >= 0; i--) { if (resultados[i]==='W') wins++; else break }
+    for (let i = resultados.length - 1; i >= 0; i--) { if (resultados[i]==='L') losses++; else break }
+    if (wins > mejorN) { mejorN = wins; mejor = { ...eq, racha: wins } }
+    if (losses > peorN) { peorN = losses; peor = { ...eq, racha: losses } }
+  }
+  return { mejor, peor }
+}
+
+function getMejorDefensa() {
+  if (!estado?.ligaAfa?.configurado) return null
+  const tabla = calcularTablaLiga().filter(e => e.pj >= 2)
+  if (!tabla.length) return null
+  return [...tabla].sort((a,b) => a.gc - b.gc)[0]
+}
+
+function getMejorPromedio() {
+  if (!estado?.ligaAfa?.configurado) return null
+  const tabla = calcularTablaLiga().filter(e => e.pj >= 2)
+  if (!tabla.length) return null
+  return [...tabla].sort((a,b) => (b.gf/b.pj) - (a.gf/a.pj))[0]
+}
+
+function getProximoPartido() {
+  if (!estado?.ligaAfa?.configurado) return null
+  const jornada = getLigaJornadaActual()
+  const pendientes = (estado.ligaAfa.partidos || []).filter(p => p.jornada === jornada && p.golesLocal === null)
+  if (!pendientes.length) return null
+  // El más interesante: el que enfrenta a los equipos con más puntos
+  const tabla = calcularTablaLiga()
+  const posMap = {}
+  tabla.forEach((e,i) => posMap[e.id] = i)
+  return pendientes.sort((a,b) => {
+    const scoreA = (posMap[a.local]??99) + (posMap[a.visitante]??99)
+    const scoreB = (posMap[b.local]??99) + (posMap[b.visitante]??99)
+    return scoreA - scoreB
+  })[0]
+}
+
+function getUltimoEliminadoCopa() {
+  if (!estado?.copaArgentina?.configurado) return null
+  const b = estado.copaArgentina.bracket
+  for (const ronda of ['final','semis','cuartos','r2','r1']) {
+    const partidos = (b[ronda] || []).filter(p => p.ganador)
+    if (partidos.length) {
+      const ult = partidos[partidos.length - 1]
+      const perdedor = ult.ganador === ult.local ? ult.visitante : ult.local
+      const label = { final:'Final', semis:'Semis', cuartos:'Cuartos', r2:'Octavos', r1:'Ronda 1' }
+      return perdedor ? { id: perdedor, ronda: label[ronda] } : null
+    }
+  }
+  return null
+}
+
+function getFavoritoMundial() {
+  if (!estado?.sorteo?.confirmado) return null
+  const b = estado.bracket
+  const rondaLabel = { dieciseisavos:'Dieciseisavos', octavos:'Octavos', cuartos:'Cuartos', semis:'Semifinal', final:'Final' }
+  for (const ronda of ['final','semis','cuartos','octavos','dieciseisavos']) {
+    const partidos = b[ronda] || []
+    if (!partidos.length) continue
+    if (ronda === 'final' && partidos[0]?.ganador) return { id: partidos[0].ganador, ronda: '🏆 Campeón' }
+    const enJuego = partidos.filter(p => !p.ganador)
+    if (enJuego.length) return { id: enJuego[0].local, ronda: rondaLabel[ronda] }
+    // Todos tienen ganador en esta ronda — favorito es el primero que ganó
+    if (partidos[0]?.ganador) return { id: partidos[0].ganador, ronda: rondaLabel[ronda] }
+  }
+  return null
+}
+
 function renderEstadoInicio() {
   if (!estado) return
   const cont = document.getElementById('inicio-contenido')
@@ -1069,33 +1152,56 @@ function renderEstadoInicio() {
   const faseLiga = getFaseLiga()
   const faseCopa = getFaseCopa()
   const faseMundial = getFaseMundial()
-  const lider = getLigaLider()
   const masGoleador = getEquipoMasGoleador()
   const mejorPartido = getMejorPartido()
   const ultimos = getUltimosResultados(5)
   const tabla = estado?.ligaAfa?.configurado ? calcularTablaLiga() : []
+  const rachas = getRachas()
+  const mejorDefensa = getMejorDefensa()
+  const mejorPromedio = getMejorPromedio()
+  const proximoPartido = getProximoPartido()
+  const ultimoEliminado = getUltimoEliminadoCopa()
+  const favoritoMundial = getFavoritoMundial()
   const ultima = estado.ultimaActualizacion ? new Date(estado.ultimaActualizacion).toLocaleString('es-AR') : 'Nunca'
 
-  // ── Fila 1: Estado de las 3 competencias ──
+  // ── helpers de HTML ──
   function compCard(emoji, titulo, fase, sub, color) {
-    return `<div style="flex:1;min-width:160px;background:var(--card);border:1px solid var(--border);border-top:3px solid ${color};border-radius:10px;padding:14px 16px;">
+    return `<div style="flex:1;min-width:150px;background:var(--card);border:1px solid var(--border);border-top:3px solid ${color};border-radius:10px;padding:14px 16px;">
       <div style="font-size:11px;color:var(--gris);text-transform:uppercase;letter-spacing:1px;margin-bottom:6px;">${emoji} ${titulo}</div>
       <div style="font-size:15px;font-weight:700;color:var(--texto);">${fase}</div>
       ${sub ? `<div style="font-size:11px;color:var(--gris);margin-top:3px;">${sub}</div>` : ''}
     </div>`
   }
 
+  function miniCard(emoji, titulo, cuerpo) {
+    return `<div style="flex:1;min-width:140px;background:var(--card);border:1px solid var(--border);border-radius:10px;padding:12px 14px;">
+      <div style="font-size:10px;color:var(--gris);text-transform:uppercase;letter-spacing:1px;margin-bottom:8px;">${emoji} ${titulo}</div>
+      ${cuerpo}
+    </div>`
+  }
+
+  function equipoMini(id, dueno, linea1, linea2='') {
+    return `<div style="display:flex;align-items:center;gap:8px;">
+      ${logoHTML(id, 28)}
+      <div>
+        <div style="font-size:13px;font-weight:700;color:${dueno==='santi'?'#4a9eff':'#ff6b6b'};">${getPoolNombre(id)}</div>
+        ${linea1 ? `<div style="font-size:12px;color:var(--dorado2);font-weight:700;">${linea1}</div>` : ''}
+        ${linea2 ? `<div style="font-size:11px;color:var(--gris);">${linea2}</div>` : ''}
+      </div>
+    </div>`
+  }
+
   // ── Equipo más goleador ──
   let goleadorHTML = ''
   if (masGoleador) {
-    const dueno = masGoleador.dueno
+    const d = masGoleador.dueno
     goleadorHTML = `<div style="flex:1;min-width:200px;background:var(--card);border:1px solid var(--border);border-radius:10px;padding:16px;display:flex;align-items:center;gap:14px;">
-      <div>${logoHTML(masGoleador.id, 52)}</div>
+      ${logoHTML(masGoleador.id, 52)}
       <div>
-        <div style="font-size:11px;color:var(--gris);text-transform:uppercase;letter-spacing:1px;margin-bottom:4px;">⚽ Equipo más goleador</div>
-        <div style="font-size:16px;font-weight:700;color:${dueno==='santi'?'#4a9eff':'#ff6b6b'};">${getPoolNombre(masGoleador.id)}</div>
+        <div style="font-size:11px;color:var(--gris);text-transform:uppercase;letter-spacing:1px;margin-bottom:4px;">⚽ Más goleador</div>
+        <div style="font-size:16px;font-weight:700;color:${d==='santi'?'#4a9eff':'#ff6b6b'};">${getPoolNombre(masGoleador.id)}</div>
         <div style="font-size:24px;font-weight:800;color:var(--dorado2);line-height:1.2;">${masGoleador.gf} <span style="font-size:13px;color:var(--gris);font-weight:400;">goles</span></div>
-        <div style="font-size:11px;color:var(--gris);">${masGoleador.pj} partidos jugados</div>
+        <div style="font-size:11px;color:var(--gris);">${masGoleador.pj} partidos</div>
       </div>
     </div>`
   }
@@ -1104,28 +1210,96 @@ function renderEstadoInicio() {
   let mejorHTML = ''
   if (mejorPartido) {
     const total = mejorPartido.golesLocal + mejorPartido.golesVisitante
-    const dL = estado.ligaAfa.equipos.find(e => e.id === mejorPartido.local)?.dueno || ''
-    const dV = estado.ligaAfa.equipos.find(e => e.id === mejorPartido.visitante)?.dueno || ''
+    const dL = estado.ligaAfa.equipos.find(e=>e.id===mejorPartido.local)?.dueno||''
+    const dV = estado.ligaAfa.equipos.find(e=>e.id===mejorPartido.visitante)?.dueno||''
     mejorHTML = `<div style="flex:1;min-width:200px;background:var(--card);border:1px solid var(--border);border-radius:10px;padding:16px;">
       <div style="font-size:11px;color:var(--gris);text-transform:uppercase;letter-spacing:1px;margin-bottom:12px;">🔥 Mejor partido — ${total} goles</div>
       <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;">
-        <div style="display:flex;flex-direction:column;align-items:center;gap:6px;flex:1;">
-          ${logoHTML(mejorPartido.local, 44)}
+        <div style="display:flex;flex-direction:column;align-items:center;gap:4px;flex:1;">
+          ${logoHTML(mejorPartido.local, 40)}
           <span style="font-size:11px;text-align:center;color:${dL==='santi'?'#4a9eff':'#ff6b6b'};font-weight:600;">${getPoolNombre(mejorPartido.local)}</span>
         </div>
         <div style="text-align:center;flex-shrink:0;">
-          <div style="font-size:28px;font-weight:800;color:var(--dorado2);">${mejorPartido.golesLocal} - ${mejorPartido.golesVisitante}</div>
+          <div style="font-size:26px;font-weight:800;color:var(--dorado2);">${mejorPartido.golesLocal} - ${mejorPartido.golesVisitante}</div>
           <div style="font-size:10px;color:var(--gris);">J${mejorPartido.jornada}</div>
         </div>
-        <div style="display:flex;flex-direction:column;align-items:center;gap:6px;flex:1;">
-          ${logoHTML(mejorPartido.visitante, 44)}
+        <div style="display:flex;flex-direction:column;align-items:center;gap:4px;flex:1;">
+          ${logoHTML(mejorPartido.visitante, 40)}
           <span style="font-size:11px;text-align:center;color:${dV==='santi'?'#4a9eff':'#ff6b6b'};font-weight:600;">${getPoolNombre(mejorPartido.visitante)}</span>
         </div>
       </div>
     </div>`
   }
 
-  // ── Top 5 Liga ──
+  // ── Rachas ──
+  let rachasBuenaHTML = '', rachasMalaHTML = ''
+  if (rachas.mejor) {
+    const d = rachas.mejor.dueno
+    rachasBuenaHTML = miniCard('🔥','Racha ganadora', equipoMini(rachas.mejor.id, d, `${rachas.mejor.racha} victorias seguidas`))
+  }
+  if (rachas.peor) {
+    const d = rachas.peor.dueno
+    rachasMalaHTML = miniCard('😬','Racha perdedora', equipoMini(rachas.peor.id, d, `${rachas.peor.racha} derrotas seguidas`))
+  }
+
+  // ── Mejor defensa ──
+  let defHTML = ''
+  if (mejorDefensa) {
+    defHTML = miniCard('🛡️','Mejor defensa', equipoMini(mejorDefensa.id, mejorDefensa.dueno, `${mejorDefensa.gc} goles recibidos`, `${mejorDefensa.pj} partidos`))
+  }
+
+  // ── Mejor promedio goleador ──
+  let promHTML = ''
+  if (mejorPromedio) {
+    const prom = (mejorPromedio.gf / mejorPromedio.pj).toFixed(1)
+    promHTML = miniCard('🎯','Mejor promedio', equipoMini(mejorPromedio.id, mejorPromedio.dueno, `${prom} goles/partido`, `${mejorPromedio.gf} en ${mejorPromedio.pj} PJ`))
+  }
+
+  // ── Próximo partido ──
+  let proximoHTML = ''
+  if (proximoPartido) {
+    const dL = estado.ligaAfa.equipos.find(e=>e.id===proximoPartido.local)?.dueno||''
+    const dV = estado.ligaAfa.equipos.find(e=>e.id===proximoPartido.visitante)?.dueno||''
+    proximoHTML = miniCard('⚔️',`Próximo partido — J${proximoPartido.jornada}`,
+      `<div style="display:flex;align-items:center;justify-content:space-between;gap:6px;">
+        <div style="display:flex;flex-direction:column;align-items:center;gap:3px;flex:1;">
+          ${logoHTML(proximoPartido.local, 28)}
+          <span style="font-size:10px;text-align:center;color:${dL==='santi'?'#4a9eff':'#ff6b6b'};font-weight:600;">${getPoolNombre(proximoPartido.local)}</span>
+        </div>
+        <span style="font-size:16px;font-weight:800;color:var(--gris);">vs</span>
+        <div style="display:flex;flex-direction:column;align-items:center;gap:3px;flex:1;">
+          ${logoHTML(proximoPartido.visitante, 28)}
+          <span style="font-size:10px;text-align:center;color:${dV==='santi'?'#4a9eff':'#ff6b6b'};font-weight:600;">${getPoolNombre(proximoPartido.visitante)}</span>
+        </div>
+      </div>`)
+  }
+
+  // ── Último eliminado Copa ──
+  let copaEliminadoHTML = ''
+  if (ultimoEliminado) {
+    const eq = estado.copaArgentina.equipos?.find(e=>e.id===ultimoEliminado.id)
+    const d = eq?.dueno || ''
+    copaEliminadoHTML = miniCard('💔',`Último eliminado Copa`,
+      equipoMini(ultimoEliminado.id, d, `Eliminado en ${ultimoEliminado.ronda}`))
+  }
+
+  // ── Favorito Mundial ──
+  let favoritoHTML = ''
+  if (favoritoMundial) {
+    const todos = [...estado.equiposArgentinos, ...(estado.sorteo?.internacionales||[])]
+    const eq = todos.find(e=>e.id===favoritoMundial.id)
+    const d = eq?.dueno||''
+    favoritoHTML = miniCard('🌍','Favorito Mundial',
+      `<div style="display:flex;align-items:center;gap:8px;">
+        <div>
+          <div style="font-size:13px;font-weight:700;color:${d==='santi'?'#4a9eff':'#ff6b6b'};">${eq?.nombre||favoritoMundial.id}</div>
+          <div style="font-size:12px;color:var(--dorado2);font-weight:700;">${favoritoMundial.ronda}</div>
+          <div style="font-size:11px;color:var(--gris);">de ${d==='santi'?'Santi':'Luciano'}</div>
+        </div>
+      </div>`)
+  }
+
+  // ── Top 5 ──
   let top5HTML = ''
   if (tabla.length && tabla.some(e => e.pj > 0)) {
     top5HTML = `<div class="card">
@@ -1169,6 +1343,10 @@ function renderEstadoInicio() {
     </div>`
   }
 
+  // juntar mini cards que existan
+  const miniCards1 = [rachasBuenaHTML, rachasMalaHTML, defHTML, promHTML].filter(Boolean)
+  const miniCards2 = [proximoHTML, copaEliminadoHTML, favoritoHTML].filter(Boolean)
+
   cont.innerHTML = `
     <!-- Competencias -->
     <div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:14px;">
@@ -1179,6 +1357,12 @@ function renderEstadoInicio() {
 
     <!-- Stats grandes -->
     ${(goleadorHTML || mejorHTML) ? `<div style="display:flex;gap:12px;flex-wrap:wrap;margin-bottom:14px;">${goleadorHTML}${mejorHTML}</div>` : ''}
+
+    <!-- Mini stats fila 1: rachas + defensa + promedio -->
+    ${miniCards1.length ? `<div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:14px;">${miniCards1.join('')}</div>` : ''}
+
+    <!-- Mini stats fila 2: próximo partido + copa + mundial -->
+    ${miniCards2.length ? `<div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:14px;">${miniCards2.join('')}</div>` : ''}
 
     <!-- Top 5 + Últimos -->
     ${top5HTML}

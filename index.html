@@ -1972,111 +1972,136 @@ function renderClasifTentativa(tabla, n, titulo, compact = false) {
 function renderCopa() {
   const cont = document.getElementById('copa-contenido')
   if (!cont || !estado) return
+  // Defensivo: inicializar si no existe
+  if (!estado.copaArgentina) {
+    estado.copaArgentina = { configurado: false, equipos: [], bracket: { r1: [], r2: [], cuartos: [], semis: [], final: [] } }
+  }
   const copa = estado.copaArgentina
-
   if (!copa.configurado) {
     renderCopaConfig(cont)
-    return
+  } else {
+    renderCopaBracket(cont)
   }
-
-  // Copa configurada: mostrar bracket
-  renderCopaBracket(cont)
 }
 
 function renderCopaConfig(cont) {
-  const liga = estado.ligaAfa
+  const liga = estado.ligaAfa || {}
   const copa = estado.copaArgentina
   const pool = estado.poolArgentino || POOL_ARG
 
-  // Los equipos de la liga son base
-  const enLiga = (liga.equipos || []).map(e => e.id)
-  const extrasActuales = copa.equipos || []
-  const extrasSanti = extrasActuales.filter(e => e.origen === 'extra' && e.dueno === 'santi').map(e => e.id)
-  const extrasLuciano = extrasActuales.filter(e => e.origen === 'extra' && e.dueno === 'luciano').map(e => e.id)
-
-  let html = `<div class="card">
-    <div class="card-titulo">Configurar Copa Argentina</div>`
-
   if (!liga.configurado) {
-    html += `<p class="text-gris">Primero configurá la Liga AFA. Los 20 equipos de la liga participan automáticamente en la Copa.</p>`
-    cont.innerHTML = html + '</div>'
+    cont.innerHTML = `<div class="card">
+      <div class="card-titulo">Copa Argentina</div>
+      <p class="text-gris">Primero configurá la <strong>Liga AFA</strong> con los 20 equipos. Los mismos participan automáticamente en la Copa.</p>
+    </div>`
     return
   }
 
-  html += `<p class="text-gris" style="margin-bottom:14px;">
-    Los <strong>20 equipos de la Liga AFA</strong> entran automáticamente.<br>
-    Cada uno elige <strong>5 equipos extras</strong> del pool restante para completar 30.
-  </p>
-  <div style="display:flex;gap:20px;margin-bottom:12px;flex-wrap:wrap;">
-    <span style="font-size:13px;"><span class="badge-santi" style="font-size:10px;">S</span> Santi extras: <strong id="cnt-s-copa">${extrasSanti.length}</strong>/5</span>
-    <span style="font-size:13px;"><span class="badge-luciano" style="font-size:10px;">L</span> Luciano extras: <strong id="cnt-l-copa">${extrasLuciano.length}</strong>/5</span>
+  const enLiga = (liga.equipos || []).map(e => e.id)
+  const extras = (copa.equipos || []).filter(e => e.origen === 'extra')
+  const extS = extras.filter(e => e.dueno === 'santi')
+  const extL = extras.filter(e => e.dueno === 'luciano')
+  const extSIds = extS.map(e => e.id)
+  const extLIds = extL.map(e => e.id)
+  const poolResto = pool.filter(e => !enLiga.includes(e.id))
+  const disponibles = poolResto.filter(e => !extSIds.includes(e.id) && !extLIds.includes(e.id))
+
+  // Card: equipos de la liga (colapsable, solo count)
+  const ligaEquipos = liga.equipos || []
+  const ligaS = ligaEquipos.filter(e => e.dueno === 'santi')
+  const ligaL = ligaEquipos.filter(e => e.dueno === 'luciano')
+
+  function seleccionadosHTML(list, dueno) {
+    if (!list.length) return `<div class="text-gris" style="font-size:12px;padding:8px 0;">Ninguno elegido aún</div>`
+    return list.map(e => {
+      const eq = pool.find(p => p.id === e.id)
+      return `<div style="display:flex;align-items:center;gap:8px;padding:6px 0;border-bottom:1px solid var(--border);">
+        ${logoHTML(e.id, 22)}
+        <span style="flex:1;font-size:13px;">${eq?.nombre || e.id}</span>
+        ${esAdmin ? `<button onclick="quitarExtraCopa('${e.id}')" style="background:none;border:none;color:#e74c3c;cursor:pointer;font-size:16px;padding:0 4px;">×</button>` : ''}
+      </div>`
+    }).join('')
+  }
+
+  let html = `
+  <!-- Equipos base de la liga -->
+  <div class="card" style="margin-bottom:12px;">
+    <div class="card-titulo">✅ Equipos de la Liga AFA — incluidos automáticamente (20)</div>
+    <div style="display:flex;gap:16px;flex-wrap:wrap;">
+      <div>
+        <div class="badge-santi" style="font-size:11px;margin-bottom:8px;display:inline-block;">Santi — ${ligaS.length} equipos</div>
+        ${ligaS.map(e => `<div style="display:flex;align-items:center;gap:6px;padding:4px 0;font-size:12px;">${logoHTML(e.id,18)}<span>${getPoolNombre(e.id)}</span></div>`).join('')}
+      </div>
+      <div>
+        <div class="badge-luciano" style="font-size:11px;margin-bottom:8px;display:inline-block;">Luciano — ${ligaL.length} equipos</div>
+        ${ligaL.map(e => `<div style="display:flex;align-items:center;gap:6px;padding:4px 0;font-size:12px;">${logoHTML(e.id,18)}<span>${getPoolNombre(e.id)}</span></div>`).join('')}
+      </div>
+    </div>
+  </div>
+
+  <!-- Selección extras -->
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:14px;">
+    <div class="card" style="border-top:3px solid #4a9eff;">
+      <div style="font-weight:700;color:#4a9eff;margin-bottom:10px;font-size:13px;">Santi — extras ${extS.length}/5</div>
+      ${seleccionadosHTML(extS, 'santi')}
+    </div>
+    <div class="card" style="border-top:3px solid #ff6b6b;">
+      <div style="font-weight:700;color:#ff6b6b;margin-bottom:10px;font-size:13px;">Luciano — extras ${extL.length}/5</div>
+      ${seleccionadosHTML(extL, 'luciano')}
+    </div>
   </div>`
 
   if (esAdmin) {
-    // Mostrar los del pool que NO están en la liga
-    const poolResto = pool.filter(e => !enLiga.includes(e.id))
-    html += `<div class="pool-grid" id="pool-copa-grid">
-      ${poolResto.map(eq => {
-        const isSanti = extrasSanti.includes(eq.id)
-        const isLuc = extrasLuciano.includes(eq.id)
-        let cls = 'pool-item' + (isSanti ? ' seleccionado-santi' : isLuc ? ' seleccionado-luciano' : '')
-        return `<div class="${cls}" id="cpi_${eq.id}" onclick="togglePoolCopa('${eq.id}')">
+    html += `<div class="card">
+      <div class="card-titulo">Equipos disponibles para elegir (${disponibles.length})</div>
+      ${disponibles.length === 0 ? '<p class="text-gris">Todos los equipos del pool ya fueron asignados.</p>' : ''}
+      ${disponibles.map(eq => `
+        <div style="display:flex;align-items:center;gap:8px;padding:8px 0;border-bottom:1px solid var(--border);">
           ${logoHTML(eq.id, 26)}
-          <span style="flex:1;">${eq.nombre}</span>
-          ${isSanti ? '<span class="badge-santi" style="font-size:10px;padding:1px 7px;">S</span>' : ''}
-          ${isLuc ? '<span class="badge-luciano" style="font-size:10px;padding:1px 7px;">L</span>' : ''}
-        </div>`
-      }).join('')}
+          <span style="flex:1;font-size:13px;font-weight:600;">${eq.nombre}</span>
+          <button onclick="agregarExtraCopa('${eq.id}','santi')"
+            ${extS.length >= 5 ? 'disabled' : ''}
+            style="padding:5px 10px;border:none;border-radius:6px;background:${extS.length>=5?'#333':'#1a4fa3'};color:${extS.length>=5?'#666':'#fff'};font-size:12px;font-weight:700;cursor:${extS.length>=5?'default':'pointer'};">
+            + Santi
+          </button>
+          <button onclick="agregarExtraCopa('${eq.id}','luciano')"
+            ${extL.length >= 5 ? 'disabled' : ''}
+            style="padding:5px 10px;border:none;border-radius:6px;background:${extL.length>=5?'#333':'#8b1a1a'};color:${extL.length>=5?'#666':'#fff'};font-size:12px;font-weight:700;cursor:${extL.length>=5?'default':'pointer'};">
+            + Luciano
+          </button>
+        </div>`).join('')}
     </div>
-    <p class="text-gris" style="margin-top:10px;margin-bottom:14px;">Click: primer click = Santi extra, segundo = Luciano extra, tercero = quitar.</p>
-    <div class="flex-gap">
-      <button class="btn btn-primary" onclick="confirmarCopa()">🏆 Confirmar y generar bracket</button>
+    <div class="flex-gap mt">
+      <button class="btn btn-primary" onclick="confirmarCopa()"
+        ${extS.length === 5 && extL.length === 5 ? '' : 'disabled style="opacity:0.5;cursor:default;"'}>
+        🏆 Confirmar y generar bracket
+      </button>
+      <span class="text-gris" style="font-size:12px;">
+        ${extS.length === 5 && extL.length === 5 ? '¡Listo para confirmar!' : `Faltan: Santi ${5-extS.length}, Luciano ${5-extL.length}`}
+      </span>
     </div>`
   } else {
-    html += `<p class="text-gris">Esperando configuración de Santi.</p>`
+    html += `<div class="card"><p class="text-gris">Esperando que Santi complete la selección de extras.</p></div>`
   }
 
-  html += `</div>`
   cont.innerHTML = html
 }
 
-function togglePoolCopa(id) {
+function agregarExtraCopa(id, dueno) {
   if (!estado.copaArgentina.equipos) estado.copaArgentina.equipos = []
   const equipos = estado.copaArgentina.equipos
-  const idx = equipos.findIndex(e => e.id === id && e.origen === 'extra')
-  if (idx === -1) {
-    const cntS = equipos.filter(e => e.origen === 'extra' && e.dueno === 'santi').length
-    if (cntS < 5) { equipos.push({ id, dueno: 'santi', origen: 'extra' }) }
-    else {
-      const cntL = equipos.filter(e => e.origen === 'extra' && e.dueno === 'luciano').length
-      if (cntL < 5) { equipos.push({ id, dueno: 'luciano', origen: 'extra' }) }
-      else { toast('Ya hay 5 extras por jugador', true); return }
-    }
-  } else if (equipos[idx].dueno === 'santi') {
-    const cntL = equipos.filter(e => e.origen === 'extra' && e.dueno === 'luciano').length
-    if (cntL < 5) { equipos[idx].dueno = 'luciano' }
-    else { toast('Luciano ya tiene 5 extras', true); return }
-  } else {
-    equipos.splice(idx, 1)
-  }
-  // Actualizar UI
-  const el = document.getElementById(`cpi_${id}`)
-  const dot = document.getElementById(`cdot_${id}`)
-  const eq = equipos.find(e => e.id === id && e.origen === 'extra')
-  if (!el) return
-  el.className = 'pool-item' + (eq ? (eq.dueno === 'santi' ? ' seleccionado-santi' : ' seleccionado-luciano') : '')
-  if (dot) dot.className = 'pool-dot ' + (eq ? eq.dueno : '')
-  el.querySelectorAll('.badge-santi,.badge-luciano').forEach(b => b.remove())
-  if (eq) {
-    const badge = document.createElement('span')
-    badge.className = `badge-${eq.dueno}`
-    badge.style.cssText = 'font-size:10px;margin-left:auto;'
-    badge.textContent = eq.dueno === 'santi' ? 'S' : 'L'
-    el.appendChild(badge)
-  }
-  const extras = estado.copaArgentina.equipos.filter(e => e.origen === 'extra')
-  document.getElementById('cnt-s-copa').textContent = extras.filter(e => e.dueno === 'santi').length
-  document.getElementById('cnt-l-copa').textContent = extras.filter(e => e.dueno === 'luciano').length
+  const cnt = equipos.filter(e => e.origen === 'extra' && e.dueno === dueno).length
+  if (cnt >= 5) { toast(`${dueno === 'santi' ? 'Santi' : 'Luciano'} ya tiene 5 extras`, true); return }
+  if (equipos.find(e => e.id === id && e.origen === 'extra')) { toast('Ya está agregado', true); return }
+  equipos.push({ id, dueno, origen: 'extra' })
+  renderCopaConfig(document.getElementById('copa-contenido'))
+}
+
+function quitarExtraCopa(id) {
+  if (!estado.copaArgentina.equipos) return
+  const idx = estado.copaArgentina.equipos.findIndex(e => e.id === id && e.origen === 'extra')
+  if (idx !== -1) estado.copaArgentina.equipos.splice(idx, 1)
+  renderCopaConfig(document.getElementById('copa-contenido'))
 }
 
 async function confirmarCopa() {

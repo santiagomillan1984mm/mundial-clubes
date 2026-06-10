@@ -938,8 +938,8 @@ async function guardarEstado() {
   estado.ultimaActualizacion = new Date().toISOString()
   const contenido = btoa(unescape(encodeURIComponent(JSON.stringify(estado, null, 2))))
 
-  // Siempre obtener el SHA fresco antes de guardar
-  if (!fileSha) await obtenerSha()
+  // Siempre obtener SHA fresco
+  await obtenerSha()
 
   const body = { message: 'Actualizar estado torneo', content: contenido }
   if (fileSha) body.sha = fileSha
@@ -953,7 +953,23 @@ async function guardarEstado() {
     if (res.ok) {
       const data = await res.json()
       fileSha = data.content.sha
-      toast('¡Guardado en GitHub!')
+      toast('¡Guardado!')
+    } else if (res.status === 409) {
+      // SHA desactualizado — reintentar una vez con SHA fresco
+      await obtenerSha()
+      body.sha = fileSha
+      const res2 = await fetch(GH_API, {
+        method: 'PUT',
+        headers: { Authorization: `token ${token}`, 'Content-Type': 'application/json' },
+        body: JSON.stringify(body)
+      })
+      if (res2.ok) {
+        const data2 = await res2.json()
+        fileSha = data2.content.sha
+        toast('¡Guardado!')
+      } else {
+        toast('Error al guardar (reintento fallido)', true)
+      }
     } else {
       const err = await res.json()
       toast('Error al guardar: ' + err.message, true)
@@ -1048,6 +1064,7 @@ function getUltimosResultados(n = 5) {
   if (!estado?.ligaAfa?.configurado) return []
   return (estado.ligaAfa.partidos || [])
     .filter(p => p.golesLocal !== null)
+    .sort((a,b) => a.jornada - b.jornada)
     .slice(-n)
     .reverse()
 }

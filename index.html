@@ -2526,6 +2526,7 @@ async function init() {
   await cargarEstado()
   actualizarUIAdmin()
   // Cargar logos en segundo plano; re-renderizar cuando terminen
+  renderTodo()
   loadLogos().then(() => renderTodo())
 }
 

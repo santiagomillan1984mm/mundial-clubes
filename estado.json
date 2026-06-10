@@ -1,6 +1,6 @@
 {
   "version": "1.0",
-  "ultimaActualizacion": "2026-06-10T00:53:59.425Z",
+  "ultimaActualizacion": "2026-06-10T00:56:37.841Z",
   "equiposArgentinos": [
     {
       "id": "arg1",
@@ -1065,10 +1065,290 @@
     ]
   },
   "copaArgentina": {
-    "configurado": false,
-    "equipos": [],
+    "configurado": true,
+    "equipos": [
+      {
+        "id": "pa1",
+        "dueno": "santi",
+        "origen": "liga"
+      },
+      {
+        "id": "pa3",
+        "dueno": "santi",
+        "origen": "liga"
+      },
+      {
+        "id": "pa5",
+        "dueno": "santi",
+        "origen": "liga"
+      },
+      {
+        "id": "pa7",
+        "dueno": "santi",
+        "origen": "liga"
+      },
+      {
+        "id": "pa9",
+        "dueno": "santi",
+        "origen": "liga"
+      },
+      {
+        "id": "pa11",
+        "dueno": "santi",
+        "origen": "liga"
+      },
+      {
+        "id": "pa13",
+        "dueno": "santi",
+        "origen": "liga"
+      },
+      {
+        "id": "pa15",
+        "dueno": "santi",
+        "origen": "liga"
+      },
+      {
+        "id": "pa17",
+        "dueno": "santi",
+        "origen": "liga"
+      },
+      {
+        "id": "pa19",
+        "dueno": "santi",
+        "origen": "liga"
+      },
+      {
+        "id": "pa20",
+        "dueno": "luciano",
+        "origen": "liga"
+      },
+      {
+        "id": "pa18",
+        "dueno": "luciano",
+        "origen": "liga"
+      },
+      {
+        "id": "pa16",
+        "dueno": "luciano",
+        "origen": "liga"
+      },
+      {
+        "id": "pa14",
+        "dueno": "luciano",
+        "origen": "liga"
+      },
+      {
+        "id": "pa12",
+        "dueno": "luciano",
+        "origen": "liga"
+      },
+      {
+        "id": "pa10",
+        "dueno": "luciano",
+        "origen": "liga"
+      },
+      {
+        "id": "pa8",
+        "dueno": "luciano",
+        "origen": "liga"
+      },
+      {
+        "id": "pa6",
+        "dueno": "luciano",
+        "origen": "liga"
+      },
+      {
+        "id": "pa4",
+        "dueno": "luciano",
+        "origen": "liga"
+      },
+      {
+        "id": "pa2",
+        "dueno": "luciano",
+        "origen": "liga"
+      },
+      {
+        "id": "pa21",
+        "dueno": "santi",
+        "origen": "extra"
+      },
+      {
+        "id": "pa22",
+        "dueno": "santi",
+        "origen": "extra"
+      },
+      {
+        "id": "pa23",
+        "dueno": "santi",
+        "origen": "extra"
+      },
+      {
+        "id": "pa24",
+        "dueno": "santi",
+        "origen": "extra"
+      },
+      {
+        "id": "pa25",
+        "dueno": "luciano",
+        "origen": "extra"
+      },
+      {
+        "id": "pa26",
+        "dueno": "luciano",
+        "origen": "extra"
+      },
+      {
+        "id": "pa27",
+        "dueno": "luciano",
+        "origen": "extra"
+      },
+      {
+        "id": "pa28",
+        "dueno": "luciano",
+        "origen": "extra"
+      },
+      {
+        "id": "pa29",
+        "dueno": "luciano",
+        "origen": "extra"
+      },
+      {
+        "id": "pa30",
+        "dueno": "santi",
+        "origen": "extra"
+      }
+    ],
     "bracket": {
-      "r1": [],
+      "r1": [
+        {
+          "id": "cr1_1",
+          "local": "pa20",
+          "visitante": "pa26",
+          "golesLocal": null,
+          "golesVisitante": null,
+          "ganador": null
+        },
+        {
+          "id": "cr1_2",
+          "local": "pa12",
+          "visitante": "pa7",
+          "golesLocal": null,
+          "golesVisitante": null,
+          "ganador": null
+        },
+        {
+          "id": "cr1_3",
+          "local": "pa2",
+          "visitante": "pa13",
+          "golesLocal": null,
+          "golesVisitante": null,
+          "ganador": null
+        },
+        {
+          "id": "cr1_4",
+          "local": "pa23",
+          "visitante": "pa4",
+          "golesLocal": null,
+          "golesVisitante": null,
+          "ganador": null
+        },
+        {
+          "id": "cr1_5",
+          "local": "pa21",
+          "visitante": "pa5",
+          "golesLocal": null,
+          "golesVisitante": null,
+          "ganador": null
+        },
+        {
+          "id": "cr1_6",
+          "local": "pa10",
+          "visitante": "pa19",
+          "golesLocal": null,
+          "golesVisitante": null,
+          "ganador": null
+        },
+        {
+          "id": "cr1_7",
+          "local": "pa25",
+          "visitante": "pa18",
+          "golesLocal": null,
+          "golesVisitante": null,
+          "ganador": null
+        },
+        {
+          "id": "cr1_8",
+          "local": "pa24",
+          "visitante": "pa16",
+          "golesLocal": null,
+          "golesVisitante": null,
+          "ganador": null
+        },
+        {
+          "id": "cr1_9",
+          "local": "pa3",
+          "visitante": "pa15",
+          "golesLocal": null,
+          "golesVisitante": null,
+          "ganador": null
+        },
+        {
+          "id": "cr1_10",
+          "local": "pa1",
+          "visitante": "pa6",
+          "golesLocal": null,
+          "golesVisitante": null,
+          "ganador": null
+        },
+        {
+          "id": "cr1_11",
+          "local": "pa29",
+          "visitante": "pa28",
+          "golesLocal": null,
+          "golesVisitante": null,
+          "ganador": null
+        },
+        {
+          "id": "cr1_12",
+          "local": "pa8",
+          "visitante": "pa9",
+          "golesLocal": null,
+          "golesVisitante": null,
+          "ganador": null
+        },
+        {
+          "id": "cr1_13",
+          "local": "pa14",
+          "visitante": "pa17",
+          "golesLocal": null,
+          "golesVisitante": null,
+          "ganador": null
+        },
+        {
+          "id": "cr1_14",
+          "local": "pa22",
+          "visitante": "pa11",
+          "golesLocal": null,
+          "golesVisitante": null,
+          "ganador": null
+        },
+        {
+          "id": "cr1_15",
+          "local": "pa27",
+          "visitante": "pa30",
+          "golesLocal": null,
+          "golesVisitante": null,
+          "ganador": null
+        },
+        {
+          "id": "cr1_16",
+          "local": null,
+          "visitante": null,
+          "golesLocal": null,
+          "golesVisitante": null,
+          "ganador": null
+        }
+      ],
       "r2": [],
       "cuartos": [],
       "semis": [],

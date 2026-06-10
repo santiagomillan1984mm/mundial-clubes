@@ -1,6 +1,6 @@
 {
   "version": "1.0",
-  "ultimaActualizacion": "2026-06-10T00:15:44.881Z",
+  "ultimaActualizacion": "2026-06-10T00:17:22.639Z",
   "equiposArgentinos": [
     {
       "id": "arg1",
@@ -49,313 +49,152 @@
     "internacionales": [
       {
         "id": "int_s1",
-        "nombre": "St Mirren",
-        "liga": "Escocia - Premiership",
-        "dueno": "santi"
-      },
-      {
-        "id": "int_s2",
-        "nombre": "Malmö FF",
-        "liga": "Suecia - Allsvenskan",
-        "dueno": "santi"
-      },
-      {
-        "id": "int_s3",
-        "nombre": "Gil Vicente",
-        "liga": "Portugal - Liga Portugal",
-        "dueno": "santi"
-      },
-      {
-        "id": "int_s4",
-        "nombre": "Columbus Crew",
-        "liga": "Estados Unidos - MLS",
-        "dueno": "santi"
-      },
-      {
-        "id": "int_s5",
-        "nombre": "Al-Ettifaq",
-        "liga": "Arabia Saudita - Pro League",
-        "dueno": "santi"
-      },
-      {
-        "id": "int_s6",
-        "nombre": "Drogheda United",
-        "liga": "Irlanda - Premier Division",
-        "dueno": "santi"
-      },
-      {
-        "id": "int_s7",
-        "nombre": "CA Osasuna",
-        "liga": "España - LaLiga",
-        "dueno": "santi"
-      },
-      {
-        "id": "int_s8",
-        "nombre": "Al-Fayha",
-        "liga": "Arabia Saudita - Pro League",
-        "dueno": "santi"
-      },
-      {
-        "id": "int_s9",
-        "nombre": "Nashville SC",
-        "liga": "Estados Unidos - MLS",
-        "dueno": "santi"
-      },
-      {
-        "id": "int_s10",
-        "nombre": "Atalanta",
-        "liga": "Italia - Serie A",
-        "dueno": "santi"
-      },
-      {
-        "id": "int_s11",
-        "nombre": "Sepsi OSK",
+        "nombre": "Dinamo București",
         "liga": "Rumania - SuperLiga",
         "dueno": "santi"
       },
       {
+        "id": "int_s2",
+        "nombre": "SM Caen",
+        "liga": "Francia - Ligue 2",
+        "dueno": "santi"
+      },
+      {
+        "id": "int_s3",
+        "nombre": "Portsmouth",
+        "liga": "Inglaterra - Championship",
+        "dueno": "santi"
+      },
+      {
+        "id": "int_s4",
+        "nombre": "Queens Park Rangers",
+        "liga": "Inglaterra - Championship",
+        "dueno": "santi"
+      },
+      {
+        "id": "int_s5",
+        "nombre": "Adelaide United",
+        "liga": "Australia - A-League",
+        "dueno": "santi"
+      },
+      {
+        "id": "int_s6",
+        "nombre": "Wellington Phoenix",
+        "liga": "Australia - A-League",
+        "dueno": "santi"
+      },
+      {
+        "id": "int_s7",
+        "nombre": "Tianjin Jinmen Tiger",
+        "liga": "China - Super League",
+        "dueno": "santi"
+      },
+      {
+        "id": "int_s8",
+        "nombre": "Chengdu Rongcheng",
+        "liga": "China - Super League",
+        "dueno": "santi"
+      },
+      {
+        "id": "int_s9",
+        "nombre": "Auckland FC",
+        "liga": "Australia - A-League",
+        "dueno": "santi"
+      },
+      {
+        "id": "int_s10",
+        "nombre": "AGF",
+        "liga": "Dinamarca - Superliga",
+        "dueno": "santi"
+      },
+      {
+        "id": "int_s11",
+        "nombre": "Bolton Wanderers",
+        "liga": "Inglaterra - League One",
+        "dueno": "santi"
+      },
+      {
         "id": "int_s12",
-        "nombre": "Çaykur Rizespor",
-        "liga": "Turquía - Süper Lig",
+        "nombre": "Unirea Slobozia",
+        "liga": "Rumania - SuperLiga",
         "dueno": "santi"
       },
       {
         "id": "int_s13",
-        "nombre": "Damac",
-        "liga": "Arabia Saudita - Pro League",
+        "nombre": "Melbourne Victory",
+        "liga": "Australia - A-League",
         "dueno": "santi"
       },
       {
         "id": "int_l1",
-        "nombre": "Lechia Gdańsk",
-        "liga": "Polonia - Ekstraklasa",
+        "nombre": "Sheffield Wednesday",
+        "liga": "Inglaterra - Championship",
         "dueno": "luciano"
       },
       {
         "id": "int_l2",
-        "nombre": "SCR Altach",
-        "liga": "Austria - Bundesliga",
-        "dueno": "luciano"
-      },
-      {
-        "id": "int_l3",
-        "nombre": "BK Häcken",
-        "liga": "Suecia - Allsvenskan",
-        "dueno": "luciano"
-      },
-      {
-        "id": "int_l4",
-        "nombre": "Girondins de Bordeaux",
-        "liga": "Francia - Ligue 1",
-        "dueno": "luciano"
-      },
-      {
-        "id": "int_l5",
-        "nombre": "Hatayspor",
-        "liga": "Turquía - Süper Lig",
-        "dueno": "luciano"
-      },
-      {
-        "id": "int_l6",
-        "nombre": "Crawley Town",
-        "liga": "Inglaterra - League One",
-        "dueno": "luciano"
-      },
-      {
-        "id": "int_l7",
-        "nombre": "CD Nacional",
-        "liga": "Portugal - Liga Portugal",
-        "dueno": "luciano"
-      },
-      {
-        "id": "int_l8",
         "nombre": "Cardiff City",
         "liga": "Inglaterra - Championship",
         "dueno": "luciano"
       },
       {
-        "id": "int_l9",
-        "nombre": "FC Voluntari",
+        "id": "int_l3",
+        "nombre": "UTA Arad",
         "liga": "Rumania - SuperLiga",
         "dueno": "luciano"
       },
       {
+        "id": "int_l4",
+        "nombre": "Lincoln City",
+        "liga": "Inglaterra - League One",
+        "dueno": "luciano"
+      },
+      {
+        "id": "int_l5",
+        "nombre": "Brøndby IF",
+        "liga": "Dinamarca - Superliga",
+        "dueno": "luciano"
+      },
+      {
+        "id": "int_l6",
+        "nombre": "Drogheda United",
+        "liga": "Irlanda - Premier Division",
+        "dueno": "luciano"
+      },
+      {
+        "id": "int_l7",
+        "nombre": "Beijing Guoan",
+        "liga": "China - Super League",
+        "dueno": "luciano"
+      },
+      {
+        "id": "int_l8",
+        "nombre": "Brisbane Roar",
+        "liga": "Australia - A-League",
+        "dueno": "luciano"
+      },
+      {
+        "id": "int_l9",
+        "nombre": "Al-Fayha",
+        "liga": "Arabia Saudita - Pro League",
+        "dueno": "luciano"
+      },
+      {
         "id": "int_l10",
-        "nombre": "Bristol City",
-        "liga": "Inglaterra - Championship",
+        "nombre": "Macarthur FC",
+        "liga": "Australia - A-League",
         "dueno": "luciano"
       },
       {
         "id": "int_l11",
-        "nombre": "Stoke City",
-        "liga": "Inglaterra - Championship",
+        "nombre": "Galway United",
+        "liga": "Irlanda - Premier Division",
         "dueno": "luciano"
       }
     ]
   },
   "bracket": {
-    "dieciseisavos": [
-      {
-        "id": "d1",
-        "local": "int_s1",
-        "visitante": "arg1",
-        "golesLocal1": null,
-        "golesVisitante1": null,
-        "golesLocal2": null,
-        "golesVisitante2": null,
-        "ganador": null
-      },
-      {
-        "id": "d2",
-        "local": "int_s4",
-        "visitante": "arg2",
-        "golesLocal1": null,
-        "golesVisitante1": null,
-        "golesLocal2": null,
-        "golesVisitante2": null,
-        "ganador": null
-      },
-      {
-        "id": "d3",
-        "local": "int_s8",
-        "visitante": "int_l3",
-        "golesLocal1": null,
-        "golesVisitante1": null,
-        "golesLocal2": null,
-        "golesVisitante2": null,
-        "ganador": null
-      },
-      {
-        "id": "d4",
-        "local": "int_s12",
-        "visitante": "int_l1",
-        "golesLocal1": null,
-        "golesVisitante1": null,
-        "golesLocal2": null,
-        "golesVisitante2": null,
-        "ganador": null
-      },
-      {
-        "id": "d5",
-        "local": "int_s11",
-        "visitante": "int_l4",
-        "golesLocal1": null,
-        "golesVisitante1": null,
-        "golesLocal2": null,
-        "golesVisitante2": null,
-        "ganador": null
-      },
-      {
-        "id": "d6",
-        "local": "int_s13",
-        "visitante": "arg3",
-        "golesLocal1": null,
-        "golesVisitante1": null,
-        "golesLocal2": null,
-        "golesVisitante2": null,
-        "ganador": null
-      },
-      {
-        "id": "d7",
-        "local": "int_s9",
-        "visitante": "int_l6",
-        "golesLocal1": null,
-        "golesVisitante1": null,
-        "golesLocal2": null,
-        "golesVisitante2": null,
-        "ganador": null
-      },
-      {
-        "id": "d8",
-        "local": "int_s2",
-        "visitante": "arg5",
-        "golesLocal1": null,
-        "golesVisitante1": null,
-        "golesLocal2": null,
-        "golesVisitante2": null,
-        "ganador": null
-      },
-      {
-        "id": "d9",
-        "local": "int_s5",
-        "visitante": "int_l7",
-        "golesLocal1": null,
-        "golesVisitante1": null,
-        "golesLocal2": null,
-        "golesVisitante2": null,
-        "ganador": null
-      },
-      {
-        "id": "d10",
-        "local": "int_s3",
-        "visitante": "int_l9",
-        "golesLocal1": null,
-        "golesVisitante1": null,
-        "golesLocal2": null,
-        "golesVisitante2": null,
-        "ganador": null
-      },
-      {
-        "id": "d11",
-        "local": "arg6",
-        "visitante": "arg4",
-        "golesLocal1": null,
-        "golesVisitante1": null,
-        "golesLocal2": null,
-        "golesVisitante2": null,
-        "ganador": null
-      },
-      {
-        "id": "d12",
-        "local": "int_s10",
-        "visitante": "int_l2",
-        "golesLocal1": null,
-        "golesVisitante1": null,
-        "golesLocal2": null,
-        "golesVisitante2": null,
-        "ganador": null
-      },
-      {
-        "id": "d13",
-        "local": "arg7",
-        "visitante": "int_l5",
-        "golesLocal1": null,
-        "golesVisitante1": null,
-        "golesLocal2": null,
-        "golesVisitante2": null,
-        "ganador": null
-      },
-      {
-        "id": "d14",
-        "local": "int_s7",
-        "visitante": "int_l8",
-        "golesLocal1": null,
-        "golesVisitante1": null,
-        "golesLocal2": null,
-        "golesVisitante2": null,
-        "ganador": null
-      },
-      {
-        "id": "d15",
-        "local": "arg8",
-        "visitante": "int_l10",
-        "golesLocal1": null,
-        "golesVisitante1": null,
-        "golesLocal2": null,
-        "golesVisitante2": null,
-        "ganador": null
-      },
-      {
-        "id": "d16",
-        "local": "int_s6",
-        "visitante": "int_l11",
-        "golesLocal1": null,
-        "golesVisitante1": null,
-        "golesLocal2": null,
-        "golesVisitante2": null,
-        "ganador": null
-      }
-    ],
+    "dieciseisavos": [],
     "octavos": [],
     "cuartos": [],
     "semis": [],

@@ -1,47 +1,15 @@
 {
   "version": "1.0",
-  "ultimaActualizacion": "2026-06-10T22:08:03.200Z",
+  "ultimaActualizacion": "",
   "equiposArgentinos": [
-    {
-      "id": "arg1",
-      "nombre": "Equipo 1",
-      "dueno": "luciano"
-    },
-    {
-      "id": "arg2",
-      "nombre": "Equipo 2",
-      "dueno": "luciano"
-    },
-    {
-      "id": "arg3",
-      "nombre": "Equipo 3",
-      "dueno": "luciano"
-    },
-    {
-      "id": "arg4",
-      "nombre": "Equipo 4",
-      "dueno": "luciano"
-    },
-    {
-      "id": "arg5",
-      "nombre": "Equipo 5",
-      "dueno": "luciano"
-    },
-    {
-      "id": "arg6",
-      "nombre": "Equipo 6",
-      "dueno": "santi"
-    },
-    {
-      "id": "arg7",
-      "nombre": "Equipo 7",
-      "dueno": "santi"
-    },
-    {
-      "id": "arg8",
-      "nombre": "Equipo 8",
-      "dueno": "santi"
-    }
+    { "id": "arg1", "nombre": "Equipo 1", "dueno": "luciano" },
+    { "id": "arg2", "nombre": "Equipo 2", "dueno": "luciano" },
+    { "id": "arg3", "nombre": "Equipo 3", "dueno": "luciano" },
+    { "id": "arg4", "nombre": "Equipo 4", "dueno": "luciano" },
+    { "id": "arg5", "nombre": "Equipo 5", "dueno": "luciano" },
+    { "id": "arg6", "nombre": "Equipo 6", "dueno": "santi" },
+    { "id": "arg7", "nombre": "Equipo 7", "dueno": "santi" },
+    { "id": "arg8", "nombre": "Equipo 8", "dueno": "santi" }
   ],
   "sorteo": {
     "realizado": false,
@@ -54,152 +22,5 @@
     "cuartos": [],
     "semis": [],
     "final": []
-  },
-  "poolArgentino": [
-    {
-      "id": "pa1",
-      "nombre": "Boca Juniors"
-    },
-    {
-      "id": "pa2",
-      "nombre": "River Plate"
-    },
-    {
-      "id": "pa3",
-      "nombre": "Racing Club"
-    },
-    {
-      "id": "pa4",
-      "nombre": "Rosario Central"
-    },
-    {
-      "id": "pa5",
-      "nombre": "Estudiantes"
-    },
-    {
-      "id": "pa6",
-      "nombre": "Vélez Sarsfield"
-    },
-    {
-      "id": "pa7",
-      "nombre": "Lanús"
-    },
-    {
-      "id": "pa8",
-      "nombre": "Argentinos Juniors"
-    },
-    {
-      "id": "pa9",
-      "nombre": "Talleres"
-    },
-    {
-      "id": "pa10",
-      "nombre": "Independiente"
-    },
-    {
-      "id": "pa11",
-      "nombre": "Belgrano"
-    },
-    {
-      "id": "pa12",
-      "nombre": "San Lorenzo"
-    },
-    {
-      "id": "pa13",
-      "nombre": "Indep. Rivadavia"
-    },
-    {
-      "id": "pa14",
-      "nombre": "Defensa y Justicia"
-    },
-    {
-      "id": "pa15",
-      "nombre": "Huracán"
-    },
-    {
-      "id": "pa16",
-      "nombre": "Platense"
-    },
-    {
-      "id": "pa17",
-      "nombre": "Instituto"
-    },
-    {
-      "id": "pa18",
-      "nombre": "Atlético Tucumán"
-    },
-    {
-      "id": "pa19",
-      "nombre": "Tigre"
-    },
-    {
-      "id": "pa20",
-      "nombre": "Unión de Santa Fe"
-    },
-    {
-      "id": "pa21",
-      "nombre": "Barracas Central"
-    },
-    {
-      "id": "pa22",
-      "nombre": "Banfield"
-    },
-    {
-      "id": "pa23",
-      "nombre": "Newell's"
-    },
-    {
-      "id": "pa24",
-      "nombre": "Aldosivi"
-    },
-    {
-      "id": "pa25",
-      "nombre": "Gimnasia LP"
-    },
-    {
-      "id": "pa26",
-      "nombre": "Sarmiento"
-    },
-    {
-      "id": "pa27",
-      "nombre": "Godoy Cruz"
-    },
-    {
-      "id": "pa28",
-      "nombre": "Central Córdoba"
-    },
-    {
-      "id": "pa29",
-      "nombre": "Dep. Riestra"
-    },
-    {
-      "id": "pa30",
-      "nombre": "San Martín SJ"
-    }
-  ],
-  "ligaAfa": {
-    "configurado": false,
-    "equipos": [],
-    "partidos": []
-  },
-  "copaArgentina": {
-    "configurado": false,
-    "equipos": [],
-    "bracket": {
-      "r1": [],
-      "r2": [],
-      "cuartos": [],
-      "semis": [],
-      "final": []
-    }
-  },
-  "historial": [
-    {
-      "id": "1781120591632",
-      "temporada": 2026,
-      "competencia": "liga",
-      "campeon": "River Plate",
-      "dueno": "luciano"
-    }
-  ]
+  }
 }

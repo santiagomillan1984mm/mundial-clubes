@@ -700,6 +700,7 @@
   <button class="nav-btn" onclick="mostrarSeccion('argentinos')">Mundial Arg.</button>
   <button class="nav-btn" onclick="mostrarSeccion('sorteo')">Sorteo</button>
   <button class="nav-btn" onclick="mostrarSeccion('bracket')">Eliminatorias</button>
+  <button class="nav-btn" onclick="mostrarSeccion('supercopa')">🥇 Supercopa</button>
   <button class="nav-btn" onclick="mostrarSeccion('historial')">🏅 Historial</button>
   <button class="nav-btn" onclick="mostrarSeccion('relampago')">⚡ Relámpago</button>
   <button class="nav-btn" onclick="mostrarSeccion('admin')">Admin</button>
@@ -754,6 +755,12 @@
         <p class="text-gris">El bracket se genera automáticamente cuando se confirme el sorteo.</p>
       </div>
     </div>
+  </div>
+
+  <!-- SUPERCOPA ARGENTINA -->
+  <div id="sec-supercopa" class="seccion">
+    <div class="sec-titulo">🥇 Supercopa Argentina</div>
+    <div id="supercopa-contenido"><div class="loading">Cargando...</div></div>
   </div>
 
   <!-- ADMIN -->
@@ -944,6 +951,13 @@ const ESTADO_INICIAL = {
   ],
   sorteo: { realizado: false, confirmado: false, internacionales: [] },
   bracket: { dieciseisavos: [], octavos: [], cuartos: [], semis: [], final: [] },
+  supercopa: {
+    localId: null,   // campeón de liga
+    visitanteId: null, // campeón de copa
+    golesLocal: null,
+    golesVisitante: null,
+    ganador: null
+  },
   historial: [],
   torneosRelampago: []
 }
@@ -1230,9 +1244,11 @@ function renderTodo() {
   if (!estado.copaArgentina) estado.copaArgentina = { configurado: false, equipos: [], bracket: { r1: [], r2: [], cuartos: [], semis: [], final: [] } }
   if (!estado.historial) estado.historial = []
   if (!estado.torneosRelampago) estado.torneosRelampago = []
+  if (!estado.supercopa) estado.supercopa = { localId: null, visitanteId: null, golesLocal: null, golesVisitante: null, ganador: null }
   renderEstadoInicio()
   renderLiga()
   renderCopa()
+  renderSupercopa()
   renderArgentinos()
   renderSorteo()
   renderBracket()
@@ -3309,6 +3325,182 @@ function toast(msg, error = false) {
 // ══════════════════════════════════════════════
 // TORNEOS RELÁMPAGO
 // ══════════════════════════════════════════════
+
+// ══════════════════════════════════════════════
+// SUPERCOPA ARGENTINA
+// ══════════════════════════════════════════════
+function getSupercopaNombre(id) {
+  if (!id) return 'Por definir'
+  return getPoolNombre(id)
+}
+
+function getSupercopaDueno(id) {
+  if (!id) return ''
+  const enLiga = (estado.ligaAfa?.equipos || []).find(e => e.id === id)
+  if (enLiga) return enLiga.dueno
+  const enCopa = (estado.copaArgentina?.equipos || []).find(e => e.id === id)
+  if (enCopa) return enCopa.dueno
+  return ''
+}
+
+function getCampeonLiga() {
+  if (!estado.ligaAfa?.configurado) return null
+  const jugados = (estado.ligaAfa.partidos || []).filter(p => p.golesLocal !== null).length
+  if (jugados < 100) return null  // liga no terminada
+  const tabla = calcularTablaLiga()
+  return tabla[0] || null
+}
+
+function getCampeonCopa() {
+  const b = estado.copaArgentina?.bracket
+  if (!b) return null
+  const fin = b.final?.[0]
+  if (!fin?.ganador) return null
+  return { id: fin.ganador, dueno: getCopaDueno(fin.ganador) }
+}
+
+function renderSupercopa() {
+  const cont = document.getElementById('supercopa-contenido')
+  if (!cont || !estado) return
+
+  if (!estado.supercopa) estado.supercopa = { localId: null, visitanteId: null, golesLocal: null, golesVisitante: null, ganador: null }
+  const sc = estado.supercopa
+
+  const campeonLiga = getCampeonLiga()
+  const campeonCopa = getCampeonCopa()
+
+  // Auto-completar equipos si están disponibles y no están seteados
+  if (esAdmin) {
+    if (campeonLiga && !sc.localId) sc.localId = campeonLiga.id
+    if (campeonCopa && !sc.visitanteId) sc.visitanteId = campeonCopa.id
+  }
+
+  const localId = sc.localId
+  const visitanteId = sc.visitanteId
+  const localN = getSupercopaNombre(localId)
+  const visitanteN = getSupercopaNombre(visitanteId)
+  const localD = getSupercopaDueno(localId)
+  const visitanteD = getSupercopaDueno(visitanteId)
+
+  const badgeD = (d) => d === 'santi'
+    ? `<span class="badge-santi">Santi</span>`
+    : d === 'luciano'
+    ? `<span class="badge-luciano">Luciano</span>`
+    : ''
+
+  const ligaTerminada = (estado.ligaAfa?.configurado && (estado.ligaAfa.partidos||[]).filter(p=>p.golesLocal!==null).length === 100)
+  const copaTerminada = !!getCampeonCopa()
+
+  // Estado de requisitos
+  const reqHTML = `<div class="card" style="margin-bottom:16px;">
+    <div class="card-titulo">Requisitos</div>
+    <div style="display:flex;flex-direction:column;gap:8px;">
+      <div style="display:flex;align-items:center;gap:10px;font-size:14px;">
+        <span style="font-size:18px;">${ligaTerminada ? '✅' : '⏳'}</span>
+        <span>Campeón de Liga AFA${campeonLiga ? ` — <b>${getPoolNombre(campeonLiga.id)}</b> ${badgeD(campeonLiga.dueno)}` : ' (liga sin terminar)'}</span>
+      </div>
+      <div style="display:flex;align-items:center;gap:10px;font-size:14px;">
+        <span style="font-size:18px;">${copaTerminada ? '✅' : '⏳'}</span>
+        <span>Campeón de Copa Argentina${campeonCopa ? ` — <b>${getCopaNombre(campeonCopa.id)}</b> ${badgeD(campeonCopa.dueno)}` : ' (copa sin terminar)'}</span>
+      </div>
+    </div>
+  </div>`
+
+  // Partido
+  const gl = sc.golesLocal
+  const gv = sc.golesVisitante
+  const hayResultado = gl !== null && gv !== null
+
+  const colorLocal = localD === 'santi' ? '#4a9eff' : localD === 'luciano' ? '#ff6b6b' : 'var(--border)'
+  const colorVisitante = visitanteD === 'santi' ? '#4a9eff' : visitanteD === 'luciano' ? '#ff6b6b' : 'var(--border)'
+
+  const eqCard = (nombre, dueno, goles, esGanador, esLocal) => {
+    const alineacion = esLocal ? 'flex-end' : 'flex-start'
+    const borde = esLocal ? `border-right: 4px solid ${colorLocal}` : `border-left: 4px solid ${colorVisitante}`
+    const bg = esGanador ? 'background:#0f3020;border-color:#2ecc71;' : ''
+    return `<div style="flex:1;display:flex;flex-direction:column;align-items:${alineacion};gap:6px;padding:20px 16px;background:var(--card);border:1px solid var(--border);border-radius:${esLocal?'12px 0 0 12px':'0 12px 12px 0'};${borde};${bg}">
+      <div style="font-size:13px;font-weight:700;color:${esLocal?colorLocal:colorVisitante};text-align:${esLocal?'right':'left'}">${dueno==='santi'?'SANTI':dueno==='luciano'?'LUCIANO':''}</div>
+      <div style="font-size:16px;font-weight:700;color:var(--texto);text-align:${esLocal?'right':'left'};">${nombre}</div>
+      ${goles !== null ? `<div style="font-size:42px;font-weight:800;color:${esGanador?'#2ecc71':'var(--dorado2)'};line-height:1;">${goles}</div>` : '<div style="font-size:14px;color:var(--gris);">—</div>'}
+      <div style="font-size:11px;color:var(--gris);">${esLocal ? '🏆 Campeón Liga' : '🏆 Campeón Copa'}</div>
+    </div>`
+  }
+
+  const esGanadorL = hayResultado && gl > gv
+  const esGanadorV = hayResultado && gv > gl
+  const vsSep = `<div style="display:flex;align-items:center;justify-content:center;width:50px;flex-shrink:0;font-size:14px;font-weight:800;color:var(--gris);">VS</div>`
+
+  const partidoHTML = `<div style="display:flex;align-items:stretch;margin-bottom:16px;border-radius:12px;overflow:hidden;box-shadow:0 4px 20px rgba(0,0,0,0.3);">
+    ${eqCard(localN, localD, gl, esGanadorL, true)}
+    ${vsSep}
+    ${eqCard(visitanteN, visitanteD, gv, esGanadorV, false)}
+  </div>`
+
+  // Campeón
+  let campeonHTML = ''
+  if (sc.ganador) {
+    const nGan = getSupercopaNombre(sc.ganador)
+    const dGan = getSupercopaDueno(sc.ganador)
+    campeonHTML = `<div style="text-align:center;padding:30px 20px;background:var(--card);border:2px solid var(--dorado2);border-radius:14px;margin-bottom:16px;">
+      <div style="font-size:48px;margin-bottom:8px;">🥇</div>
+      <div style="font-size:13px;font-weight:700;color:var(--gris);text-transform:uppercase;letter-spacing:1px;margin-bottom:6px;">Campeón Supercopa Argentina</div>
+      <div style="font-size:28px;font-weight:800;color:var(--dorado2);margin-bottom:8px;">${nGan}</div>
+      ${badgeD(dGan)}
+    </div>`
+  }
+
+  // Botón admin para cargar resultado
+  let adminHTML = ''
+  if (esAdmin) {
+    if (!localId || !visitanteId) {
+      // Selección manual si no hay campeones automáticos
+      const optsLiga = (estado.ligaAfa?.equipos || []).map(e => `<option value="${e.id}" ${sc.localId===e.id?'selected':''}>${getPoolNombre(e.id)}</option>`).join('')
+      const optsCopa = (estado.copaArgentina?.equipos || []).map(e => `<option value="${e.id}" ${sc.visitanteId===e.id?'selected':''}>${getPoolNombre(e.id)}</option>`).join('')
+      adminHTML = `<div class="card">
+        <div class="card-titulo">Configurar enfrentamiento</div>
+        <div style="display:flex;flex-direction:column;gap:10px;">
+          <div><label style="font-size:12px;color:var(--gris);">🏆 Campeón Liga</label><br>
+            <select onchange="estado.supercopa.localId=this.value;renderSupercopa()" style="margin-top:4px;width:100%;"><option value="">Seleccionar...</option>${optsLiga}</select></div>
+          <div><label style="font-size:12px;color:var(--gris);">🏆 Campeón Copa</label><br>
+            <select onchange="estado.supercopa.visitanteId=this.value;renderSupercopa()" style="margin-top:4px;width:100%;"><option value="">Seleccionar...</option>${optsCopa}</select></div>
+        </div>
+      </div>`
+    } else if (!hayResultado) {
+      adminHTML = `<div class="card">
+        <div class="card-titulo">Cargar resultado</div>
+        <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;">
+          <div style="flex:1;min-width:120px;font-size:14px;font-weight:600;text-align:right;">${localN}</div>
+          <input type="number" id="sc-gl" min="0" value="0" style="width:54px;text-align:center;font-size:20px;font-weight:700;padding:6px;border-radius:6px;border:1px solid var(--border);background:var(--azul);color:var(--texto);">
+          <span style="color:var(--gris);font-weight:700;">–</span>
+          <input type="number" id="sc-gv" min="0" value="0" style="width:54px;text-align:center;font-size:20px;font-weight:700;padding:6px;border-radius:6px;border:1px solid var(--border);background:var(--azul);color:var(--texto);">
+          <div style="flex:1;min-width:120px;font-size:14px;font-weight:600;">${visitanteN}</div>
+        </div>
+        <button class="btn btn-primary" style="width:100%;margin-top:14px;" onclick="guardarResultadoSupercopa()">💾 Guardar resultado</button>
+      </div>`
+    } else {
+      adminHTML = `<div class="card" style="text-align:center;">
+        <button class="btn btn-secondary btn-sm" onclick="if(confirm('¿Borrar resultado?')){estado.supercopa.golesLocal=null;estado.supercopa.golesVisitante=null;estado.supercopa.ganador=null;guardarEstado().then(()=>{renderSupercopa();toast('Resultado borrado')})}">🗑 Borrar resultado</button>
+      </div>`
+    }
+  }
+
+  cont.innerHTML = reqHTML + partidoHTML + campeonHTML + adminHTML
+}
+
+function guardarResultadoSupercopa() {
+  const gl = parseInt(document.getElementById('sc-gl')?.value)
+  const gv = parseInt(document.getElementById('sc-gv')?.value)
+  if (isNaN(gl) || isNaN(gv)) return toast('Ingresá los goles', true)
+  if (gl === gv) return toast('No puede terminar empatado (es un partido único)', true)
+  const sc = estado.supercopa
+  sc.golesLocal = gl
+  sc.golesVisitante = gv
+  sc.ganador = gl > gv ? sc.localId : sc.visitanteId
+  guardarEstado().then(() => {
+    renderSupercopa()
+    toast('¡Supercopa guardada!')
+  }).catch(e => toast('Error al guardar: ' + e.message, true))
+}
 
 function rlId() { return 'rl_' + Date.now() + '_' + Math.random().toString(36).slice(2,7) }
 

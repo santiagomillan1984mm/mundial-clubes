@@ -1,6 +1,6 @@
 {
   "version": "1.0",
-  "ultimaActualizacion": "2026-06-29T20:49:00.714Z",
+  "ultimaActualizacion": "2026-06-29T20:50:09.608Z",
   "equiposArgentinos": [
     {
       "id": "arg1",
@@ -207,13 +207,6 @@
       "competencia": "liga",
       "campeon": "River Plate",
       "dueno": "luciano"
-    },
-    {
-      "id": "1782766140714",
-      "temporada": 2026,
-      "competencia": "copa",
-      "campeon": "Vélez",
-      "dueno": "santi"
     }
   ],
   "torneosRelampago": [],

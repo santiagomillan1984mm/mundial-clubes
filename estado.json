@@ -1,6 +1,6 @@
 {
   "version": "1.0",
-  "ultimaActualizacion": "2026-06-30T00:44:59.262Z",
+  "ultimaActualizacion": "2026-06-30T00:48:38.763Z",
   "equiposArgentinos": [
     {
       "id": "arg1",
@@ -44,9 +44,154 @@
     }
   ],
   "sorteo": {
-    "realizado": false,
-    "confirmado": false,
-    "internacionales": []
+    "realizado": true,
+    "confirmado": true,
+    "internacionales": [
+      {
+        "id": "int_s1",
+        "nombre": "Luton Town",
+        "liga": "Inglaterra - Championship",
+        "dueno": "santi"
+      },
+      {
+        "id": "int_s2",
+        "nombre": "FK Austria Wien",
+        "liga": "Austria - Bundesliga",
+        "dueno": "santi"
+      },
+      {
+        "id": "int_s3",
+        "nombre": "Bolton Wanderers",
+        "liga": "Inglaterra - League One",
+        "dueno": "santi"
+      },
+      {
+        "id": "int_s4",
+        "nombre": "Toronto FC",
+        "liga": "Estados Unidos - MLS",
+        "dueno": "santi"
+      },
+      {
+        "id": "int_s5",
+        "nombre": "FC Volendam",
+        "liga": "Países Bajos - Eredivisie",
+        "dueno": "santi"
+      },
+      {
+        "id": "int_s6",
+        "nombre": "Colchester United",
+        "liga": "Inglaterra - League Two",
+        "dueno": "santi"
+      },
+      {
+        "id": "int_s7",
+        "nombre": "İstanbul Başakşehir",
+        "liga": "Turquía - Süper Lig",
+        "dueno": "santi"
+      },
+      {
+        "id": "int_s8",
+        "nombre": "Shrewsbury Town",
+        "liga": "Inglaterra - League One",
+        "dueno": "santi"
+      },
+      {
+        "id": "int_s9",
+        "nombre": "Rio Ave",
+        "liga": "Portugal - Liga Portugal",
+        "dueno": "santi"
+      },
+      {
+        "id": "int_s10",
+        "nombre": "Korona Kielce",
+        "liga": "Polonia - Ekstraklasa",
+        "dueno": "santi"
+      },
+      {
+        "id": "int_s11",
+        "nombre": "Wolfsberger AC",
+        "liga": "Austria - Bundesliga",
+        "dueno": "santi"
+      },
+      {
+        "id": "int_s12",
+        "nombre": "Olympique Lyonnais",
+        "liga": "Francia - Ligue 1",
+        "dueno": "santi"
+      },
+      {
+        "id": "int_l1",
+        "nombre": "Hannover 96",
+        "liga": "Alemania - Bundesliga 2",
+        "dueno": "luciano"
+      },
+      {
+        "id": "int_l2",
+        "nombre": "Stevenage",
+        "liga": "Inglaterra - League One",
+        "dueno": "luciano"
+      },
+      {
+        "id": "int_l3",
+        "nombre": "Randers FC",
+        "liga": "Dinamarca - Superliga",
+        "dueno": "luciano"
+      },
+      {
+        "id": "int_l4",
+        "nombre": "CD Eldense",
+        "liga": "España - LaLiga Hypermotion",
+        "dueno": "luciano"
+      },
+      {
+        "id": "int_l5",
+        "nombre": "Barnsley",
+        "liga": "Inglaterra - League One",
+        "dueno": "luciano"
+      },
+      {
+        "id": "int_l6",
+        "nombre": "KV Mechelen",
+        "liga": "Bélgica - Pro League",
+        "dueno": "luciano"
+      },
+      {
+        "id": "int_l7",
+        "nombre": "Abha",
+        "liga": "Arabia Saudita - Pro League",
+        "dueno": "luciano"
+      },
+      {
+        "id": "int_l8",
+        "nombre": "Queens Park Rangers",
+        "liga": "Inglaterra - Championship",
+        "dueno": "luciano"
+      },
+      {
+        "id": "int_l9",
+        "nombre": "LOSC Lille",
+        "liga": "Francia - Ligue 1",
+        "dueno": "luciano"
+      },
+      {
+        "id": "int_l10",
+        "nombre": "Zhejiang FC",
+        "liga": "China - Super League",
+        "dueno": "luciano"
+      },
+      {
+        "id": "int_l11",
+        "nombre": "CD Nacional",
+        "liga": "Portugal - Liga Portugal",
+        "dueno": "luciano"
+      },
+      {
+        "id": "int_l12",
+        "nombre": "CD Tondela",
+        "liga": "Portugal - Liga Portugal",
+        "dueno": "luciano"
+      }
+    ]
   },
   "bracket": {
     "dieciseisavos": [],

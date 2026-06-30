@@ -1,6 +1,6 @@
 {
   "version": "1.0",
-  "ultimaActualizacion": "2026-06-30T00:43:58.537Z",
+  "ultimaActualizacion": "2026-06-30T00:44:38.481Z",
   "equiposArgentinos": [
     {
       "id": "arg1",
@@ -19,7 +19,7 @@
     },
     {
       "id": "arg4",
-      "nombre": "Racing",
+      "nombre": "Racing Club",
       "dueno": "luciano"
     },
     {

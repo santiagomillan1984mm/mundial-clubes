@@ -1697,17 +1697,20 @@ function renderSorteo() {
     // Mostrar resultado confirmado
     const santi = estado.sorteo.internacionales.filter(e => e.dueno === 'santi')
     const luciano = estado.sorteo.internacionales.filter(e => e.dueno === 'luciano')
+    const lapiz = esAdmin
+      ? (id) => `<button onclick="abrirReemplazoEquipo('${id}')" title="Reemplazar equipo" style="background:none;border:none;cursor:pointer;font-size:14px;padding:2px 4px;opacity:0.6;" onmouseover="this.style.opacity=1" onmouseout="this.style.opacity=0.6">✏️</button>`
+      : () => ''
     cont.innerHTML = `
       <div class="card">
         <div class="card-titulo">✅ Sorteo confirmado</div>
         <div class="sorteo-grid">
           <div>
             <div style="font-weight:700; margin-bottom:10px;" class="badge-santi">SANTI (${santi.length})</div>
-            ${santi.map(e => `<div class="equipo-row"><span class="equipo-nombre">${e.nombre}</span><span class="equipo-liga">${e.liga}</span></div>`).join('')}
+            ${santi.map(e => `<div class="equipo-row"><span class="equipo-nombre">${e.nombre}</span><span class="equipo-liga">${e.liga}</span>${lapiz(e.id)}</div>`).join('')}
           </div>
           <div>
             <div style="font-weight:700; margin-bottom:10px;" class="badge-luciano">LUCIANO (${luciano.length})</div>
-            ${luciano.map(e => `<div class="equipo-row"><span class="equipo-nombre">${e.nombre}</span><span class="equipo-liga">${e.liga}</span></div>`).join('')}
+            ${luciano.map(e => `<div class="equipo-row"><span class="equipo-nombre">${e.nombre}</span><span class="equipo-liga">${e.liga}</span>${lapiz(e.id)}</div>`).join('')}
           </div>
         </div>
         ${esAdmin ? `<div class="mt flex-gap"><button class="btn btn-secondary btn-sm" onclick="resetSorteo()">↺ Rehacer sorteo</button></div>` : ''}
@@ -1948,6 +1951,116 @@ async function confirmarSorteo() {
   await guardarEstado()
   renderTodo()
   toast('¡Sorteo confirmado!')
+}
+
+// ── Reemplazo individual de equipo sorteado ──
+let _reemplazoId = null
+let _reemplazoCandidato = null
+
+function abrirReemplazoEquipo(id) {
+  _reemplazoId = id
+  _reemplazoCandidato = null
+  const eq = estado.sorteo.internacionales.find(e => e.id === id)
+  if (!eq) return
+
+  // Pool disponible: clubes que no están ya sorteados
+  const yaUsados = new Set(estado.sorteo.internacionales.map(e => e.nombre))
+  const disponibles = poolClubes.filter(c => !yaUsados.has(c.nombre))
+
+  if (disponibles.length === 0) {
+    toast('No hay clubes disponibles en el pool para reemplazar', true)
+    return
+  }
+
+  document.body.insertAdjacentHTML('beforeend', `
+    <div class="modal-overlay" id="modal-reemplazo" onclick="if(event.target===this)cerrarReemplazo()">
+      <div class="modal" style="width:380px;">
+        <h3>✏️ Reemplazar equipo</h3>
+        <p class="text-gris" style="margin-bottom:14px;">
+          Reemplazando: <strong>${eq.nombre}</strong> (${eq.dueno === 'santi' ? 'Santi' : 'Luciano'})
+        </p>
+        <div id="bol-reemplazo-wrap" style="text-align:center; padding:10px 0 16px;">
+          <div id="bol-reemplazo-esfera" style="
+            width:110px; height:110px; border-radius:50%;
+            background: radial-gradient(circle at 35% 35%, #2a5caa, #0a1a3a);
+            border: 3px solid var(--dorado2);
+            margin: 0 auto 12px;
+            display:flex; align-items:center; justify-content:center;
+            box-shadow: 0 0 30px rgba(245,166,35,0.3);
+          ">
+            <div style="text-align:center; padding:0 8px;">
+              <div id="bol-reemplazo-num" style="font-size:11px; color:var(--gris);">Listo para sortear</div>
+              <div id="bol-reemplazo-texto" style="font-size:12px; font-weight:700; color:var(--dorado2); line-height:1.3;">?</div>
+            </div>
+          </div>
+        </div>
+        <div id="bol-reemplazo-candidato" style="display:none; background:var(--azul3); border-radius:8px; padding:10px 14px; margin-bottom:14px; font-size:13px;"></div>
+        <div class="flex-gap" style="justify-content:flex-end;">
+          <button class="btn btn-secondary" onclick="cerrarReemplazo()">Cancelar</button>
+          <button class="btn btn-primary" onclick="girarReemplazo()" id="btn-girar-reemplazo">🎲 Sortear</button>
+          <button class="btn btn-gold" onclick="confirmarReemplazo()" id="btn-confirmar-reemplazo" style="display:none;">✅ Confirmar</button>
+        </div>
+      </div>
+    </div>
+  `)
+
+  // guardar disponibles para el sorteo
+  window._reemplazoDisponibles = disponibles
+}
+
+function girarReemplazo() {
+  const disponibles = window._reemplazoDisponibles
+  const esfera = document.getElementById('bol-reemplazo-esfera')
+  const texto = document.getElementById('bol-reemplazo-texto')
+  const num = document.getElementById('bol-reemplazo-num')
+  const candidatoDiv = document.getElementById('bol-reemplazo-candidato')
+  const btnConfirmar = document.getElementById('btn-confirmar-reemplazo')
+  const btnGirar = document.getElementById('btn-girar-reemplazo')
+
+  btnGirar.disabled = true
+  btnConfirmar.style.display = 'none'
+  candidatoDiv.style.display = 'none'
+  texto.textContent = '...'
+  num.textContent = 'Sorteando...'
+  esfera.style.animation = 'girar 0.6s linear infinite'
+  esfera.style.boxShadow = '0 0 50px rgba(245,166,35,0.7)'
+
+  setTimeout(() => {
+    const elegido = disponibles[Math.floor(Math.random() * disponibles.length)]
+    _reemplazoCandidato = elegido
+    esfera.style.animation = ''
+    esfera.style.boxShadow = '0 0 30px rgba(245,166,35,0.3)'
+    texto.textContent = elegido.nombre
+    num.textContent = elegido.liga || ''
+    candidatoDiv.style.display = 'block'
+    candidatoDiv.innerHTML = `<strong>${elegido.nombre}</strong> — ${elegido.liga || ''}`
+    btnConfirmar.style.display = ''
+    btnGirar.disabled = false
+    btnGirar.textContent = '🔀 Volver a sortear'
+  }, 1400)
+}
+
+async function confirmarReemplazo() {
+  if (!_reemplazoCandidato || !_reemplazoId) return
+  const idx = estado.sorteo.internacionales.findIndex(e => e.id === _reemplazoId)
+  if (idx === -1) return
+  const dueno = estado.sorteo.internacionales[idx].dueno
+  estado.sorteo.internacionales[idx] = {
+    id: _reemplazoId,
+    nombre: _reemplazoCandidato.nombre,
+    liga: _reemplazoCandidato.liga || '',
+    dueno
+  }
+  cerrarReemplazo()
+  await guardarEstado()
+  renderTodo()
+  toast(`✅ Reemplazado por ${_reemplazoCandidato.nombre}`)
+}
+
+function cerrarReemplazo() {
+  document.getElementById('modal-reemplazo')?.remove()
+  _reemplazoId = null
+  _reemplazoCandidato = null
 }
 
 async function resetSorteo() {

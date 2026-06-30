@@ -2157,7 +2157,7 @@ function renderCruceCard(cruce, ronda) {
     gl = cruce.golesLocal1; gv = cruce.golesVisitante1
   }
   const adminAttr = esAdmin ? `onclick="abrirModalResultado('${cruce.id}','${ronda}')" title="Cargar resultado" style="cursor:pointer;"` : ''
-  const lapiz = esAdmin && !ganador
+  const lapiz = esAdmin
     ? `<div style="text-align:center;margin-top:2px;">
         <button onclick="event.stopPropagation();abrirEditorCruce('${cruce.id}','${ronda}')" title="Editar enfrentamiento"
           style="background:none;border:none;cursor:pointer;font-size:11px;padding:1px 6px;color:var(--gris);font-family:inherit;"
@@ -2178,7 +2178,7 @@ function abrirEditorCruce(cruceId, ronda) {
   if (!cruce) return
   const eq1 = getEquipo(cruce.local)
   const eq2 = getEquipo(cruce.visitante)
-  const otros = cruces.filter(c => c.id !== cruceId && !c.ganador)
+  const otros = cruces.filter(c => c.id !== cruceId)
   document.body.insertAdjacentHTML('beforeend', `
     <div class="modal-overlay" id="modal-editor-cruce" onclick="if(event.target===this)cerrarEditorCruce()">
       <div class="modal" style="width:380px;">
@@ -2216,8 +2216,11 @@ async function ejecutarSwapCruce(cruceId, ronda) {
   const c1 = cruces.find(c => c.id === cruceId)
   const c2 = cruces.find(c => c.id === otroCruceId)
   if (!c1 || !c2) return
-  ;[c1.local, c2.local] = [c2.local, c1.local]
-  ;[c1.visitante, c2.visitante] = [c2.visitante, c1.visitante]
+  // Swap todo el contenido del cruce (equipos, goles y ganador)
+  const campos = ['local','visitante','golesLocal1','golesVisitante1','golesLocal2','golesVisitante2','ganador']
+  for (const campo of campos) {
+    ;[c1[campo], c2[campo]] = [c2[campo], c1[campo]]
+  }
   cerrarEditorCruce()
   await guardarEstado()
   renderBracket()

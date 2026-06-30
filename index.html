@@ -1120,13 +1120,35 @@ async function cargarPool() {
 // ══════════════════════════════════════════════
 // HISTORIAL
 // ══════════════════════════════════════════════
-const COMPETENCIAS_LABEL = { liga: 'Liga AFA', copa: 'Copa Argentina', mundial: 'Mundial de Clubes' }
+const COMPETENCIAS_LABEL = { liga: 'Liga AFA', copa: 'Copa Argentina', mundial: 'Mundial de Clubes', supercopa: 'Supercopa Argentina' }
 const MEDALLAS = ['🥇','🥈','🥉']
 
 function renderHistorial() {
   const cont = document.getElementById('historial-contenido')
   if (!cont) return
-  const historial = (estado.historial || []).slice().sort((a,b) => b.temporada - a.temporada)
+
+  // Incluir supercopa actual si tiene ganador y no está ya en historial manual
+  const historialBase = (estado.historial || []).slice()
+  const sc = estado.supercopa
+  if (sc?.ganador) {
+    const yaEsta = historialBase.some(h => h.competencia === 'supercopa' && h.campeonId === sc.ganador)
+    if (!yaEsta) {
+      const eqSC = getEquipo(sc.ganador)
+      if (eqSC) {
+        historialBase.push({
+          id: '_sc_auto',
+          temporada: new Date().getFullYear(),
+          competencia: 'supercopa',
+          campeon: eqSC.nombre,
+          campeonId: sc.ganador,
+          dueno: eqSC.dueno,
+          _auto: true
+        })
+      }
+    }
+  }
+
+  const historial = historialBase.sort((a,b) => b.temporada - a.temporada)
 
   // Agrupar por temporada
   const porTemporada = {}
@@ -1157,6 +1179,7 @@ function renderHistorial() {
             <option value="liga">Liga AFA</option>
             <option value="copa">Copa Argentina</option>
             <option value="mundial">Mundial de Clubes</option>
+            <option value="supercopa">Supercopa Argentina</option>
           </select>
         </div>
         <div>

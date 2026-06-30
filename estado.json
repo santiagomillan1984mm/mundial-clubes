@@ -1,6 +1,6 @@
 {
   "version": "1.0",
-  "ultimaActualizacion": "2026-06-30T00:49:03.169Z",
+  "ultimaActualizacion": "2026-06-30T23:00:04.897Z",
   "equiposArgentinos": [
     {
       "id": "arg1",
@@ -157,8 +157,8 @@
       },
       {
         "id": "int_l7",
-        "nombre": "Abha",
-        "liga": "Arabia Saudita - Pro League",
+        "nombre": "Nottingham Forest",
+        "liga": "Inglaterra - Premier League",
         "dueno": "luciano"
       },
       {

@@ -1,45 +1,45 @@
 {
   "version": "1.0",
-  "ultimaActualizacion": "2026-06-29T20:50:21.999Z",
+  "ultimaActualizacion": "2026-06-30T00:43:54.059Z",
   "equiposArgentinos": [
     {
       "id": "arg1",
-      "nombre": "Equipo 1",
+      "nombre": "River Plate",
       "dueno": "luciano"
     },
     {
       "id": "arg2",
-      "nombre": "Equipo 2",
+      "nombre": "Talleres",
       "dueno": "luciano"
     },
     {
       "id": "arg3",
-      "nombre": "Equipo 3",
+      "nombre": "Independiente",
       "dueno": "luciano"
     },
     {
       "id": "arg4",
-      "nombre": "Equipo 4",
+      "nombre": "Racing",
       "dueno": "luciano"
     },
     {
       "id": "arg5",
-      "nombre": "Equipo 5",
-      "dueno": "luciano"
+      "nombre": "Vélez Sarsfield",
+      "dueno": "santi"
     },
     {
       "id": "arg6",
-      "nombre": "Equipo 6",
+      "nombre": "Boca Juniors",
       "dueno": "santi"
     },
     {
       "id": "arg7",
-      "nombre": "Equipo 7",
+      "nombre": "Huracán",
       "dueno": "santi"
     },
     {
       "id": "arg8",
-      "nombre": "Equipo 8",
+      "nombre": "Unión",
       "dueno": "santi"
     }
   ],

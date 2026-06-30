@@ -2254,6 +2254,11 @@ function cerrarEditorCruce() {
   document.getElementById('modal-editor-cruce')?.remove()
 }
 
+async function confirmarRegenerarBracket() {
+  if (!confirm('¿Regenerar los dieciseisavos? Se pierden todos los resultados cargados pero el sorteo queda igual.')) return
+  await generarDieciseisavos()
+}
+
 function connectorHTML(n, dir) {
   const side = dir === 'right' ? 'right' : 'left'
   let html = `<div style="width:18px;display:flex;flex-direction:column;flex-shrink:0;">`
@@ -2324,6 +2329,7 @@ function renderBracket() {
     <div style="display:flex;align-items:center;gap:6px;font-size:12px;"><div style="width:10px;height:10px;background:#4a9eff;border-radius:2px;flex-shrink:0;"></div>Santi</div>
     <div style="display:flex;align-items:center;gap:6px;font-size:12px;"><div style="width:10px;height:10px;background:#ff6b6b;border-radius:2px;flex-shrink:0;"></div>Luciano</div>
     ${esAdmin ? '<div style="font-size:11px;color:var(--gris);">Click en un cruce para cargar resultado (ida y vuelta)</div>' : ''}
+    ${esAdmin ? `<button class="btn btn-secondary btn-sm" onclick="confirmarRegenerarBracket()" style="margin-left:auto;">🔀 Regenerar bracket</button>` : ''}
   </div>`
 
   const finalCard = fin ? renderCruceCard(fin, 'final') : `<div style="font-size:11px;color:var(--gris);text-align:center;padding:8px;">Pendiente</div>`

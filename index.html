@@ -2139,9 +2139,11 @@ function renderEquipoCard(eqId, goles, ganador, esTop) {
 
 function renderCruceCard(cruce, ronda) {
   if (!cruce) {
-    return `<div class="bracket-cruce" style="margin:3px 0;">
-      ${renderEquipoCard(null,null,null,true)}
-      ${renderEquipoCard(null,null,null,false)}
+    return `<div style="margin:3px 0;">
+      <div class="bracket-cruce">
+        ${renderEquipoCard(null,null,null,true)}
+        ${renderEquipoCard(null,null,null,false)}
+      </div>
     </div>`
   }
   const ganador = cruce.ganador
@@ -2154,11 +2156,76 @@ function renderCruceCard(cruce, ronda) {
   } else if (tieneIda) {
     gl = cruce.golesLocal1; gv = cruce.golesVisitante1
   }
-  const adminAttr = esAdmin ? `onclick="abrirModalResultado('${cruce.id}','${ronda}')" title="Cargar resultado" style="cursor:pointer;margin:3px 0;"` : 'style="margin:3px 0;"'
-  return `<div class="bracket-cruce" ${adminAttr}>
-    ${renderEquipoCard(cruce.local, tieneIda ? gl : null, ganador, true)}
-    ${renderEquipoCard(cruce.visitante, tieneIda ? gv : null, ganador, false)}
+  const adminAttr = esAdmin ? `onclick="abrirModalResultado('${cruce.id}','${ronda}')" title="Cargar resultado" style="cursor:pointer;"` : ''
+  const lapiz = esAdmin && !ganador
+    ? `<div style="text-align:center;margin-top:2px;">
+        <button onclick="event.stopPropagation();abrirEditorCruce('${cruce.id}','${ronda}')" title="Editar enfrentamiento"
+          style="background:none;border:none;cursor:pointer;font-size:11px;padding:1px 6px;color:var(--gris);font-family:inherit;"
+          onmouseover="this.style.color='var(--dorado2)'" onmouseout="this.style.color='var(--gris)'">✏️ editar</button>
+       </div>`
+    : ''
+  return `<div style="margin:3px 0;">
+    <div class="bracket-cruce" ${adminAttr}>
+      ${renderEquipoCard(cruce.local, tieneIda ? gl : null, ganador, true)}
+      ${renderEquipoCard(cruce.visitante, tieneIda ? gv : null, ganador, false)}
+    </div>${lapiz}
   </div>`
+}
+
+function abrirEditorCruce(cruceId, ronda) {
+  const cruces = estado.bracket[ronda]
+  const cruce = cruces.find(c => c.id === cruceId)
+  if (!cruce) return
+  const eq1 = getEquipo(cruce.local)
+  const eq2 = getEquipo(cruce.visitante)
+  const otros = cruces.filter(c => c.id !== cruceId && !c.ganador)
+  document.body.insertAdjacentHTML('beforeend', `
+    <div class="modal-overlay" id="modal-editor-cruce" onclick="if(event.target===this)cerrarEditorCruce()">
+      <div class="modal" style="width:380px;">
+        <h3>✏️ Editar enfrentamiento</h3>
+        <p style="font-size:13px;margin-bottom:14px;color:var(--gris);">
+          Cruce actual: <strong style="color:var(--texto);">${eq1?.nombre||'?'}</strong> vs <strong style="color:var(--texto);">${eq2?.nombre||'?'}</strong>
+        </p>
+        <div style="margin-bottom:16px;">
+          <div style="font-size:12px;color:var(--gris);margin-bottom:8px;text-transform:uppercase;letter-spacing:0.5px;">Intercambiar con:</div>
+          ${otros.length === 0
+            ? `<p class="text-gris">No hay otros cruces disponibles para intercambiar en esta ronda.</p>`
+            : `<select id="sel-swap-cruce" style="width:100%;padding:8px;background:var(--azul);color:var(--texto);border:1px solid var(--border);border-radius:6px;font-size:13px;">
+                <option value="">— Seleccioná un cruce —</option>
+                ${otros.map(c => {
+                  const n1 = getEquipo(c.local)?.nombre || '?'
+                  const n2 = getEquipo(c.visitante)?.nombre || '?'
+                  return `<option value="${c.id}">${n1} vs ${n2}</option>`
+                }).join('')}
+              </select>`
+          }
+        </div>
+        <div class="flex-gap" style="justify-content:flex-end;">
+          <button class="btn btn-secondary" onclick="cerrarEditorCruce()">Cancelar</button>
+          ${otros.length > 0 ? `<button class="btn btn-gold" onclick="ejecutarSwapCruce('${cruceId}','${ronda}')">🔀 Intercambiar</button>` : ''}
+        </div>
+      </div>
+    </div>
+  `)
+}
+
+async function ejecutarSwapCruce(cruceId, ronda) {
+  const otroCruceId = document.getElementById('sel-swap-cruce')?.value
+  if (!otroCruceId) { toast('Seleccioná un cruce para intercambiar', true); return }
+  const cruces = estado.bracket[ronda]
+  const c1 = cruces.find(c => c.id === cruceId)
+  const c2 = cruces.find(c => c.id === otroCruceId)
+  if (!c1 || !c2) return
+  ;[c1.local, c2.local] = [c2.local, c1.local]
+  ;[c1.visitante, c2.visitante] = [c2.visitante, c1.visitante]
+  cerrarEditorCruce()
+  await guardarEstado()
+  renderBracket()
+  toast('¡Enfrentamiento actualizado!')
+}
+
+function cerrarEditorCruce() {
+  document.getElementById('modal-editor-cruce')?.remove()
 }
 
 function connectorHTML(n, dir) {
@@ -2270,20 +2337,50 @@ function renderBracket() {
 
 async function generarDieciseisavos() {
   const todos = getTodosEquipos()
-  const santiTeams = todos.filter(e => e.dueno === 'santi').sort(() => Math.random() - 0.5)
-  const lucianoTeams = todos.filter(e => e.dueno === 'luciano').sort(() => Math.random() - 0.5)
-  const cruces = []
-  for (let i = 0; i < 16; i++) {
-    cruces.push({
-      id: `d${i + 1}`,
-      local: santiTeams[i]?.id || null,
-      visitante: lucianoTeams[i]?.id || null,
-      golesLocal1: null, golesVisitante1: null,
-      golesLocal2: null, golesVisitante2: null,
-      ganador: null
-    })
+  const shuffle = arr => [...arr].sort(() => Math.random() - 0.5)
+  const esArgentino = e => e.id.startsWith('pa') || e.id.startsWith('arg')
+
+  const santiArg  = shuffle(todos.filter(e => e.dueno === 'santi'   && esArgentino(e)))
+  const santiInt  = shuffle(todos.filter(e => e.dueno === 'santi'   && !esArgentino(e)))
+  const luciArg   = shuffle(todos.filter(e => e.dueno === 'luciano' && esArgentino(e)))
+  const luciInt   = shuffle(todos.filter(e => e.dueno === 'luciano' && !esArgentino(e)))
+
+  // Regla 1: argentino siempre vs internacional
+  // santi_arg vs luciano_int  (8 cruces)
+  // santi_int vs luciano_arg  (8 cruces)
+  let pares = shuffle([
+    ...santiArg.map((s, i) => ({ local: s.id, visitante: luciInt[i]?.id || null })),
+    ...santiInt.map((s, i) => ({ local: s.id, visitante: luciArg[i]?.id || null }))
+  ])
+
+  // Regla 2: River (pa2) y Boca (pa1) en mitades opuestas → solo pueden cruzarse en la final
+  const BOCA = 'pa1', RIVER = 'pa2'
+  const findIdx = id => pares.findIndex(p => p.local === id || p.visitante === id)
+  const idxB = findIdx(BOCA)
+  const idxR = findIdx(RIVER)
+
+  if (idxB !== -1 && idxR !== -1) {
+    const bocaIzq  = idxB < 8
+    const riverIzq = idxR < 8
+    if (bocaIzq === riverIzq) {
+      // Ambos en la misma mitad — mover River a la otra mitad
+      const otraMitad = bocaIzq
+        ? pares.map((_, i) => i).filter(i => i >= 8 && i !== idxR)
+        : pares.map((_, i) => i).filter(i => i <  8 && i !== idxB)
+      const swapIdx = otraMitad[Math.floor(Math.random() * otraMitad.length)]
+      ;[pares[idxR], pares[swapIdx]] = [pares[swapIdx], pares[idxR]]
+    }
   }
-  // Resetear todas las rondas siguientes
+
+  const cruces = pares.map((p, i) => ({
+    id: `d${i + 1}`,
+    local: p.local,
+    visitante: p.visitante,
+    golesLocal1: null, golesVisitante1: null,
+    golesLocal2: null, golesVisitante2: null,
+    ganador: null
+  }))
+
   estado.bracket.dieciseisavos = cruces
   estado.bracket.octavos = []
   estado.bracket.cuartos = []

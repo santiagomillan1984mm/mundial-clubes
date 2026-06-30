@@ -1,6 +1,6 @@
 {
   "version": "1.0",
-  "ultimaActualizacion": "2026-06-30T23:00:04.897Z",
+  "ultimaActualizacion": "2026-06-30T23:00:22.097Z",
   "equiposArgentinos": [
     {
       "id": "arg1",
@@ -139,8 +139,8 @@
       },
       {
         "id": "int_l4",
-        "nombre": "CD Eldense",
-        "liga": "España - LaLiga Hypermotion",
+        "nombre": "Samsunspor",
+        "liga": "Turquía - Süper Lig",
         "dueno": "luciano"
       },
       {

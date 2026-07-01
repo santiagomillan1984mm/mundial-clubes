@@ -1,6 +1,6 @@
 {
   "version": "1.0",
-  "ultimaActualizacion": "2026-06-30T23:01:00.245Z",
+  "ultimaActualizacion": "2026-07-01T00:44:15.059Z",
   "equiposArgentinos": [
     {
       "id": "arg1",
@@ -500,13 +500,6 @@
     }
   },
   "historial": [
-    {
-      "id": "1782766110327",
-      "temporada": 2025,
-      "competencia": "liga",
-      "campeon": "River Plate",
-      "dueno": "luciano"
-    },
     {
       "id": "1782766128518",
       "temporada": 2025,

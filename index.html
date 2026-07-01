@@ -2320,12 +2320,9 @@ function getEquipo(id) {
 }
 
 function calcularGanadorCruce(cruce) {
-  if (cruce.golesLocal1 === null || cruce.golesLocal2 === null ||
-      cruce.golesVisitante1 === null || cruce.golesVisitante2 === null) return null
-  const gl = cruce.golesLocal1 + cruce.golesLocal2
-  const gv = cruce.golesVisitante1 + cruce.golesVisitante2
-  if (gl > gv) return cruce.local
-  if (gv > gl) return cruce.visitante
+  if (cruce.golesLocal === null || cruce.golesVisitante === null) return null
+  if (cruce.golesLocal > cruce.golesVisitante) return cruce.local
+  if (cruce.golesVisitante > cruce.golesLocal) return cruce.visitante
   return null
 }
 
@@ -2339,7 +2336,7 @@ function avanzarRonda(crucesActual, siguienteRonda, prefix) {
     const id = `${prefix}${i + 1}`
     let sig = crucesSig.find(c => c.id === id)
     if (!sig) {
-      sig = { id, local: c1.ganador, visitante: c2.ganador, golesLocal1: null, golesVisitante1: null, golesLocal2: null, golesVisitante2: null, ganador: null }
+      sig = { id, local: c1.ganador, visitante: c2.ganador, golesLocal: null, golesVisitante: null, ganador: null }
       crucesSig.push(sig)
     } else {
       sig.local = c1.ganador
@@ -2382,15 +2379,7 @@ function renderCruceCard(cruce, ronda) {
     </div>`
   }
   const ganador = cruce.ganador
-  const tieneIda = cruce.golesLocal1 !== null && cruce.golesVisitante1 !== null
-  const tieneVuelta = cruce.golesLocal2 !== null && cruce.golesVisitante2 !== null
-  let gl = null, gv = null
-  if (tieneIda && tieneVuelta) {
-    gl = cruce.golesLocal1 + cruce.golesLocal2
-    gv = cruce.golesVisitante1 + cruce.golesVisitante2
-  } else if (tieneIda) {
-    gl = cruce.golesLocal1; gv = cruce.golesVisitante1
-  }
+  const jugado = cruce.golesLocal !== null && cruce.golesVisitante !== null
   const adminAttr = esAdmin ? `onclick="abrirModalResultado('${cruce.id}','${ronda}')" title="Cargar resultado" style="cursor:pointer;"` : ''
   const lapiz = esAdmin
     ? `<div style="text-align:center;margin-top:2px;">
@@ -2401,8 +2390,8 @@ function renderCruceCard(cruce, ronda) {
     : ''
   return `<div style="margin:3px 0;">
     <div class="bracket-cruce" ${adminAttr}>
-      ${renderEquipoCard(cruce.local, tieneIda ? gl : null, ganador, true)}
-      ${renderEquipoCard(cruce.visitante, tieneIda ? gv : null, ganador, false)}
+      ${renderEquipoCard(cruce.local, jugado ? cruce.golesLocal : null, ganador, true)}
+      ${renderEquipoCard(cruce.visitante, jugado ? cruce.golesVisitante : null, ganador, false)}
     </div>${lapiz}
   </div>`
 }
@@ -2452,7 +2441,7 @@ async function ejecutarSwapCruce(cruceId, ronda) {
   const c2 = cruces.find(c => c.id === otroCruceId)
   if (!c1 || !c2) return
   // Swap todo el contenido del cruce (equipos, goles y ganador)
-  const campos = ['local','visitante','golesLocal1','golesVisitante1','golesLocal2','golesVisitante2','ganador']
+  const campos = ['local','visitante','golesLocal','golesVisitante','ganador']
   for (const campo of campos) {
     ;[c1[campo], c2[campo]] = [c2[campo], c1[campo]]
   }
@@ -2583,18 +2572,29 @@ async function generarDieciseisavos() {
   const shuffle = arr => [...arr].sort(() => Math.random() - 0.5)
   const esArgentino = e => e.id.startsWith('pa') || e.id.startsWith('arg')
 
-  const santiArg  = shuffle(todos.filter(e => e.dueno === 'santi'   && esArgentino(e)))
-  const santiInt  = shuffle(todos.filter(e => e.dueno === 'santi'   && !esArgentino(e)))
-  const luciArg   = shuffle(todos.filter(e => e.dueno === 'luciano' && esArgentino(e)))
-  const luciInt   = shuffle(todos.filter(e => e.dueno === 'luciano' && !esArgentino(e)))
+  const argentinos  = shuffle(todos.filter(esArgentino))
+  let   intSanti    = shuffle(todos.filter(e => e.dueno === 'santi'   && !esArgentino(e)))
+  let   intLuciano  = shuffle(todos.filter(e => e.dueno === 'luciano' && !esArgentino(e)))
 
-  // Regla 1: argentino siempre vs internacional
-  // santi_arg vs luciano_int  (8 cruces)
-  // santi_int vs luciano_arg  (8 cruces)
-  let pares = shuffle([
-    ...santiArg.map((s, i) => ({ local: s.id, visitante: luciInt[i]?.id || null })),
-    ...santiInt.map((s, i) => ({ local: s.id, visitante: luciArg[i]?.id || null }))
-  ])
+  // Regla 1: cada argentino cruza con un internacional, preferentemente de dueño opuesto
+  // (si no alcanzan los del dueño opuesto, se completa con los que queden)
+  const paresCrudos = []
+  for (const arg of argentinos) {
+    let rival
+    if (arg.dueno === 'santi' && intLuciano.length) rival = intLuciano.pop()
+    else if (arg.dueno === 'luciano' && intSanti.length) rival = intSanti.pop()
+    else if (intSanti.length) rival = intSanti.pop()
+    else rival = intLuciano.pop()
+    paresCrudos.push({ local: arg.id, visitante: rival.id })
+  }
+
+  // Los internacionales restantes se cruzan entre sí
+  const restantes = shuffle([...intSanti, ...intLuciano])
+  for (let i = 0; i < restantes.length; i += 2) {
+    paresCrudos.push({ local: restantes[i].id, visitante: restantes[i + 1].id })
+  }
+
+  const pares = shuffle(paresCrudos)
 
   // Regla 2: River (pa2) y Boca (pa1) en mitades opuestas → solo pueden cruzarse en la final
   const BOCA = 'pa1', RIVER = 'pa2'
@@ -2619,8 +2619,7 @@ async function generarDieciseisavos() {
     id: `d${i + 1}`,
     local: p.local,
     visitante: p.visitante,
-    golesLocal1: null, golesVisitante1: null,
-    golesLocal2: null, golesVisitante2: null,
+    golesLocal: null, golesVisitante: null,
     ganador: null
   }))
 
@@ -2648,30 +2647,14 @@ function abrirModalResultado(cruceId, ronda) {
     <div class="modal-overlay" onclick="if(event.target===this)cerrarModal()">
       <div class="modal">
         <h3>⚽ ${tituloRonda}</h3>
-        <div class="modal-partido">
-          <div class="modal-label">Partido de Ida</div>
-          <div class="modal-row">
-            <span class="modal-equipo-nombre ${d1}" style="color:${d1==='santi'?'#4a9eff':d1==='luciano'?'#ff6b6b':'var(--texto)'}">${eq1?.nombre || '?'}</span>
-            <input class="input modal-input" id="gl1" type="number" min="0" max="99" value="${cruce.golesLocal1 ?? ''}" placeholder="-">
-          </div>
-          <div class="modal-row">
-            <span class="modal-equipo-nombre ${d2}" style="color:${d2==='santi'?'#4a9eff':d2==='luciano'?'#ff6b6b':'var(--texto)'}">${eq2?.nombre || '?'}</span>
-            <input class="input modal-input" id="gv1" type="number" min="0" max="99" value="${cruce.golesVisitante1 ?? ''}" placeholder="-">
-          </div>
+        <div class="modal-label" style="margin-bottom:12px;">Partido único</div>
+        <div class="modal-row">
+          <span class="modal-equipo-nombre ${d1}" style="color:${d1==='santi'?'#4a9eff':d1==='luciano'?'#ff6b6b':'var(--texto)'}">${eq1?.nombre || '?'}</span>
+          <input class="input modal-input" id="gl1" type="number" min="0" max="99" value="${cruce.golesLocal ?? ''}" placeholder="-">
         </div>
-        <div class="modal-partido">
-          <div class="modal-label">Partido de Vuelta</div>
-          <div class="modal-row">
-            <span class="modal-equipo-nombre ${d1}" style="color:${d1==='santi'?'#4a9eff':d1==='luciano'?'#ff6b6b':'var(--texto)'}">${eq1?.nombre || '?'}</span>
-            <input class="input modal-input" id="gl2" type="number" min="0" max="99" value="${cruce.golesLocal2 ?? ''}" placeholder="-">
-          </div>
-          <div class="modal-row">
-            <span class="modal-equipo-nombre ${d2}" style="color:${d2==='santi'?'#4a9eff':d2==='luciano'?'#ff6b6b':'var(--texto)'}">${eq2?.nombre || '?'}</span>
-            <input class="input modal-input" id="gv2" type="number" min="0" max="99" value="${cruce.golesVisitante2 ?? ''}" placeholder="-">
-          </div>
-        </div>
-        <div style="font-size:11px;color:var(--gris);margin-bottom:12px;">
-          Dejá en blanco los goles que todavía no se jugaron.
+        <div class="modal-row" style="margin-bottom:16px;">
+          <span class="modal-equipo-nombre ${d2}" style="color:${d2==='santi'?'#4a9eff':d2==='luciano'?'#ff6b6b':'var(--texto)'}">${eq2?.nombre || '?'}</span>
+          <input class="input modal-input" id="gv1" type="number" min="0" max="99" value="${cruce.golesVisitante ?? ''}" placeholder="-">
         </div>
         <div style="display:flex;gap:10px;">
           <button class="btn btn-primary" style="flex:1" onclick="guardarResultado()">✅ Guardar</button>
@@ -2691,10 +2674,8 @@ async function guardarResultado() {
   const cruce = cruces.find(c => c.id === modalCruceId)
   if (!cruce) return
   const v = id => { const el = document.getElementById(id); return el && el.value !== '' ? parseInt(el.value) : null }
-  cruce.golesLocal1 = v('gl1')
-  cruce.golesVisitante1 = v('gv1')
-  cruce.golesLocal2 = v('gl2')
-  cruce.golesVisitante2 = v('gv2')
+  cruce.golesLocal = v('gl1')
+  cruce.golesVisitante = v('gv1')
   cruce.ganador = calcularGanadorCruce(cruce)
   avanzarGanadores()
   await guardarEstado()

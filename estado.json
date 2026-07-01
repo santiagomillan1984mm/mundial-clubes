@@ -1,6 +1,6 @@
 {
   "version": "1.0",
-  "ultimaActualizacion": "2026-07-01T23:00:23.662Z",
+  "ultimaActualizacion": "2026-07-01T23:00:43.044Z",
   "equiposArgentinos": [
     {
       "id": "arg1",
@@ -197,17 +197,7 @@
     "dieciseisavos": [
       {
         "id": "d1",
-        "local": "int_s11",
-        "visitante": "arg3",
-        "golesLocal1": null,
-        "golesVisitante1": null,
-        "golesLocal2": null,
-        "golesVisitante2": null,
-        "ganador": null
-      },
-      {
-        "id": "d2",
-        "local": "arg6",
+        "local": "arg8",
         "visitante": "int_l11",
         "golesLocal1": null,
         "golesVisitante1": null,
@@ -216,8 +206,8 @@
         "ganador": null
       },
       {
-        "id": "d3",
-        "local": "int_s2",
+        "id": "d2",
+        "local": "int_s10",
         "visitante": null,
         "golesLocal1": null,
         "golesVisitante1": null,
@@ -226,9 +216,19 @@
         "ganador": null
       },
       {
-        "id": "d4",
+        "id": "d3",
         "local": "arg5",
-        "visitante": "int_l9",
+        "visitante": "int_l2",
+        "golesLocal1": null,
+        "golesVisitante1": null,
+        "golesLocal2": null,
+        "golesVisitante2": null,
+        "ganador": null
+      },
+      {
+        "id": "d4",
+        "local": "int_s11",
+        "visitante": null,
         "golesLocal1": null,
         "golesVisitante1": null,
         "golesLocal2": null,
@@ -237,8 +237,8 @@
       },
       {
         "id": "d5",
-        "local": "int_s8",
-        "visitante": "arg2",
+        "local": "int_s12",
+        "visitante": null,
         "golesLocal1": null,
         "golesVisitante1": null,
         "golesLocal2": null,
@@ -247,8 +247,8 @@
       },
       {
         "id": "d6",
-        "local": "arg7",
-        "visitante": "int_l1",
+        "local": "int_s8",
+        "visitante": null,
         "golesLocal1": null,
         "golesVisitante1": null,
         "golesLocal2": null,
@@ -257,7 +257,7 @@
       },
       {
         "id": "d7",
-        "local": "int_s4",
+        "local": "int_s7",
         "visitante": null,
         "golesLocal1": null,
         "golesVisitante1": null,
@@ -267,8 +267,8 @@
       },
       {
         "id": "d8",
-        "local": "int_s10",
-        "visitante": "arg4",
+        "local": "int_s1",
+        "visitante": "arg2",
         "golesLocal1": null,
         "golesVisitante1": null,
         "golesLocal2": null,
@@ -277,7 +277,7 @@
       },
       {
         "id": "d9",
-        "local": "int_s1",
+        "local": "int_s3",
         "visitante": null,
         "golesLocal1": null,
         "golesVisitante1": null,
@@ -288,7 +288,7 @@
       {
         "id": "d10",
         "local": "int_s9",
-        "visitante": null,
+        "visitante": "arg3",
         "golesLocal1": null,
         "golesVisitante1": null,
         "golesLocal2": null,
@@ -297,8 +297,8 @@
       },
       {
         "id": "d11",
-        "local": "int_s5",
-        "visitante": null,
+        "local": "arg6",
+        "visitante": "int_l7",
         "golesLocal1": null,
         "golesVisitante1": null,
         "golesLocal2": null,
@@ -307,7 +307,7 @@
       },
       {
         "id": "d12",
-        "local": "int_s6",
+        "local": "int_s4",
         "visitante": "arg1",
         "golesLocal1": null,
         "golesVisitante1": null,
@@ -317,8 +317,8 @@
       },
       {
         "id": "d13",
-        "local": "int_s12",
-        "visitante": null,
+        "local": "int_s2",
+        "visitante": "arg4",
         "golesLocal1": null,
         "golesVisitante1": null,
         "golesLocal2": null,
@@ -327,8 +327,8 @@
       },
       {
         "id": "d14",
-        "local": "int_s3",
-        "visitante": null,
+        "local": "arg7",
+        "visitante": "int_l10",
         "golesLocal1": null,
         "golesVisitante1": null,
         "golesLocal2": null,
@@ -337,8 +337,8 @@
       },
       {
         "id": "d15",
-        "local": "arg8",
-        "visitante": "int_l6",
+        "local": "int_s5",
+        "visitante": null,
         "golesLocal1": null,
         "golesVisitante1": null,
         "golesLocal2": null,
@@ -347,7 +347,7 @@
       },
       {
         "id": "d16",
-        "local": "int_s7",
+        "local": "int_s6",
         "visitante": null,
         "golesLocal1": null,
         "golesVisitante1": null,

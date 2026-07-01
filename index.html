@@ -702,6 +702,7 @@
   <button class="nav-btn" onclick="mostrarSeccion('bracket')">Eliminatorias</button>
   <button class="nav-btn" onclick="mostrarSeccion('supercopa')">🥇 Supercopa</button>
   <button class="nav-btn" onclick="mostrarSeccion('historial')">🏅 Historial</button>
+  <button class="nav-btn" onclick="mostrarSeccion('promocion')">🔃 Promoción</button>
   <button class="nav-btn" onclick="mostrarSeccion('relampago')">⚡ Relámpago</button>
   <button class="nav-btn" onclick="mostrarSeccion('admin')">Admin</button>
 </nav>
@@ -768,6 +769,12 @@
   <div id="sec-historial" class="seccion">
     <div class="sec-titulo">🏅 Historial de Campeones</div>
     <div id="historial-contenido"></div>
+  </div>
+
+  <!-- PROMOCIÓN -->
+  <div id="sec-promocion" class="seccion">
+    <div class="sec-titulo">🔃 Promoción</div>
+    <div id="promocion-contenido"><div class="loading">Cargando...</div></div>
   </div>
 
   <!-- RELÁMPAGO -->
@@ -1261,6 +1268,187 @@ async function eliminarHistorial(id) {
   renderHistorial()
 }
 
+// ══════════════════════════════════════════════
+// PROMOCIÓN
+// ══════════════════════════════════════════════
+
+function renderPromocion() {
+  const cont = document.getElementById('promocion-contenido')
+  if (!cont || !estado) return
+  if (!estado.promocion) estado.promocion = { partidos: [
+    { id:'prom1', dueno:'santi',   descendidoId:null, rivalId:null, golesDescendido:null, golesRival:null, decision:null },
+    { id:'prom2', dueno:'santi',   descendidoId:null, rivalId:null, golesDescendido:null, golesRival:null, decision:null },
+    { id:'prom3', dueno:'luciano', descendidoId:null, rivalId:null, golesDescendido:null, golesRival:null, decision:null },
+    { id:'prom4', dueno:'luciano', descendidoId:null, rivalId:null, golesDescendido:null, golesRival:null, decision:null },
+  ]}
+
+  const pool = estado.poolArgentino || POOL_ARG
+  const partidos = estado.promocion.partidos
+
+  function optsPool(selectedId) {
+    return `<option value="">— Elegir equipo —</option>` +
+      pool.map(e => `<option value="${e.id}" ${e.id === selectedId ? 'selected' : ''}>${e.nombre}</option>`).join('')
+  }
+
+  function renderPartido(p, idx) {
+    const desc = pool.find(e => e.id === p.descendidoId)
+    const rival = pool.find(e => e.id === p.rivalId)
+    const color = p.dueno === 'santi' ? '#4a9eff' : '#ff6b6b'
+    const duenоLabel = p.dueno === 'santi' ? 'Santi' : 'Luciano'
+    const jugado = p.golesDescendido !== null && p.golesRival !== null
+    const descGana = jugado && p.golesDescendido > p.golesRival
+    const rivalGana = jugado && p.golesRival > p.golesDescendido
+
+    // Config selectors (solo admin o si no está jugado)
+    const configHTML = esAdmin ? `
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px;">
+        <div>
+          <div style="font-size:11px;color:var(--gris);margin-bottom:4px;">Descendido</div>
+          <select onchange="estado.promocion.partidos[${idx}].descendidoId=this.value;guardarEstado().then(renderPromocion)"
+            style="width:100%;padding:6px;background:var(--azul);color:var(--texto);border:1px solid var(--border);border-radius:6px;font-size:12px;">
+            ${optsPool(p.descendidoId)}
+          </select>
+        </div>
+        <div>
+          <div style="font-size:11px;color:var(--gris);margin-bottom:4px;">Rival</div>
+          <select onchange="estado.promocion.partidos[${idx}].rivalId=this.value;guardarEstado().then(renderPromocion)"
+            style="width:100%;padding:6px;background:var(--azul);color:var(--texto);border:1px solid var(--border);border-radius:6px;font-size:12px;">
+            ${optsPool(p.rivalId)}
+          </select>
+        </div>
+      </div>` : ''
+
+    // Resultado
+    let resultadoHTML = ''
+    if (desc && rival) {
+      if (esAdmin && !jugado) {
+        resultadoHTML = `
+          <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px;flex-wrap:wrap;">
+            <span style="flex:1;font-size:13px;font-weight:600;color:${color};">${desc.nombre}</span>
+            <input type="number" min="0" max="99" placeholder="-" id="gd-${p.id}"
+              style="width:44px;text-align:center;font-size:16px;font-weight:700;padding:4px;border-radius:6px;border:1px solid var(--border);background:var(--azul);color:var(--texto);">
+            <span style="color:var(--gris);font-weight:700;">vs</span>
+            <input type="number" min="0" max="99" placeholder="-" id="gr-${p.id}"
+              style="width:44px;text-align:center;font-size:16px;font-weight:700;padding:4px;border-radius:6px;border:1px solid var(--border);background:var(--azul);color:var(--texto);">
+            <span style="flex:1;font-size:13px;font-weight:600;text-align:right;">${rival.nombre}</span>
+          </div>
+          <button class="btn btn-primary btn-sm" onclick="guardarResultadoPromocion('${p.id}')">💾 Guardar resultado</button>`
+      } else if (jugado) {
+        const gdColor = descGana ? '#2ecc71' : rivalGana ? '#e74c3c' : 'var(--gris)'
+        const grColor = rivalGana ? '#2ecc71' : descGana ? '#e74c3c' : 'var(--gris)'
+        resultadoHTML = `
+          <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px;flex-wrap:wrap;">
+            <span style="flex:1;font-size:13px;font-weight:700;color:${color};">${desc.nombre}</span>
+            <span style="font-size:20px;font-weight:800;color:${gdColor};">${p.golesDescendido}</span>
+            <span style="color:var(--gris);font-weight:700;">-</span>
+            <span style="font-size:20px;font-weight:800;color:${grColor};">${p.golesRival}</span>
+            <span style="flex:1;font-size:13px;font-weight:700;text-align:right;">${rival.nombre}</span>
+          </div>
+          ${esAdmin ? `<button class="btn btn-secondary btn-sm" onclick="borrarResultadoPromocion('${p.id}')" style="margin-bottom:10px;">↺ Borrar resultado</button>` : ''}`
+      } else {
+        resultadoHTML = `
+          <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
+            <span style="flex:1;font-size:13px;font-weight:600;color:${color};">${desc.nombre}</span>
+            <span style="color:var(--gris);font-size:13px;">vs</span>
+            <span style="flex:1;font-size:13px;font-weight:600;text-align:right;">${rival.nombre}</span>
+          </div>`
+      }
+    } else {
+      resultadoHTML = `<p class="text-gris" style="font-size:12px;">Configurá los equipos para este partido.</p>`
+    }
+
+    // Decisión (solo cuando rival gana)
+    let decisionHTML = ''
+    if (jugado && rivalGana) {
+      if (p.decision === null) {
+        decisionHTML = `
+          <div style="background:var(--azul3);border-radius:8px;padding:12px;margin-top:10px;">
+            <div style="font-size:12px;font-weight:700;color:var(--dorado2);margin-bottom:8px;">⚖️ ${rival.nombre} ganó — ¿Qué decide ${duenоLabel}?</div>
+            ${esAdmin ? `
+              <div class="flex-gap">
+                <button class="btn btn-gold btn-sm" onclick="decidirPromocion('${p.id}','cambia')">🔄 ${desc.nombre} baja → sube ${rival.nombre}</button>
+                <button class="btn btn-secondary btn-sm" onclick="decidirPromocion('${p.id}','mantiene')">↩️ ${desc.nombre} se mantiene</button>
+              </div>` : `<p class="text-gris" style="font-size:12px;">Esperando decisión de ${duenоLabel}.</p>`}
+          </div>`
+      } else if (p.decision === 'cambia') {
+        decisionHTML = `<div style="background:#0f3020;border-radius:8px;padding:10px;margin-top:10px;font-size:13px;">✅ <strong style="color:#2ecc71;">${rival.nombre}</strong> sube — <strong>${desc.nombre}</strong> baja.</div>`
+      } else {
+        decisionHTML = `<div style="background:var(--azul3);border-radius:8px;padding:10px;margin-top:10px;font-size:13px;">↩️ <strong>${desc.nombre}</strong> se mantiene en la liga.</div>`
+      }
+    } else if (jugado && descGana) {
+      decisionHTML = `<div style="background:#0f3020;border-radius:8px;padding:10px;margin-top:10px;font-size:13px;">✅ <strong style="color:#2ecc71;">${desc.nombre}</strong> gana y se mantiene.</div>`
+    }
+
+    return `
+      <div class="card" style="margin-bottom:14px;border-left:4px solid ${color};">
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:12px;">
+          <span class="badge-${p.dueno}">${duenоLabel}</span>
+          <span style="font-size:12px;color:var(--gris);">Partido ${idx+1}</span>
+        </div>
+        ${configHTML}
+        ${resultadoHTML}
+        ${decisionHTML}
+      </div>`
+  }
+
+  const santiPartidos = partidos.filter(p => p.dueno === 'santi')
+  const lucianoPartidos = partidos.filter(p => p.dueno === 'luciano')
+
+  cont.innerHTML = `
+    <div class="card" style="margin-bottom:16px;">
+      <div class="card-titulo">¿Cómo funciona?</div>
+      <p class="text-gris" style="font-size:13px;line-height:1.6;">
+        Cada uno elige un equipo rival para enfrentar a su descendido. Si gana el rival, asciende y el dueño decide si el descendido baja definitivamente o se mantiene.
+      </p>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">
+      <div>
+        <div style="font-weight:700;margin-bottom:10px;" class="badge-santi">SANTI</div>
+        ${santiPartidos.map((p, i) => renderPartido(p, partidos.indexOf(p))).join('')}
+      </div>
+      <div>
+        <div style="font-weight:700;margin-bottom:10px;" class="badge-luciano">LUCIANO</div>
+        ${lucianoPartidos.map((p, i) => renderPartido(p, partidos.indexOf(p))).join('')}
+      </div>
+    </div>
+  `
+}
+
+async function guardarResultadoPromocion(id) {
+  const p = estado.promocion.partidos.find(p => p.id === id)
+  if (!p) return
+  const gd = parseInt(document.getElementById(`gd-${id}`)?.value)
+  const gr = parseInt(document.getElementById(`gr-${id}`)?.value)
+  if (isNaN(gd) || isNaN(gr)) { toast('Ingresá los goles', true); return }
+  if (gd === gr) { toast('No puede terminar empatado', true); return }
+  p.golesDescendido = gd
+  p.golesRival = gr
+  p.decision = null
+  await guardarEstado()
+  renderPromocion()
+  toast('¡Resultado guardado!')
+}
+
+async function borrarResultadoPromocion(id) {
+  const p = estado.promocion.partidos.find(p => p.id === id)
+  if (!p) return
+  p.golesDescendido = null
+  p.golesRival = null
+  p.decision = null
+  await guardarEstado()
+  renderPromocion()
+  toast('Resultado borrado')
+}
+
+async function decidirPromocion(id, decision) {
+  const p = estado.promocion.partidos.find(p => p.id === id)
+  if (!p) return
+  p.decision = decision
+  await guardarEstado()
+  renderPromocion()
+  toast(decision === 'cambia' ? '¡Cambio confirmado!' : '¡Equipo mantenido!')
+}
+
 function renderTodo() {
   if (!estado.poolArgentino) estado.poolArgentino = POOL_ARG.map(e => ({...e}))
   if (!estado.ligaAfa) estado.ligaAfa = { configurado: false, equipos: [], partidos: [] }
@@ -1268,6 +1456,12 @@ function renderTodo() {
   if (!estado.historial) estado.historial = []
   if (!estado.torneosRelampago) estado.torneosRelampago = []
   if (!estado.supercopa) estado.supercopa = { localId: null, visitanteId: null, golesLocal: null, golesVisitante: null, ganador: null }
+  if (!estado.promocion) estado.promocion = { partidos: [
+    { id: 'prom1', dueno: 'santi',   descendidoId: null, rivalId: null, golesDescendido: null, golesRival: null, decision: null },
+    { id: 'prom2', dueno: 'santi',   descendidoId: null, rivalId: null, golesDescendido: null, golesRival: null, decision: null },
+    { id: 'prom3', dueno: 'luciano', descendidoId: null, rivalId: null, golesDescendido: null, golesRival: null, decision: null },
+    { id: 'prom4', dueno: 'luciano', descendidoId: null, rivalId: null, golesDescendido: null, golesRival: null, decision: null },
+  ]}
   renderEstadoInicio()
   renderLiga()
   renderCopa()
@@ -1276,6 +1470,7 @@ function renderTodo() {
   renderSorteo()
   renderBracket()
   renderHistorial()
+  renderPromocion()
   renderRelampago()
 }
 

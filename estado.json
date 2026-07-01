@@ -1,6 +1,6 @@
 {
   "version": "1.0",
-  "ultimaActualizacion": "2026-07-01T23:54:26.537Z",
+  "ultimaActualizacion": "2026-07-01T23:54:45.337Z",
   "equiposArgentinos": [
     {
       "id": "arg1",
@@ -207,9 +207,9 @@
         "id": "d2",
         "local": "int_s11",
         "visitante": "int_l11",
-        "golesLocal": null,
-        "golesVisitante": null,
-        "ganador": null
+        "golesLocal": 0,
+        "golesVisitante": 1,
+        "ganador": "int_l11"
       },
       {
         "id": "d3",
@@ -324,7 +324,16 @@
         "ganador": null
       }
     ],
-    "octavos": [],
+    "octavos": [
+      {
+        "id": "o1",
+        "local": "arg2",
+        "visitante": "int_l11",
+        "golesLocal": null,
+        "golesVisitante": null,
+        "ganador": null
+      }
+    ],
     "cuartos": [],
     "semis": [],
     "final": []

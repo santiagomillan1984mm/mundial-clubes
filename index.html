@@ -695,6 +695,7 @@
 
 <nav>
   <button class="nav-btn active" onclick="mostrarSeccion('inicio')">Inicio</button>
+  <button class="nav-btn" onclick="mostrarSeccion('promocion')">🔃 Promoción</button>
   <button class="nav-btn" onclick="mostrarSeccion('liga')">🇦🇷 Liga AFA</button>
   <button class="nav-btn" onclick="mostrarSeccion('copa')">🏆 Copa Arg.</button>
   <button class="nav-btn" onclick="mostrarSeccion('argentinos')">Mundial Arg.</button>
@@ -702,7 +703,6 @@
   <button class="nav-btn" onclick="mostrarSeccion('bracket')">Eliminatorias</button>
   <button class="nav-btn" onclick="mostrarSeccion('supercopa')">🥇 Supercopa</button>
   <button class="nav-btn" onclick="mostrarSeccion('historial')">🏅 Historial</button>
-  <button class="nav-btn" onclick="mostrarSeccion('promocion')">🔃 Promoción</button>
   <button class="nav-btn" onclick="mostrarSeccion('relampago')">⚡ Relámpago</button>
   <button class="nav-btn" onclick="mostrarSeccion('admin')">Admin</button>
 </nav>
@@ -1271,6 +1271,23 @@ async function eliminarHistorial(id) {
 // ══════════════════════════════════════════════
 // PROMOCIÓN
 // ══════════════════════════════════════════════
+
+function getEquiposPromocion() {
+  const partidos = estado.promocion?.partidos || []
+  const result = []
+  for (const p of partidos) {
+    if (p.golesDescendido === null || p.golesRival === null) continue
+    const descGana = p.golesDescendido > p.golesRival
+    const rivalGana = p.golesRival > p.golesDescendido
+    if (descGana) {
+      result.push({ id: p.descendidoId, dueno: p.dueno })
+    } else if (rivalGana && p.decision !== null) {
+      const equipoId = p.decision === 'cambia' ? p.rivalId : p.descendidoId
+      result.push({ id: equipoId, dueno: p.dueno })
+    }
+  }
+  return result
+}
 
 function renderPromocion() {
   const cont = document.getElementById('promocion-contenido')
@@ -3169,8 +3186,21 @@ function filtrarLiga(filtro, btn) {
 
 function renderLigaConfig(cont) {
   const pool = estado.poolArgentino || POOL_ARG
-  const selSanti = (estado.ligaAfa.equipos || []).filter(e => e.dueno === 'santi').map(e => e.id)
-  const selLuciano = (estado.ligaAfa.equipos || []).filter(e => e.dueno === 'luciano').map(e => e.id)
+
+  // Equipos confirmados desde la promoción (bloqueados)
+  const desdePromo = getEquiposPromocion()
+  const desdePromoIds = new Set(desdePromo.map(e => e.id))
+
+  // Asegurarse de que los equipos de promoción estén en ligaAfa.equipos
+  if (!estado.ligaAfa.equipos) estado.ligaAfa.equipos = []
+  for (const ep of desdePromo) {
+    if (!estado.ligaAfa.equipos.find(e => e.id === ep.id)) {
+      estado.ligaAfa.equipos.push({ id: ep.id, dueno: ep.dueno })
+    }
+  }
+
+  const selSanti = estado.ligaAfa.equipos.filter(e => e.dueno === 'santi').map(e => e.id)
+  const selLuciano = estado.ligaAfa.equipos.filter(e => e.dueno === 'luciano').map(e => e.id)
 
   let html = `<div class="card">
     <div class="card-titulo">Configurar Liga AFA — elegí 10 equipos cada uno (20 en total)</div>
@@ -3179,21 +3209,39 @@ function renderLigaConfig(cont) {
       <div style="display:flex;align-items:center;gap:6px;font-size:13px;"><div class="pool-dot luciano"></div><strong>Luciano: <span id="cnt-l-liga">${selLuciano.length}</span>/10</strong></div>
     </div>`
 
+  if (desdePromo.length > 0) {
+    html += `<div style="background:var(--azul3);border-radius:8px;padding:10px 14px;margin-bottom:14px;">
+      <div style="font-size:11px;font-weight:700;color:var(--dorado2);text-transform:uppercase;letter-spacing:1px;margin-bottom:8px;">🔃 Confirmados desde Promoción</div>
+      <div style="display:flex;flex-wrap:wrap;gap:8px;">
+        ${desdePromo.map(ep => {
+          const eq = pool.find(e => e.id === ep.id)
+          return `<div style="display:flex;align-items:center;gap:6px;background:var(--card);border-radius:6px;padding:5px 10px;font-size:12px;font-weight:600;">
+            ${logoHTML(ep.id, 18)}
+            <span>${eq?.nombre || ep.id}</span>
+            <span class="badge-${ep.dueno}" style="font-size:10px;padding:1px 6px;">${ep.dueno === 'santi' ? 'S' : 'L'}</span>
+            <span style="font-size:10px;color:var(--gris);">🔒</span>
+          </div>`
+        }).join('')}
+      </div>
+    </div>`
+  }
+
   if (esAdmin) {
     html += `<div class="pool-grid" id="pool-liga-grid">
       ${pool.map(eq => {
         const isSanti = selSanti.includes(eq.id)
         const isLuc = selLuciano.includes(eq.id)
+        const bloqueado = desdePromoIds.has(eq.id)
         let cls = 'pool-item'
         if (isSanti) cls += ' seleccionado-santi'
         if (isLuc) cls += ' seleccionado-luciano'
-        const dotCls = isSanti ? 'santi' : isLuc ? 'luciano' : ''
-        return `<div class="${cls}" id="pi_${eq.id}" onclick="togglePoolLiga('${eq.id}')">
-          <div class="pool-dot ${dotCls}" id="dot_${eq.id}" style="display:none;"></div>
+        if (bloqueado) cls += ' en-liga'
+        return `<div class="${cls}" id="pi_${eq.id}" ${bloqueado ? 'title="Confirmado desde Promoción"' : `onclick="togglePoolLiga('${eq.id}')"`}>
           ${logoHTML(eq.id, 26)}
           <span style="flex:1;">${eq.nombre}</span>
-          ${isSanti ? '<span class="badge-santi" style="font-size:10px;padding:1px 7px;">S</span>' : ''}
-          ${isLuc ? '<span class="badge-luciano" style="font-size:10px;padding:1px 7px;">L</span>' : ''}
+          ${bloqueado ? '<span style="font-size:10px;color:var(--gris);">🔒</span>' : ''}
+          ${isSanti && !bloqueado ? '<span class="badge-santi" style="font-size:10px;padding:1px 7px;">S</span>' : ''}
+          ${isLuc && !bloqueado ? '<span class="badge-luciano" style="font-size:10px;padding:1px 7px;">L</span>' : ''}
         </div>`
       }).join('')}
     </div>
@@ -3211,6 +3259,8 @@ function renderLigaConfig(cont) {
 
 function togglePoolLiga(id) {
   if (!estado.ligaAfa.equipos) estado.ligaAfa.equipos = []
+  const desdePromoIds = new Set(getEquiposPromocion().map(e => e.id))
+  if (desdePromoIds.has(id)) return
   const equipos = estado.ligaAfa.equipos
   const idx = equipos.findIndex(e => e.id === id)
 

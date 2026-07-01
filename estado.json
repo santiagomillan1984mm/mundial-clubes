@@ -1,6 +1,6 @@
 {
   "version": "1.0",
-  "ultimaActualizacion": "2026-07-01T23:09:20.250Z",
+  "ultimaActualizacion": "2026-07-01T23:16:20.103Z",
   "equiposArgentinos": [
     {
       "id": "arg1",
@@ -197,110 +197,54 @@
     "dieciseisavos": [
       {
         "id": "d1",
-        "local": "arg5",
-        "visitante": "int_l10",
-        "golesLocal": null,
-        "golesVisitante": null,
-        "ganador": null
-      },
-      {
-        "id": "d2",
-        "local": "arg6",
-        "visitante": "int_l9",
-        "golesLocal": null,
-        "golesVisitante": null,
-        "ganador": null
-      },
-      {
-        "id": "d3",
-        "local": "int_l3",
-        "visitante": "int_l11",
-        "golesLocal": null,
-        "golesVisitante": null,
-        "ganador": null
-      },
-      {
-        "id": "d4",
-        "local": "arg1",
-        "visitante": "int_s8",
-        "golesLocal": null,
-        "golesVisitante": null,
-        "ganador": null
-      },
-      {
-        "id": "d5",
-        "local": "int_s3",
-        "visitante": "int_s9",
-        "golesLocal": null,
-        "golesVisitante": null,
-        "ganador": null
-      },
-      {
-        "id": "d6",
-        "local": "int_s6",
-        "visitante": "int_l5",
-        "golesLocal": null,
-        "golesVisitante": null,
-        "ganador": null
-      },
-      {
-        "id": "d7",
-        "local": "arg8",
-        "visitante": "int_l8",
-        "golesLocal": null,
-        "golesVisitante": null,
-        "ganador": null
-      },
-      {
-        "id": "d8",
-        "local": "arg7",
-        "visitante": "int_l4",
-        "golesLocal": null,
-        "golesVisitante": null,
-        "ganador": null
-      },
-      {
-        "id": "d9",
         "local": "arg2",
-        "visitante": "int_s11",
-        "golesLocal": null,
-        "golesVisitante": null,
-        "ganador": null
-      },
-      {
-        "id": "d10",
-        "local": "int_s5",
-        "visitante": "int_s7",
-        "golesLocal": null,
-        "golesVisitante": null,
-        "ganador": null
-      },
-      {
-        "id": "d11",
-        "local": "arg3",
         "visitante": "int_s10",
         "golesLocal": null,
         "golesVisitante": null,
         "ganador": null
       },
       {
-        "id": "d12",
-        "local": "int_s2",
+        "id": "d2",
+        "local": "int_s11",
+        "visitante": "int_l11",
+        "golesLocal": null,
+        "golesVisitante": null,
+        "ganador": null
+      },
+      {
+        "id": "d3",
+        "local": "int_s12",
         "visitante": "int_l2",
         "golesLocal": null,
         "golesVisitante": null,
         "ganador": null
       },
       {
-        "id": "d13",
-        "local": "int_l12",
-        "visitante": "int_l1",
+        "id": "d4",
+        "local": "arg8",
+        "visitante": "int_l3",
         "golesLocal": null,
         "golesVisitante": null,
         "ganador": null
       },
       {
-        "id": "d14",
+        "id": "d5",
+        "local": "arg4",
+        "visitante": "int_s7",
+        "golesLocal": null,
+        "golesVisitante": null,
+        "ganador": null
+      },
+      {
+        "id": "d6",
+        "local": "int_s9",
+        "visitante": "int_l4",
+        "golesLocal": null,
+        "golesVisitante": null,
+        "ganador": null
+      },
+      {
+        "id": "d7",
         "local": "int_s4",
         "visitante": "int_l7",
         "golesLocal": null,
@@ -308,17 +252,73 @@
         "ganador": null
       },
       {
+        "id": "d8",
+        "local": "arg7",
+        "visitante": "int_l8",
+        "golesLocal": null,
+        "golesVisitante": null,
+        "ganador": null
+      },
+      {
+        "id": "d9",
+        "local": "arg5",
+        "visitante": "int_l5",
+        "golesLocal": null,
+        "golesVisitante": null,
+        "ganador": null
+      },
+      {
+        "id": "d10",
+        "local": "int_s6",
+        "visitante": "int_l6",
+        "golesLocal": null,
+        "golesVisitante": null,
+        "ganador": null
+      },
+      {
+        "id": "d11",
+        "local": "arg3",
+        "visitante": "int_s8",
+        "golesLocal": null,
+        "golesVisitante": null,
+        "ganador": null
+      },
+      {
+        "id": "d12",
+        "local": "int_s2",
+        "visitante": "int_l10",
+        "golesLocal": null,
+        "golesVisitante": null,
+        "ganador": null
+      },
+      {
+        "id": "d13",
+        "local": "int_s3",
+        "visitante": "int_l1",
+        "golesLocal": null,
+        "golesVisitante": null,
+        "ganador": null
+      },
+      {
+        "id": "d14",
+        "local": "arg6",
+        "visitante": "int_l9",
+        "golesLocal": null,
+        "golesVisitante": null,
+        "ganador": null
+      },
+      {
         "id": "d15",
-        "local": "arg4",
-        "visitante": "int_s12",
+        "local": "arg1",
+        "visitante": "int_s5",
         "golesLocal": null,
         "golesVisitante": null,
         "ganador": null
       },
       {
         "id": "d16",
-        "local": "int_l6",
-        "visitante": "int_s1",
+        "local": "int_s1",
+        "visitante": "int_l12",
         "golesLocal": null,
         "golesVisitante": null,
         "ganador": null

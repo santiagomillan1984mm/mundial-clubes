@@ -2572,26 +2572,26 @@ async function generarDieciseisavos() {
   const shuffle = arr => [...arr].sort(() => Math.random() - 0.5)
   const esArgentino = e => e.id.startsWith('pa') || e.id.startsWith('arg')
 
-  const argentinos  = shuffle(todos.filter(esArgentino))
+  const argSanti    = shuffle(todos.filter(e => e.dueno === 'santi'   && esArgentino(e)))
+  const argLuciano  = shuffle(todos.filter(e => e.dueno === 'luciano' && esArgentino(e)))
   let   intSanti    = shuffle(todos.filter(e => e.dueno === 'santi'   && !esArgentino(e)))
   let   intLuciano  = shuffle(todos.filter(e => e.dueno === 'luciano' && !esArgentino(e)))
 
-  // Regla 1: cada argentino cruza con un internacional, preferentemente de dueño opuesto
-  // (si no alcanzan los del dueño opuesto, se completa con los que queden)
+  // Regla 1: cada argentino cruza SIEMPRE con un internacional de dueño contrario
+  // (nunca argentino vs argentino, nunca mismo dueño)
   const paresCrudos = []
-  for (const arg of argentinos) {
-    let rival
-    if (arg.dueno === 'santi' && intLuciano.length) rival = intLuciano.pop()
-    else if (arg.dueno === 'luciano' && intSanti.length) rival = intSanti.pop()
-    else if (intSanti.length) rival = intSanti.pop()
-    else rival = intLuciano.pop()
-    paresCrudos.push({ local: arg.id, visitante: rival.id })
-  }
+  for (const arg of argSanti)   paresCrudos.push({ local: arg.id, visitante: intLuciano.pop().id })
+  for (const arg of argLuciano) paresCrudos.push({ local: arg.id, visitante: intSanti.pop().id })
 
-  // Los internacionales restantes se cruzan entre sí
-  const restantes = shuffle([...intSanti, ...intLuciano])
-  for (let i = 0; i < restantes.length; i += 2) {
-    paresCrudos.push({ local: restantes[i].id, visitante: restantes[i + 1].id })
+  // Internacionales restantes: siempre de dueño contrario mientras alcance
+  while (intSanti.length && intLuciano.length) {
+    paresCrudos.push({ local: intSanti.pop().id, visitante: intLuciano.pop().id })
+  }
+  // Si el reparto de argentinos quedó desparejo, sobran internacionales del mismo dueño
+  // (única situación en la que un cruce puede quedar mismo dueño — matemáticamente inevitable)
+  const sobrantes = shuffle([...intSanti, ...intLuciano])
+  for (let i = 0; i < sobrantes.length; i += 2) {
+    paresCrudos.push({ local: sobrantes[i].id, visitante: sobrantes[i + 1].id })
   }
 
   const pares = shuffle(paresCrudos)

@@ -1,6 +1,6 @@
 {
   "version": "1.0",
-  "ultimaActualizacion": "2026-07-02T01:36:22.528Z",
+  "ultimaActualizacion": "2026-07-02T01:36:33.431Z",
   "equiposArgentinos": [
     {
       "id": "arg1",
@@ -347,9 +347,9 @@
         "id": "o3",
         "local": "arg4",
         "visitante": "int_s9",
-        "golesLocal": null,
-        "golesVisitante": null,
-        "ganador": null,
+        "golesLocal": 2,
+        "golesVisitante": 0,
+        "ganador": "arg4",
         "editado": false
       },
       {
@@ -367,6 +367,15 @@
         "id": "c1",
         "local": "int_s10",
         "visitante": "int_s12",
+        "golesLocal": null,
+        "golesVisitante": null,
+        "ganador": null,
+        "editado": false
+      },
+      {
+        "id": "c2",
+        "local": "arg4",
+        "visitante": null,
         "golesLocal": null,
         "golesVisitante": null,
         "ganador": null,

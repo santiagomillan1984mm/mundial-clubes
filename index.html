@@ -4147,10 +4147,9 @@ function renderPremios() {
         const dColor = perdedor?.dueno === 'santi' ? '#4a9eff' : perdedor?.dueno === 'luciano' ? '#ff6b6b' : 'var(--texto)'
         const duenoLabel = perdedor?.dueno === 'santi' ? 'Santi' : perdedor?.dueno === 'luciano' ? 'Luciano' : ''
         const logo = perdedor?.id && perdedor.id.startsWith('pa') ? logoHTML(perdedor.id, 28) : ''
-        const cDuenoLabel = perdedor?.campeonDueno === 'santi' ? 'Santi' : 'Luciano'
         const detalle = perdedor
           ? (p.id === 'liga'
-              ? `🔔 <strong style="color:${dColor};">${duenoLabel}</strong> debe ${p.item.toLowerCase()} de <strong>${p.label}</strong> — salió campeón ${perdedor.campeonNombre} (de ${cDuenoLabel}) <span style="color:var(--gris);">(tope $${p.tope.toLocaleString('es-AR')})</span>`
+              ? `🔔 <strong style="color:${dColor};">${duenoLabel}</strong> debe ${p.item.toLowerCase()} de <strong>${p.label}</strong> <span style="color:var(--gris);">(tope $${p.tope.toLocaleString('es-AR')})</span>`
               : `🔔 <strong style="color:${dColor};">${duenoLabel} (${perdedor.nombre})</strong> debe ${p.item.toLowerCase()} de <strong>${p.label}</strong> <span style="color:var(--gris);">(tope $${p.tope.toLocaleString('es-AR')})</span>`)
           : ''
         return `<div style="background:var(--card);border:1px solid var(--border);border-radius:10px;padding:16px;">

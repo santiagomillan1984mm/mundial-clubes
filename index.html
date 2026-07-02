@@ -2333,23 +2333,23 @@ function avanzarRonda(crucesActual, siguienteRonda, prefix) {
     const c1 = crucesActual[i * 2]
     const c2 = crucesActual[i * 2 + 1]
     const id = `${prefix}${i + 1}`
+    // Cada lado se muestra apenas se conoce su ganador, aunque el otro lado
+    // todavía no esté definido (queda "Por definir" hasta que se juegue).
+    const nuevoLocal = c1?.ganador || null
+    const nuevoVisitante = c2?.ganador || null
     let sig = crucesSig.find(c => c.id === id)
-    if (!c1?.ganador || !c2?.ganador) {
-      // Si se borró/corrigió el resultado que definía este cruce, el siguiente vuelve a "por definir"
-      // (salvo que el admin lo haya editado a mano con ejecutarSwapEquipo)
-      if (sig && !sig.editado && (sig.local || sig.visitante)) {
-        sig.local = null; sig.visitante = null
-        sig.golesLocal = null; sig.golesVisitante = null; sig.ganador = null
-      }
-      continue
-    }
     if (!sig) {
-      sig = { id, local: c1.ganador, visitante: c2.ganador, golesLocal: null, golesVisitante: null, ganador: null, editado: false }
-      crucesSig.push(sig)
-    } else if (!sig.editado) {
-      // Si el cruce fue editado a mano (ejecutarSwapEquipo), no se pisa con el ganador "natural"
-      sig.local = c1.ganador
-      sig.visitante = c2.ganador
+      if (!nuevoLocal && !nuevoVisitante) continue
+      crucesSig.push({ id, local: nuevoLocal, visitante: nuevoVisitante, golesLocal: null, golesVisitante: null, ganador: null, editado: false })
+    } else if (!sig.editado && (sig.local !== nuevoLocal || sig.visitante !== nuevoVisitante)) {
+      // Si el cruce fue editado a mano (ejecutarSwapEquipo), no se pisa.
+      // Si cambió alguno de los dos lados (nuevo ganador, o se corrigió/borró un resultado
+      // y volvió a "por definir"), se actualiza y se invalida cualquier resultado ya cargado acá.
+      sig.local = nuevoLocal
+      sig.visitante = nuevoVisitante
+      sig.golesLocal = null
+      sig.golesVisitante = null
+      sig.ganador = null
     }
   }
 }

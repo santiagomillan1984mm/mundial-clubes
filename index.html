@@ -704,6 +704,7 @@
   <button class="nav-btn" onclick="mostrarSeccion('supercopa')">🥇 Supercopa</button>
   <button class="nav-btn" onclick="mostrarSeccion('historial')">🏅 Historial</button>
   <button class="nav-btn" onclick="mostrarSeccion('relampago')">⚡ Relámpago</button>
+  <button class="nav-btn" onclick="mostrarSeccion('premios')">🎁 Premios</button>
   <button class="nav-btn" onclick="mostrarSeccion('admin')">Admin</button>
 </nav>
 
@@ -781,6 +782,12 @@
   <div id="sec-relampago" class="seccion">
     <div class="sec-titulo">⚡ Torneos Relámpago</div>
     <div id="relampago-contenido"></div>
+  </div>
+
+  <!-- PREMIOS -->
+  <div id="sec-premios" class="seccion">
+    <div class="sec-titulo">🎁 Premios</div>
+    <div id="premios-contenido"><div class="loading">Cargando...</div></div>
   </div>
 
   <div id="sec-admin" class="seccion">
@@ -1489,6 +1496,7 @@ function renderTodo() {
   renderHistorial()
   renderPromocion()
   renderRelampago()
+  renderPremios()
 }
 
 // ── Stats helpers ──────────────────────────────
@@ -4077,6 +4085,85 @@ function guardarResultadoSupercopa() {
     renderSupercopa()
     toast('¡Supercopa guardada!')
   }).catch(e => toast('Error al guardar: ' + e.message, true))
+}
+
+// ══════════════════════════════════════════════
+// PREMIOS
+// ══════════════════════════════════════════════
+const PREMIOS_CONFIG = [
+  { id: 'liga', label: 'Liga AFA', emoji: '🥩', item: 'Asado', tope: 1000 },
+  { id: 'copa', label: 'Copa Argentina', emoji: '🥤', item: 'Bebida', tope: 750 },
+  { id: 'supercopa', label: 'Supercopa Argentina', emoji: '🥐', item: 'Medialunas y alfajores', tope: 400 },
+  { id: 'mundial', label: 'Mundial de Clubes', emoji: '🍮', item: 'Postre', tope: 600 },
+]
+
+function getPerdedorPremio(competId) {
+  if (competId === 'liga') {
+    const liga = estado.ligaAfa
+    if (!liga?.configurado) return null
+    const jugados = (liga.partidos || []).filter(p => p.golesLocal !== null).length
+    if (jugados < 100) return null
+    const tabla = calcularTablaLiga()
+    if (!tabla.length) return null
+    const ultimo = tabla[tabla.length - 1]
+    return { id: ultimo.id, dueno: ultimo.dueno, nombre: getPoolNombre(ultimo.id) }
+  }
+  if (competId === 'copa') {
+    const f = estado.copaArgentina?.bracket?.final?.[0]
+    if (!f?.ganador) return null
+    const perdedorId = f.ganador === f.local ? f.visitante : f.local
+    return { id: perdedorId, dueno: getCopaDueno(perdedorId), nombre: getCopaNombre(perdedorId) }
+  }
+  if (competId === 'supercopa') {
+    const sc = estado.supercopa
+    if (!sc?.ganador) return null
+    const perdedorId = sc.ganador === sc.localId ? sc.visitanteId : sc.localId
+    return { id: perdedorId, dueno: getSupercopaDueno(perdedorId), nombre: getSupercopaNombre(perdedorId) }
+  }
+  if (competId === 'mundial') {
+    const f = estado.bracket?.final?.[0]
+    if (!f?.ganador) return null
+    const perdedorId = f.ganador === f.local ? f.visitante : f.local
+    const eq = getEquipo(perdedorId)
+    return { id: perdedorId, dueno: eq?.dueno || '', nombre: eq?.nombre || '?' }
+  }
+  return null
+}
+
+function renderPremios() {
+  const cont = document.getElementById('premios-contenido')
+  if (!cont || !estado) return
+  cont.innerHTML = `
+    <div class="card" style="margin-bottom:14px;">
+      <p class="text-gris">El que pierde cada competencia paga. Acá se ve quién debe qué, a medida que se van definiendo los resultados.</p>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:12px;">
+      ${PREMIOS_CONFIG.map(p => {
+        const perdedor = getPerdedorPremio(p.id)
+        const dColor = perdedor?.dueno === 'santi' ? '#4a9eff' : perdedor?.dueno === 'luciano' ? '#ff6b6b' : 'var(--texto)'
+        const duenoLabel = perdedor?.dueno === 'santi' ? 'Santi' : perdedor?.dueno === 'luciano' ? 'Luciano' : ''
+        const logo = perdedor?.id && perdedor.id.startsWith('pa') ? logoHTML(perdedor.id, 28) : ''
+        return `<div style="background:var(--card);border:1px solid var(--border);border-radius:10px;padding:16px;">
+          <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;">
+            <div style="font-size:32px;line-height:1;">${p.emoji}</div>
+            <div style="flex:1;min-width:180px;">
+              <div style="font-size:14px;font-weight:700;color:var(--texto);">${p.label}</div>
+              <div style="font-size:12px;color:var(--gris);">${p.item} — tope $${p.tope.toLocaleString('es-AR')}</div>
+            </div>
+          </div>
+          ${perdedor
+            ? `<div style="margin-top:12px;background:rgba(233,69,96,0.12);border:1px solid #e94560;border-radius:8px;padding:10px 12px;display:flex;align-items:center;gap:10px;">
+                ${logo}
+                <div style="font-size:13px;">
+                  🔔 <strong style="color:${dColor};">${duenoLabel ? duenoLabel + ' (' + perdedor.nombre + ')' : perdedor.nombre}</strong> debe ${p.item.toLowerCase()} de <strong>${p.label}</strong> <span style="color:var(--gris);">(tope $${p.tope.toLocaleString('es-AR')})</span>
+                </div>
+              </div>`
+            : `<div style="margin-top:12px;font-size:12px;color:var(--gris);">Todavía no está definido — se sabe cuando termina ${p.label}.</div>`
+          }
+        </div>`
+      }).join('')}
+    </div>
+  `
 }
 
 function rlId() { return 'rl_' + Date.now() + '_' + Math.random().toString(36).slice(2,7) }

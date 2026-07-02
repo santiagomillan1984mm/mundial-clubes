@@ -2352,6 +2352,11 @@ function avanzarRonda(crucesActual, siguienteRonda, prefix) {
       sig.ganador = null
     }
   }
+  // Los cruces se van creando en el orden en que se cargan los resultados de la ronda
+  // anterior, no en orden de número (o1, o2, o3...). El renderizado corta el array por
+  // posición para armar cada mitad del bracket, así que hay que mantenerlo siempre
+  // ordenado por número de cruce o el bracket se ve desfasado.
+  crucesSig.sort((a, b) => parseInt(a.id.slice(prefix.length)) - parseInt(b.id.slice(prefix.length)))
 }
 
 function avanzarGanadores() {

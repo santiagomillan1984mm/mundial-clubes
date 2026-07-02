@@ -2353,13 +2353,23 @@ function calcularGanadorCruce(cruce) {
   return null
 }
 
-function avanzarRonda(crucesActual, siguienteRonda, prefix) {
+const RONDA_TAMANO = { dieciseisavos: 16, octavos: 8, cuartos: 4, semis: 2, final: 1 }
+const RONDA_PREFIJO = { dieciseisavos: 'd', octavos: 'o', cuartos: 'c', semis: 's', final: 'f' }
+
+function avanzarRonda(rondaActual, siguienteRonda) {
+  const crucesActual = estado.bracket[rondaActual]
   const crucesSig = estado.bracket[siguienteRonda]
-  const mitad = Math.floor(crucesActual.length / 2)
+  const prefixActual = RONDA_PREFIJO[rondaActual]
+  const prefixSig = RONDA_PREFIJO[siguienteRonda]
+  const mitad = RONDA_TAMANO[rondaActual] / 2
   for (let i = 0; i < mitad; i++) {
-    const c1 = crucesActual[i * 2]
-    const c2 = crucesActual[i * 2 + 1]
-    const id = `${prefix}${i + 1}`
+    // Se busca por id fijo (o1, o2...), no por posición en el array: como los cruces
+    // se van creando de a uno a medida que se conocen los ganadores, el array de una
+    // ronda puede tener "huecos" (faltar un cruce todavía no definido) y la posición
+    // ya no coincide con el número de cruce.
+    const c1 = crucesActual.find(c => c.id === `${prefixActual}${i * 2 + 1}`)
+    const c2 = crucesActual.find(c => c.id === `${prefixActual}${i * 2 + 2}`)
+    const id = `${prefixSig}${i + 1}`
     // Cada lado se muestra apenas se conoce su ganador, aunque el otro lado
     // todavía no esté definido (queda "Por definir" hasta que se juegue).
     const nuevoLocal = c1?.ganador || null
@@ -2379,18 +2389,16 @@ function avanzarRonda(crucesActual, siguienteRonda, prefix) {
       sig.ganador = null
     }
   }
-  // Los cruces se van creando en el orden en que se cargan los resultados de la ronda
-  // anterior, no en orden de número (o1, o2, o3...). El renderizado corta el array por
-  // posición para armar cada mitad del bracket, así que hay que mantenerlo siempre
-  // ordenado por número de cruce o el bracket se ve desfasado.
-  crucesSig.sort((a, b) => parseInt(a.id.slice(prefix.length)) - parseInt(b.id.slice(prefix.length)))
+  // Mantener el orden por número de cruce (o1, o2, o3...) para que el renderizado
+  // por posición (slice de mitades) siempre quede alineado con la ronda anterior.
+  crucesSig.sort((a, b) => parseInt(a.id.slice(prefixSig.length)) - parseInt(b.id.slice(prefixSig.length)))
 }
 
 function avanzarGanadores() {
-  avanzarRonda(estado.bracket.dieciseisavos, 'octavos', 'o')
-  avanzarRonda(estado.bracket.octavos, 'cuartos', 'c')
-  avanzarRonda(estado.bracket.cuartos, 'semis', 's')
-  avanzarRonda(estado.bracket.semis, 'final', 'f')
+  avanzarRonda('dieciseisavos', 'octavos')
+  avanzarRonda('octavos', 'cuartos')
+  avanzarRonda('cuartos', 'semis')
+  avanzarRonda('semis', 'final')
 }
 
 function renderEquipoCard(eqId, goles, ganador, esTop) {
@@ -2598,24 +2606,33 @@ function renderBracket() {
   // Asegurar que ganadores avanzaron (por si se cargó estado guardado)
   avanzarGanadores()
 
-  const d = estado.bracket.dieciseisavos
-  const o = estado.bracket.octavos
-  const c = estado.bracket.cuartos
-  const s = estado.bracket.semis
-  const f = estado.bracket.final
+  // Se arma un array "denso" por número de cruce (d1, d2, d3...), no por posición
+  // cruda del array: como los cruces se crean de a uno a medida que se conocen los
+  // ganadores, el array real puede tener huecos (un cruce todavía sin definir en el
+  // medio), y cortar por posición desalinea todo el dibujo del bracket a partir de ahí.
+  function densoPorId(ronda) {
+    const arr = estado.bracket[ronda]
+    const prefix = RONDA_PREFIJO[ronda]
+    const n = RONDA_TAMANO[ronda]
+    return Array.from({ length: n }, (_, i) => arr.find(c => c.id === `${prefix}${i + 1}`) || null)
+  }
 
-  function fill(arr, n) { const a = [...arr]; while (a.length < n) a.push(null); return a }
+  const d = densoPorId('dieciseisavos')
+  const o = densoPorId('octavos')
+  const c = densoPorId('cuartos')
+  const s = densoPorId('semis')
+  const f = densoPorId('final')
 
   // Mitad izquierda: d[0..7] → o[0..3] → c[0..1] → s[0]
   // Mitad derecha (espejada): d[8..15] → o[4..7] → c[2..3] → s[1]
-  const dL = fill(d.slice(0, 8), 8)
-  const oL = fill(o.slice(0, 4), 4)
-  const cL = fill(c.slice(0, 2), 2)
-  const sL = fill(s.slice(0, 1), 1)
-  const dR = fill([...d.slice(8, 16)].reverse(), 8)
-  const oR = fill([...o.slice(4, 8)].reverse(), 4)
-  const cR = fill([...c.slice(2, 4)].reverse(), 2)
-  const sR = fill([...s.slice(1, 2)].reverse(), 1)
+  const dL = d.slice(0, 8)
+  const oL = o.slice(0, 4)
+  const cL = c.slice(0, 2)
+  const sL = s.slice(0, 1)
+  const dR = [...d.slice(8, 16)].reverse()
+  const oR = [...o.slice(4, 8)].reverse()
+  const cR = [...c.slice(2, 4)].reverse()
+  const sR = [...s.slice(1, 2)].reverse()
   const fin = f[0] || null
   const campeon = fin?.ganador ? getEquipo(fin.ganador) : null
 

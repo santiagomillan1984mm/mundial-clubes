@@ -2332,9 +2332,17 @@ function avanzarRonda(crucesActual, siguienteRonda, prefix) {
   for (let i = 0; i < mitad; i++) {
     const c1 = crucesActual[i * 2]
     const c2 = crucesActual[i * 2 + 1]
-    if (!c1?.ganador || !c2?.ganador) continue
     const id = `${prefix}${i + 1}`
     let sig = crucesSig.find(c => c.id === id)
+    if (!c1?.ganador || !c2?.ganador) {
+      // Si se borró/corrigió el resultado que definía este cruce, el siguiente vuelve a "por definir"
+      // (salvo que el admin lo haya editado a mano con ejecutarSwapEquipo)
+      if (sig && !sig.editado && (sig.local || sig.visitante)) {
+        sig.local = null; sig.visitante = null
+        sig.golesLocal = null; sig.golesVisitante = null; sig.ganador = null
+      }
+      continue
+    }
     if (!sig) {
       sig = { id, local: c1.ganador, visitante: c2.ganador, golesLocal: null, golesVisitante: null, ganador: null, editado: false }
       crucesSig.push(sig)

@@ -1,6 +1,6 @@
 {
   "version": "1.0",
-  "ultimaActualizacion": "2026-07-02T01:52:50.864Z",
+  "ultimaActualizacion": "2026-07-02T03:48:21.316Z",
   "equiposArgentinos": [
     {
       "id": "arg1",
@@ -625,6 +625,13 @@
       "id": "1782866668479",
       "temporada": 2026,
       "competencia": "liga",
+      "campeon": "River Plate",
+      "dueno": "luciano"
+    },
+    {
+      "id": "1782964101316",
+      "temporada": 2026,
+      "competencia": "supercopa",
       "campeon": "River Plate",
       "dueno": "luciano"
     }

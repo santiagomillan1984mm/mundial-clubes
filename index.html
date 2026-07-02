@@ -2405,18 +2405,27 @@ function renderCruceCard(cruce, ronda) {
   </div>`
 }
 
+const RONDAS_BRACKET = ['dieciseisavos', 'octavos', 'cuartos', 'semis', 'final']
+const LABELS_RONDA_BRACKET = { dieciseisavos: 'Dieciseisavos', octavos: 'Octavos', cuartos: 'Cuartos', semis: 'Semifinal', final: 'Final' }
+
 function abrirEditorCruce(cruceId, ronda) {
-  const cruces = estado.bracket[ronda]
-  const cruce = cruces.find(c => c.id === cruceId)
+  const cruce = estado.bracket[ronda]?.find(c => c.id === cruceId)
   if (!cruce) return
   const eq1 = getEquipo(cruce.local)
   const eq2 = getEquipo(cruce.visitante)
-  // Todos los equipos de la ronda (menos los de este cruce), con su ubicación exacta
+  // Todos los slots del bracket entero (cualquier ronda), menos los de este cruce.
+  // Incluye slots vacíos ("Por definir") para poder mover un equipo a un lugar libre.
   const opciones = []
-  for (const c of cruces) {
-    if (c.id === cruceId) continue
-    if (c.local) opciones.push({ cruceId: c.id, slot: 'local', nombre: getEquipo(c.local)?.nombre || '?' })
-    if (c.visitante) opciones.push({ cruceId: c.id, slot: 'visitante', nombre: getEquipo(c.visitante)?.nombre || '?' })
+  for (const r of RONDAS_BRACKET) {
+    for (const c of estado.bracket[r] || []) {
+      if (c.id === cruceId) continue
+      const rival = (slot) => getEquipo(slot === 'local' ? c.visitante : c.local)?.nombre || 'Por definir'
+      for (const slot of ['local', 'visitante']) {
+        const equipoId = c[slot]
+        const nombre = equipoId ? (getEquipo(equipoId)?.nombre || '?') : `— Vacío (rival: ${rival(slot)}) —`
+        opciones.push({ ronda: r, cruceId: c.id, slot, label: `${nombre} — ${LABELS_RONDA_BRACKET[r]}` })
+      }
+    }
   }
   document.body.insertAdjacentHTML('beforeend', `
     <div class="modal-overlay" id="modal-editor-cruce" onclick="if(event.target===this)cerrarEditorCruce()">
@@ -2433,17 +2442,17 @@ function abrirEditorCruce(cruceId, ronda) {
           </select>
         </div>
         <div style="margin-bottom:16px;">
-          <div style="font-size:12px;color:var(--gris);margin-bottom:8px;text-transform:uppercase;letter-spacing:0.5px;">Intercambiar por:</div>
+          <div style="font-size:12px;color:var(--gris);margin-bottom:8px;text-transform:uppercase;letter-spacing:0.5px;">Reemplazar por (cualquier llave):</div>
           ${opciones.length === 0
-            ? `<p class="text-gris">No hay otros equipos disponibles en esta ronda.</p>`
+            ? `<p class="text-gris">No hay otros lugares disponibles en el bracket todavía.</p>`
             : `<select id="sel-swap-equipo" style="width:100%;padding:8px;background:var(--azul);color:var(--texto);border:1px solid var(--border);border-radius:6px;font-size:13px;">
-                <option value="">— Seleccioná un equipo —</option>
-                ${opciones.map(o => `<option value="${o.cruceId}|${o.slot}">${o.nombre}</option>`).join('')}
+                <option value="">— Seleccioná un equipo o lugar —</option>
+                ${opciones.map(o => `<option value="${o.ronda}|${o.cruceId}|${o.slot}">${o.label}</option>`).join('')}
               </select>`
           }
         </div>
         <div style="font-size:11px;color:var(--gris);margin-bottom:12px;">
-          Se intercambia solo ese equipo. Si alguno de los dos cruces ya tenía resultado cargado, se borra.
+          Se intercambia solo ese equipo con el lugar elegido (puede ser de cualquier ronda). Si alguno de los dos cruces ya tenía resultado cargado, se borra.
         </div>
         <div class="flex-gap" style="justify-content:flex-end;">
           <button class="btn btn-secondary" onclick="cerrarEditorCruce()">Cancelar</button>
@@ -2458,10 +2467,9 @@ async function ejecutarSwapEquipo(cruceId, ronda) {
   const slotOrigen = document.getElementById('sel-slot-origen')?.value
   const destino = document.getElementById('sel-swap-equipo')?.value
   if (!slotOrigen || !destino) { toast('Seleccioná un equipo para intercambiar', true); return }
-  const [destCruceId, destSlot] = destino.split('|')
-  const cruces = estado.bracket[ronda]
-  const cOrigen = cruces.find(c => c.id === cruceId)
-  const cDestino = cruces.find(c => c.id === destCruceId)
+  const [destRonda, destCruceId, destSlot] = destino.split('|')
+  const cOrigen = estado.bracket[ronda]?.find(c => c.id === cruceId)
+  const cDestino = estado.bracket[destRonda]?.find(c => c.id === destCruceId)
   if (!cOrigen || !cDestino) return
   // Swap solo el equipo de ese slot puntual, no el cruce completo
   ;[cOrigen[slotOrigen], cDestino[destSlot]] = [cDestino[destSlot], cOrigen[slotOrigen]]

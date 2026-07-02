@@ -1,6 +1,6 @@
 {
   "version": "1.0",
-  "ultimaActualizacion": "2026-07-01T23:59:06.860Z",
+  "ultimaActualizacion": "2026-07-02T00:09:10.282Z",
   "equiposArgentinos": [
     {
       "id": "arg1",
@@ -199,9 +199,9 @@
         "id": "d1",
         "local": "arg2",
         "visitante": "int_s10",
-        "golesLocal": null,
-        "golesVisitante": null,
-        "ganador": null
+        "golesLocal": 1,
+        "golesVisitante": 0,
+        "ganador": "arg2"
       },
       {
         "id": "d2",
@@ -327,16 +327,16 @@
     "octavos": [
       {
         "id": "o1",
-        "local": "arg2",
-        "visitante": "int_l11",
+        "local": null,
+        "visitante": null,
         "golesLocal": null,
         "golesVisitante": null,
         "ganador": null
       },
       {
         "id": "o2",
-        "local": "int_s12",
-        "visitante": "arg8",
+        "local": null,
+        "visitante": null,
         "golesLocal": null,
         "golesVisitante": null,
         "ganador": null

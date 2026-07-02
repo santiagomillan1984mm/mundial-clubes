@@ -1633,7 +1633,9 @@ function getFavoritoMundial() {
     const partidos = b[ronda] || []
     if (!partidos.length) continue
     if (ronda === 'final' && partidos[0]?.ganador) return { id: partidos[0].ganador, ronda: '🏆 Campeón' }
-    const enJuego = partidos.filter(p => !p.ganador)
+    // Solo cuenta un cruce "en juego" si ya tiene al menos un equipo real asignado
+    // (los cruces todavía sin generar quedan como objetos vacíos con local/visitante en null)
+    const enJuego = partidos.filter(p => !p.ganador && p.local)
     if (enJuego.length) return { id: enJuego[0].local, ronda: rondaLabel[ronda] }
     // Todos tienen ganador en esta ronda — favorito es el primero que ganó
     if (partidos[0]?.ganador) return { id: partidos[0].ganador, ronda: rondaLabel[ronda] }

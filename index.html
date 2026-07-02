@@ -4099,14 +4099,18 @@ const PREMIOS_CONFIG = [
 
 function getPerdedorPremio(competId) {
   if (competId === 'liga') {
+    // Liga AFA es Santi (10 equipos) vs Luciano (10 equipos): el dueño del equipo
+    // que sale campeón (1° de la tabla) gana, el otro dueño pierde automáticamente
+    // — no importa cómo terminó cada equipo individual suyo.
     const liga = estado.ligaAfa
     if (!liga?.configurado) return null
     const jugados = (liga.partidos || []).filter(p => p.golesLocal !== null).length
     if (jugados < 100) return null
     const tabla = calcularTablaLiga()
     if (!tabla.length) return null
-    const ultimo = tabla[tabla.length - 1]
-    return { id: ultimo.id, dueno: ultimo.dueno, nombre: getPoolNombre(ultimo.id) }
+    const campeon = tabla[0]
+    const duenoPerdedor = campeon.dueno === 'santi' ? 'luciano' : 'santi'
+    return { id: null, dueno: duenoPerdedor, nombre: null, campeonId: campeon.id, campeonNombre: getPoolNombre(campeon.id), campeonDueno: campeon.dueno }
   }
   if (competId === 'copa') {
     const f = estado.copaArgentina?.bracket?.final?.[0]
@@ -4143,6 +4147,12 @@ function renderPremios() {
         const dColor = perdedor?.dueno === 'santi' ? '#4a9eff' : perdedor?.dueno === 'luciano' ? '#ff6b6b' : 'var(--texto)'
         const duenoLabel = perdedor?.dueno === 'santi' ? 'Santi' : perdedor?.dueno === 'luciano' ? 'Luciano' : ''
         const logo = perdedor?.id && perdedor.id.startsWith('pa') ? logoHTML(perdedor.id, 28) : ''
+        const cDuenoLabel = perdedor?.campeonDueno === 'santi' ? 'Santi' : 'Luciano'
+        const detalle = perdedor
+          ? (p.id === 'liga'
+              ? `🔔 <strong style="color:${dColor};">${duenoLabel}</strong> debe ${p.item.toLowerCase()} de <strong>${p.label}</strong> — salió campeón ${perdedor.campeonNombre} (de ${cDuenoLabel}) <span style="color:var(--gris);">(tope $${p.tope.toLocaleString('es-AR')})</span>`
+              : `🔔 <strong style="color:${dColor};">${duenoLabel} (${perdedor.nombre})</strong> debe ${p.item.toLowerCase()} de <strong>${p.label}</strong> <span style="color:var(--gris);">(tope $${p.tope.toLocaleString('es-AR')})</span>`)
+          : ''
         return `<div style="background:var(--card);border:1px solid var(--border);border-radius:10px;padding:16px;">
           <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;">
             <div style="font-size:32px;line-height:1;">${p.emoji}</div>
@@ -4154,9 +4164,7 @@ function renderPremios() {
           ${perdedor
             ? `<div style="margin-top:12px;background:rgba(233,69,96,0.12);border:1px solid #e94560;border-radius:8px;padding:10px 12px;display:flex;align-items:center;gap:10px;">
                 ${logo}
-                <div style="font-size:13px;">
-                  🔔 <strong style="color:${dColor};">${duenoLabel ? duenoLabel + ' (' + perdedor.nombre + ')' : perdedor.nombre}</strong> debe ${p.item.toLowerCase()} de <strong>${p.label}</strong> <span style="color:var(--gris);">(tope $${p.tope.toLocaleString('es-AR')})</span>
-                </div>
+                <div style="font-size:13px;">${detalle}</div>
               </div>`
             : `<div style="margin-top:12px;font-size:12px;color:var(--gris);">Todavía no está definido — se sabe cuando termina ${p.label}.</div>`
           }

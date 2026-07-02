@@ -1,6 +1,6 @@
 {
   "version": "1.0",
-  "ultimaActualizacion": "2026-07-02T00:50:09.891Z",
+  "ultimaActualizacion": "2026-07-02T00:50:46.146Z",
   "equiposArgentinos": [
     {
       "id": "arg1",
@@ -197,7 +197,7 @@
     "dieciseisavos": [
       {
         "id": "d1",
-        "local": "arg2",
+        "local": "int_s10",
         "visitante": "arg2",
         "golesLocal": null,
         "golesVisitante": null,
@@ -328,7 +328,7 @@
     "octavos": [
       {
         "id": "o1",
-        "local": "int_s10",
+        "local": "arg2",
         "visitante": "int_s11",
         "golesLocal": null,
         "golesVisitante": null,

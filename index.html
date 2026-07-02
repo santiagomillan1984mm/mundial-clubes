@@ -2474,6 +2474,13 @@ function abrirEditorCruce(cruceId, ronda) {
         <div style="font-size:11px;color:var(--gris);margin-bottom:12px;">
           Se intercambia solo ese equipo con el lugar elegido (puede ser de cualquier ronda), o se deja el cruce en "Por definir" si elegís esa opción. Si alguno de los cruces ya tenía resultado cargado, se borra.
         </div>
+        ${cruce.editado ? `
+        <div style="font-size:12px;background:rgba(255,193,7,0.12);border:1px solid #ffc107;border-radius:8px;padding:10px;margin-bottom:12px;">
+          ⚠️ Este cruce está <strong>fijado manualmente</strong>: no se va a actualizar solo aunque cambien los resultados de la ronda anterior.
+          <div style="margin-top:8px;">
+            <button class="btn btn-secondary btn-sm" onclick="quitarFijacionCruce('${cruceId}','${ronda}')">🔓 Quitar fijación (volver a automático)</button>
+          </div>
+        </div>` : ''}
         <div class="flex-gap" style="justify-content:flex-end;">
           <button class="btn btn-secondary" onclick="cerrarEditorCruce()">Cancelar</button>
           <button class="btn btn-gold" onclick="ejecutarSwapEquipo('${cruceId}','${ronda}')">🔀 Intercambiar</button>
@@ -2481,6 +2488,18 @@ function abrirEditorCruce(cruceId, ronda) {
       </div>
     </div>
   `)
+}
+
+async function quitarFijacionCruce(cruceId, ronda) {
+  const cruce = estado.bracket[ronda]?.find(c => c.id === cruceId)
+  if (!cruce) return
+  snapshotBracket()
+  cruce.editado = false
+  avanzarGanadores()
+  await guardarEstado()
+  cerrarEditorCruce()
+  renderBracket()
+  toast('🔓 Cruce vuelto a automático')
 }
 
 async function ejecutarSwapEquipo(cruceId, ronda) {

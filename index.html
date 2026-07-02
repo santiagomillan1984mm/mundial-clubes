@@ -2749,6 +2749,9 @@ function abrirModalResultado(cruceId, ronda) {
           <button class="btn btn-primary" style="flex:1" onclick="guardarResultado()">✅ Guardar</button>
           <button class="btn" style="flex:0.5" onclick="cerrarModal()">Cancelar</button>
         </div>
+        ${cruce.golesLocal !== null || cruce.golesVisitante !== null
+          ? `<button class="btn btn-secondary btn-sm" style="width:100%;margin-top:10px;" onclick="borrarResultadoCruce()">🗑️ Borrar resultado</button>`
+          : ''}
       </div>
     </div>`
 }
@@ -2756,6 +2759,21 @@ function abrirModalResultado(cruceId, ronda) {
 function cerrarModal() {
   const el = document.getElementById('bracket-modal')
   if (el) el.innerHTML = ''
+}
+
+async function borrarResultadoCruce() {
+  const cruces = estado.bracket[modalRonda]
+  const cruce = cruces.find(c => c.id === modalCruceId)
+  if (!cruce) return
+  snapshotBracket()
+  cruce.golesLocal = null
+  cruce.golesVisitante = null
+  cruce.ganador = null
+  avanzarGanadores()
+  await guardarEstado()
+  cerrarModal()
+  renderBracket()
+  toast('🗑️ Resultado borrado')
 }
 
 async function guardarResultado() {

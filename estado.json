@@ -1,6 +1,6 @@
 {
   "version": "1.0",
-  "ultimaActualizacion": "2026-07-02T01:37:03.443Z",
+  "ultimaActualizacion": "2026-07-02T01:38:37.423Z",
   "equiposArgentinos": [
     {
       "id": "arg1",
@@ -367,9 +367,9 @@
         "id": "c1",
         "local": "int_s10",
         "visitante": "int_s12",
-        "golesLocal": null,
-        "golesVisitante": null,
-        "ganador": null,
+        "golesLocal": 2,
+        "golesVisitante": 0,
+        "ganador": "int_s10",
         "editado": false
       },
       {
@@ -382,7 +382,17 @@
         "editado": false
       }
     ],
-    "semis": [],
+    "semis": [
+      {
+        "id": "s1",
+        "local": "int_s10",
+        "visitante": null,
+        "golesLocal": null,
+        "golesVisitante": null,
+        "ganador": null,
+        "editado": false
+      }
+    ],
     "final": []
   },
   "poolArgentino": [

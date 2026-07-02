@@ -2314,6 +2314,23 @@ async function resetSorteo() {
 
 let modalRonda = null, modalCruceId = null
 
+// ── Deshacer: guarda una foto del bracket antes de cada acción que lo modifica ──
+let bracketHistory = []
+const BRACKET_HISTORY_MAX = 20
+
+function snapshotBracket() {
+  bracketHistory.push(JSON.stringify(estado.bracket))
+  if (bracketHistory.length > BRACKET_HISTORY_MAX) bracketHistory.shift()
+}
+
+async function deshacerBracket() {
+  if (!bracketHistory.length) { toast('No hay nada para deshacer', true); return }
+  estado.bracket = JSON.parse(bracketHistory.pop())
+  await guardarEstado()
+  renderBracket()
+  toast('↩️ Deshecho')
+}
+
 function getEquipo(id) {
   if (!id) return null
   return getTodosEquipos().find(e => e.id === id) || null
@@ -2448,20 +2465,18 @@ function abrirEditorCruce(cruceId, ronda) {
         </div>
         <div style="margin-bottom:16px;">
           <div style="font-size:12px;color:var(--gris);margin-bottom:8px;text-transform:uppercase;letter-spacing:0.5px;">Reemplazar por (cualquier llave):</div>
-          ${opciones.length === 0
-            ? `<p class="text-gris">No hay otros lugares disponibles en el bracket todavía.</p>`
-            : `<select id="sel-swap-equipo" style="width:100%;padding:8px;background:var(--azul);color:var(--texto);border:1px solid var(--border);border-radius:6px;font-size:13px;">
-                <option value="">— Seleccioná un equipo o lugar —</option>
-                ${opciones.map(o => `<option value="${o.ronda}|${o.cruceId}|${o.slot}">${o.label}</option>`).join('')}
-              </select>`
-          }
+          <select id="sel-swap-equipo" style="width:100%;padding:8px;background:var(--azul);color:var(--texto);border:1px solid var(--border);border-radius:6px;font-size:13px;">
+            <option value="">— Seleccioná un equipo o lugar —</option>
+            <option value="__vacio__">— Por definir (dejar vacío) —</option>
+            ${opciones.map(o => `<option value="${o.ronda}|${o.cruceId}|${o.slot}">${o.label}</option>`).join('')}
+          </select>
         </div>
         <div style="font-size:11px;color:var(--gris);margin-bottom:12px;">
-          Se intercambia solo ese equipo con el lugar elegido (puede ser de cualquier ronda). Si alguno de los dos cruces ya tenía resultado cargado, se borra.
+          Se intercambia solo ese equipo con el lugar elegido (puede ser de cualquier ronda), o se deja el cruce en "Por definir" si elegís esa opción. Si alguno de los cruces ya tenía resultado cargado, se borra.
         </div>
         <div class="flex-gap" style="justify-content:flex-end;">
           <button class="btn btn-secondary" onclick="cerrarEditorCruce()">Cancelar</button>
-          ${opciones.length > 0 ? `<button class="btn btn-gold" onclick="ejecutarSwapEquipo('${cruceId}','${ronda}')">🔀 Intercambiar</button>` : ''}
+          <button class="btn btn-gold" onclick="ejecutarSwapEquipo('${cruceId}','${ronda}')">🔀 Intercambiar</button>
         </div>
       </div>
     </div>
@@ -2472,10 +2487,25 @@ async function ejecutarSwapEquipo(cruceId, ronda) {
   const slotOrigen = document.getElementById('sel-slot-origen')?.value
   const destino = document.getElementById('sel-swap-equipo')?.value
   if (!slotOrigen || !destino) { toast('Seleccioná un equipo para intercambiar', true); return }
-  const [destRonda, destCruceId, destSlot] = destino.split('|')
   const cOrigen = estado.bracket[ronda]?.find(c => c.id === cruceId)
+  if (!cOrigen) return
+
+  snapshotBracket()
+
+  if (destino === '__vacio__') {
+    // Dejar el cruce en "Por definir": no se toca ningún otro cruce
+    cOrigen[slotOrigen] = null
+    cOrigen.golesLocal = null; cOrigen.golesVisitante = null; cOrigen.ganador = null; cOrigen.editado = true
+    cerrarEditorCruce()
+    await guardarEstado()
+    renderBracket()
+    toast('Cruce dejado en "Por definir"')
+    return
+  }
+
+  const [destRonda, destCruceId, destSlot] = destino.split('|')
   const cDestino = estado.bracket[destRonda]?.find(c => c.id === destCruceId)
-  if (!cOrigen || !cDestino) return
+  if (!cDestino) return
   // Swap solo el equipo de ese slot puntual, no el cruce completo
   ;[cOrigen[slotOrigen], cDestino[destSlot]] = [cDestino[destSlot], cOrigen[slotOrigen]]
   // Los equipos cambiaron: cualquier resultado cargado en ambos cruces queda inválido.
@@ -2567,6 +2597,7 @@ function renderBracket() {
   const leyenda = `${clasifWidget}<div style="display:flex;gap:12px;margin-bottom:14px;align-items:center;flex-wrap:wrap;">
     <div style="display:flex;align-items:center;gap:6px;font-size:12px;"><div style="width:10px;height:10px;background:#4a9eff;border-radius:2px;flex-shrink:0;"></div>Santi</div>
     <div style="display:flex;align-items:center;gap:6px;font-size:12px;"><div style="width:10px;height:10px;background:#ff6b6b;border-radius:2px;flex-shrink:0;"></div>Luciano</div>
+    ${esAdmin ? `<button class="btn btn-secondary btn-sm" onclick="deshacerBracket()" ${bracketHistory.length ? '' : 'disabled style="opacity:0.4;cursor:not-allowed;"'}>↩️ Deshacer</button>` : ''}
     ${esAdmin ? `<button class="btn btn-secondary btn-sm" onclick="confirmarRegenerarBracket()">🔀 Regenerar</button>` : ''}
   </div>`
 
@@ -2606,6 +2637,7 @@ function renderBracket() {
 }
 
 async function generarDieciseisavos() {
+  if (estado.bracket.dieciseisavos.length) snapshotBracket()
   const todos = getTodosEquipos()
   const shuffle = arr => [...arr].sort(() => Math.random() - 0.5)
   const esArgentino = e => e.id.startsWith('pa') || e.id.startsWith('arg')
@@ -2711,6 +2743,7 @@ async function guardarResultado() {
   const cruces = estado.bracket[modalRonda]
   const cruce = cruces.find(c => c.id === modalCruceId)
   if (!cruce) return
+  snapshotBracket()
   const v = id => { const el = document.getElementById(id); return el && el.value !== '' ? parseInt(el.value) : null }
   cruce.golesLocal = v('gl1')
   cruce.golesVisitante = v('gv1')

@@ -2336,9 +2336,10 @@ function avanzarRonda(crucesActual, siguienteRonda, prefix) {
     const id = `${prefix}${i + 1}`
     let sig = crucesSig.find(c => c.id === id)
     if (!sig) {
-      sig = { id, local: c1.ganador, visitante: c2.ganador, golesLocal: null, golesVisitante: null, ganador: null }
+      sig = { id, local: c1.ganador, visitante: c2.ganador, golesLocal: null, golesVisitante: null, ganador: null, editado: false }
       crucesSig.push(sig)
-    } else {
+    } else if (!sig.editado) {
+      // Si el cruce fue editado a mano (ejecutarSwapEquipo), no se pisa con el ganador "natural"
       sig.local = c1.ganador
       sig.visitante = c2.ganador
     }
@@ -2402,53 +2403,69 @@ function abrirEditorCruce(cruceId, ronda) {
   if (!cruce) return
   const eq1 = getEquipo(cruce.local)
   const eq2 = getEquipo(cruce.visitante)
-  const otros = cruces.filter(c => c.id !== cruceId)
+  // Todos los equipos de la ronda (menos los de este cruce), con su ubicación exacta
+  const opciones = []
+  for (const c of cruces) {
+    if (c.id === cruceId) continue
+    if (c.local) opciones.push({ cruceId: c.id, slot: 'local', nombre: getEquipo(c.local)?.nombre || '?' })
+    if (c.visitante) opciones.push({ cruceId: c.id, slot: 'visitante', nombre: getEquipo(c.visitante)?.nombre || '?' })
+  }
   document.body.insertAdjacentHTML('beforeend', `
     <div class="modal-overlay" id="modal-editor-cruce" onclick="if(event.target===this)cerrarEditorCruce()">
       <div class="modal" style="width:380px;">
-        <h3>✏️ Editar enfrentamiento</h3>
+        <h3>✏️ Editar equipo</h3>
         <p style="font-size:13px;margin-bottom:14px;color:var(--gris);">
           Cruce actual: <strong style="color:var(--texto);">${eq1?.nombre||'?'}</strong> vs <strong style="color:var(--texto);">${eq2?.nombre||'?'}</strong>
         </p>
+        <div style="margin-bottom:12px;">
+          <div style="font-size:12px;color:var(--gris);margin-bottom:8px;text-transform:uppercase;letter-spacing:0.5px;">Equipo a mover:</div>
+          <select id="sel-slot-origen" style="width:100%;padding:8px;background:var(--azul);color:var(--texto);border:1px solid var(--border);border-radius:6px;font-size:13px;">
+            ${eq1 ? `<option value="local">${eq1.nombre}</option>` : ''}
+            ${eq2 ? `<option value="visitante">${eq2.nombre}</option>` : ''}
+          </select>
+        </div>
         <div style="margin-bottom:16px;">
-          <div style="font-size:12px;color:var(--gris);margin-bottom:8px;text-transform:uppercase;letter-spacing:0.5px;">Intercambiar con:</div>
-          ${otros.length === 0
-            ? `<p class="text-gris">No hay otros cruces disponibles para intercambiar en esta ronda.</p>`
-            : `<select id="sel-swap-cruce" style="width:100%;padding:8px;background:var(--azul);color:var(--texto);border:1px solid var(--border);border-radius:6px;font-size:13px;">
-                <option value="">— Seleccioná un cruce —</option>
-                ${otros.map(c => {
-                  const n1 = getEquipo(c.local)?.nombre || '?'
-                  const n2 = getEquipo(c.visitante)?.nombre || '?'
-                  return `<option value="${c.id}">${n1} vs ${n2}</option>`
-                }).join('')}
+          <div style="font-size:12px;color:var(--gris);margin-bottom:8px;text-transform:uppercase;letter-spacing:0.5px;">Intercambiar por:</div>
+          ${opciones.length === 0
+            ? `<p class="text-gris">No hay otros equipos disponibles en esta ronda.</p>`
+            : `<select id="sel-swap-equipo" style="width:100%;padding:8px;background:var(--azul);color:var(--texto);border:1px solid var(--border);border-radius:6px;font-size:13px;">
+                <option value="">— Seleccioná un equipo —</option>
+                ${opciones.map(o => `<option value="${o.cruceId}|${o.slot}">${o.nombre}</option>`).join('')}
               </select>`
           }
         </div>
+        <div style="font-size:11px;color:var(--gris);margin-bottom:12px;">
+          Se intercambia solo ese equipo. Si alguno de los dos cruces ya tenía resultado cargado, se borra.
+        </div>
         <div class="flex-gap" style="justify-content:flex-end;">
           <button class="btn btn-secondary" onclick="cerrarEditorCruce()">Cancelar</button>
-          ${otros.length > 0 ? `<button class="btn btn-gold" onclick="ejecutarSwapCruce('${cruceId}','${ronda}')">🔀 Intercambiar</button>` : ''}
+          ${opciones.length > 0 ? `<button class="btn btn-gold" onclick="ejecutarSwapEquipo('${cruceId}','${ronda}')">🔀 Intercambiar</button>` : ''}
         </div>
       </div>
     </div>
   `)
 }
 
-async function ejecutarSwapCruce(cruceId, ronda) {
-  const otroCruceId = document.getElementById('sel-swap-cruce')?.value
-  if (!otroCruceId) { toast('Seleccioná un cruce para intercambiar', true); return }
+async function ejecutarSwapEquipo(cruceId, ronda) {
+  const slotOrigen = document.getElementById('sel-slot-origen')?.value
+  const destino = document.getElementById('sel-swap-equipo')?.value
+  if (!slotOrigen || !destino) { toast('Seleccioná un equipo para intercambiar', true); return }
+  const [destCruceId, destSlot] = destino.split('|')
   const cruces = estado.bracket[ronda]
-  const c1 = cruces.find(c => c.id === cruceId)
-  const c2 = cruces.find(c => c.id === otroCruceId)
-  if (!c1 || !c2) return
-  // Swap todo el contenido del cruce (equipos, goles y ganador)
-  const campos = ['local','visitante','golesLocal','golesVisitante','ganador']
-  for (const campo of campos) {
-    ;[c1[campo], c2[campo]] = [c2[campo], c1[campo]]
+  const cOrigen = cruces.find(c => c.id === cruceId)
+  const cDestino = cruces.find(c => c.id === destCruceId)
+  if (!cOrigen || !cDestino) return
+  // Swap solo el equipo de ese slot puntual, no el cruce completo
+  ;[cOrigen[slotOrigen], cDestino[destSlot]] = [cDestino[destSlot], cOrigen[slotOrigen]]
+  // Los equipos cambiaron: cualquier resultado cargado en ambos cruces queda inválido.
+  // Se marcan como "editado" para que avanzarRonda no los pise con el ganador natural de la ronda anterior.
+  for (const c of [cOrigen, cDestino]) {
+    c.golesLocal = null; c.golesVisitante = null; c.ganador = null; c.editado = true
   }
   cerrarEditorCruce()
   await guardarEstado()
   renderBracket()
-  toast('¡Enfrentamiento actualizado!')
+  toast('¡Equipo intercambiado!')
 }
 
 function cerrarEditorCruce() {

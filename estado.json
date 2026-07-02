@@ -354,12 +354,12 @@
       },
       {
         "id": "o4",
-        "local": null,
-        "visitante": "arg7",
+        "local": "int_s4",
+        "visitante": null,
         "golesLocal": null,
         "golesVisitante": null,
         "ganador": null,
-        "editado": true
+        "editado": false
       }
     ],
     "cuartos": [

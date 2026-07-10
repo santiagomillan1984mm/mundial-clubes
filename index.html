@@ -2472,13 +2472,13 @@ function abrirEditorCruce(cruceId, ronda) {
       <div class="modal" style="width:380px;">
         <h3>✏️ Editar equipo</h3>
         <p style="font-size:13px;margin-bottom:14px;color:var(--gris);">
-          Cruce actual: <strong style="color:var(--texto);">${eq1?.nombre||'?'}</strong> vs <strong style="color:var(--texto);">${eq2?.nombre||'?'}</strong>
+          Cruce actual: <strong style="color:var(--texto);">${eq1?.nombre||'Por definir'}</strong> vs <strong style="color:var(--texto);">${eq2?.nombre||'Por definir'}</strong>
         </p>
         <div style="margin-bottom:12px;">
-          <div style="font-size:12px;color:var(--gris);margin-bottom:8px;text-transform:uppercase;letter-spacing:0.5px;">Equipo a mover:</div>
+          <div style="font-size:12px;color:var(--gris);margin-bottom:8px;text-transform:uppercase;letter-spacing:0.5px;">Equipo a mover / lugar a llenar:</div>
           <select id="sel-slot-origen" style="width:100%;padding:8px;background:var(--azul);color:var(--texto);border:1px solid var(--border);border-radius:6px;font-size:13px;">
-            ${eq1 ? `<option value="local">${eq1.nombre}</option>` : ''}
-            ${eq2 ? `<option value="visitante">${eq2.nombre}</option>` : ''}
+            <option value="local">${eq1 ? eq1.nombre : `— Vacío (rival: ${eq2?.nombre||'Por definir'}) —`}</option>
+            <option value="visitante">${eq2 ? eq2.nombre : `— Vacío (rival: ${eq1?.nombre||'Por definir'}) —`}</option>
           </select>
         </div>
         <div style="margin-bottom:16px;">

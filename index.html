@@ -715,7 +715,7 @@
     <div class="sec-titulo">🏆 Torneo de Campeones</div>
     <div id="inicio-contenido"><div class="loading">Cargando...</div></div>
     <div class="flex-gap mt">
-      <button class="btn btn-secondary" onclick="this.textContent='⏳ Cargando...';this.disabled=true;cargarEstado().finally(()=>{this.textContent='🔄 Actualizar';this.disabled=false;toast('Datos actualizados')})">🔄 Actualizar</button>
+      <button class="btn btn-secondary" onclick="this.textContent='⏳ Actualizando...';this.disabled=true;location.href = location.pathname + '?t=' + Date.now()">🔄 Actualizar</button>
     </div>
   </div>
 

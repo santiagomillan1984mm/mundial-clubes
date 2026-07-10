@@ -2000,6 +2000,26 @@ function getProximoPartidoPromocion() {
   return partidos.find(p => p.descendidoId && p.rivalId && p.golesDescendido === null) || null
 }
 
+function getTitulosPorDueno() {
+  // Mismo criterio que renderHistorial(): el historial manual + la Supercopa
+  // actual si ya tiene ganador y todavía no se cargó a mano.
+  const historialBase = (estado.historial || []).slice()
+  const sc = estado.supercopa
+  if (sc?.ganador) {
+    const yaEsta = historialBase.some(h => h.competencia === 'supercopa' && h.campeonId === sc.ganador)
+    if (!yaEsta) {
+      const eqSC = getEquipo(sc.ganador)
+      if (eqSC) historialBase.push({ dueno: eqSC.dueno })
+    }
+  }
+  const conteo = { santi: 0, luciano: 0 }
+  for (const h of historialBase) {
+    if (h.dueno === 'santi') conteo.santi++
+    else if (h.dueno === 'luciano') conteo.luciano++
+  }
+  return conteo
+}
+
 function renderEstadoInicio() {
   if (!estado) return
   const cont = document.getElementById('inicio-contenido')
@@ -2019,6 +2039,29 @@ function renderEstadoInicio() {
   const ultimoEliminado = getUltimoEliminadoCopa()
   const favoritoMundial = getFavoritoMundial()
   const ultima = estado.ultimaActualizacion ? new Date(estado.ultimaActualizacion).toLocaleString('es-AR') : 'Nunca'
+  const titulos = getTitulosPorDueno()
+  const vsBannerHTML = `<div class="card" style="margin-bottom:14px;padding:0;overflow:hidden;">
+    <div style="display:flex;align-items:flex-end;justify-content:center;position:relative;background:linear-gradient(180deg, var(--azul2) 0%, var(--azul) 100%);min-height:150px;">
+      <div style="flex:1;display:flex;justify-content:flex-end;overflow:hidden;">
+        <img src="santi.png" alt="Santi" style="max-height:210px;width:auto;object-fit:contain;object-position:bottom;" />
+      </div>
+      <div style="position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);z-index:2;background:var(--dorado2);color:#1a1a2e;font-weight:800;font-size:15px;width:44px;height:44px;border-radius:50%;display:flex;align-items:center;justify-content:center;box-shadow:0 2px 10px rgba(0,0,0,0.4);letter-spacing:0.5px;">VS</div>
+      <div style="flex:1;display:flex;justify-content:flex-start;overflow:hidden;">
+        <img src="luciano.png" alt="Luciano" style="max-height:210px;width:auto;object-fit:contain;object-position:bottom;" />
+      </div>
+    </div>
+    <div style="display:flex;border-top:1px solid var(--border);">
+      <div style="flex:1;text-align:center;padding:10px 6px;">
+        <div style="color:#4a9eff;font-weight:800;font-size:14px;letter-spacing:0.5px;">SANTI</div>
+        <div style="font-size:13px;color:var(--dorado2);font-weight:700;margin-top:2px;">🏆 ${titulos.santi}</div>
+      </div>
+      <div style="width:1px;background:var(--border);"></div>
+      <div style="flex:1;text-align:center;padding:10px 6px;">
+        <div style="color:#ff6b6b;font-weight:800;font-size:14px;letter-spacing:0.5px;">LUCIANO</div>
+        <div style="font-size:13px;color:var(--dorado2);font-weight:700;margin-top:2px;">🏆 ${titulos.luciano}</div>
+      </div>
+    </div>
+  </div>`
 
   // ── stats Mundial de Clubes ──
   const mGoleador = getEquipoMasGoleadorMundial()
@@ -2545,6 +2588,7 @@ function renderEstadoInicio() {
   const hayStatsLiga = goleadorHTML || mejorHTML || miniCards1.length || top5HTML || ultimosHTML
 
   cont.innerHTML = `
+    ${vsBannerHTML}
     <!-- Competencias -->
     <div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:14px;">
       ${compCard('🇦🇷','Liga AFA', faseLiga.label, faseLiga.sub, '#4a9eff')}

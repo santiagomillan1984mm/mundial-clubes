@@ -3334,11 +3334,7 @@ function renderBracket() {
   const fin = f[0] || null
   const campeon = fin?.ganador ? getEquipo(fin.ganador) : null
 
-  // Widget clasificación tentativa en bracket
-  const tablaLigaWidget = estado.ligaAfa?.configurado ? calcularTablaLiga() : []
-  const clasifWidget = renderClasifTentativa(tablaLigaWidget, 8, 'Clasificados tentantivos — Liga AFA')
-
-  const leyenda = `${clasifWidget}<div style="display:flex;gap:12px;margin-bottom:14px;align-items:center;flex-wrap:wrap;">
+  const leyenda = `<div style="display:flex;gap:12px;margin-bottom:14px;align-items:center;flex-wrap:wrap;">
     <div style="display:flex;align-items:center;gap:6px;font-size:12px;"><div style="width:10px;height:10px;background:#4a9eff;border-radius:2px;flex-shrink:0;"></div>Santi</div>
     <div style="display:flex;align-items:center;gap:6px;font-size:12px;"><div style="width:10px;height:10px;background:#ff6b6b;border-radius:2px;flex-shrink:0;"></div>Luciano</div>
     ${esAdmin ? `<button class="btn btn-secondary btn-sm" onclick="deshacerBracket()" ${bracketHistory.length ? '' : 'disabled style="opacity:0.4;cursor:not-allowed;"'}>↩️ Deshacer</button>` : ''}

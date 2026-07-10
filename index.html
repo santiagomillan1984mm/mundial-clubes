@@ -5630,9 +5630,35 @@ function actualizarBtnNotif() {
 }
 
 // ══════════════════════════════════════════════
+// AUTO-ACTUALIZACIÓN DE LA APP
+// ══════════════════════════════════════════════
+// Chequea (con un pedido liviano, sin bajar toda la página) si hay una versión
+// más nueva de index.html publicada. Si la hay, se recarga sola una vez antes
+// de mostrar nada, para que nadie necesite borrar/reinstalar la app a mano.
+const APP_VERSION_KEY = 'mc_app_version'
+
+async function verificarVersionApp() {
+  try {
+    const res = await fetch(location.pathname, { method: 'HEAD', cache: 'no-store' })
+    const version = res.headers.get('etag') || res.headers.get('last-modified')
+    if (!version) return false
+    const guardada = localStorage.getItem(APP_VERSION_KEY)
+    if (guardada && guardada !== version) {
+      localStorage.setItem(APP_VERSION_KEY, version)
+      location.href = location.pathname + '?t=' + Date.now()
+      return true // se está recargando: no seguir con el resto del init
+    }
+    localStorage.setItem(APP_VERSION_KEY, version)
+  } catch (e) {}
+  return false
+}
+
+// ══════════════════════════════════════════════
 // INIT
 // ══════════════════════════════════════════════
 async function init() {
+  const seVaARecargar = await verificarVersionApp()
+  if (seVaARecargar) return
   const t = getToken()
   if (t) { esAdmin = true; actualizarUIAdmin() }
   await cargarPool()

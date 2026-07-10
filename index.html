@@ -1545,10 +1545,19 @@ function getFaseCopa() {
   if (!copa?.configurado) return { label: 'Sin configurar', sub: '' }
   const b = copa.bracket
   if (b.final?.[0]?.ganador) return { label: '¡Finalizada!', sub: 'Campeón definido' }
-  if (b.semis?.length) return { label: 'Semifinales', sub: '' }
-  if (b.cuartos?.length) return { label: 'Cuartos de final', sub: '' }
-  if (b.r2?.length) return { label: 'Octavos de final', sub: '' }
-  if (b.r1?.length) return { label: 'Ronda 1', sub: `${b.r1.filter(c=>c.ganador).length}/${b.r1.length} definidos` }
+  const labelsCopa = { r1: 'Ronda 1', r2: 'Octavos de final', cuartos: 'Cuartos de final', semis: 'Semifinales', final: 'Final' }
+  // La ronda "actual" es la más temprana que todavía tiene partidos pendientes,
+  // no simplemente la última ronda cuyo array ya existe (los arrays de todas las
+  // rondas se pre-crean vacíos desde el sorteo, así que .length siempre es > 0).
+  const proximo = getProximoPartidoCopa()
+  if (proximo) {
+    const sub = proximo.ronda === 'r1' ? `${(b.r1||[]).filter(c=>c.ganador).length}/${(b.r1||[]).length} definidos` : ''
+    return { label: labelsCopa[proximo.ronda], sub }
+  }
+  // Nada pendiente y sin campeón todavía: mostrar la ronda más avanzada con equipos definidos
+  for (const ronda of ['semis', 'cuartos', 'r2', 'r1']) {
+    if ((b[ronda] || []).some(c => c.local && c.visitante)) return { label: labelsCopa[ronda], sub: '' }
+  }
   return { label: 'Bracket por generar', sub: '' }
 }
 
@@ -1556,10 +1565,17 @@ function getFaseMundial() {
   if (!estado?.sorteo?.confirmado) return { label: 'Sorteo pendiente', sub: '' }
   const b = estado.bracket
   if (b.final?.[0]?.ganador) return { label: '¡Finalizado!', sub: 'Campeón definido' }
-  if (b.semis?.length) return { label: 'Semifinales', sub: '' }
-  if (b.cuartos?.length) return { label: 'Cuartos de final', sub: '' }
-  if (b.octavos?.length) return { label: 'Octavos de final', sub: '' }
-  if (b.dieciseisavos?.length) return { label: 'Dieciseisavos', sub: `${b.dieciseisavos.filter(c=>c.ganador).length}/16 definidos` }
+  const labelsMundial = { dieciseisavos: 'Dieciseisavos', octavos: 'Octavos de final', cuartos: 'Cuartos de final', semis: 'Semifinales', final: 'Final' }
+  // Misma lógica que Copa: la ronda "actual" es la más temprana con partidos
+  // pendientes, no la última cuyo array ya existe.
+  const proximo = getProximoPartidoMundial()
+  if (proximo) {
+    const sub = proximo.ronda === 'dieciseisavos' ? `${(b.dieciseisavos||[]).filter(c=>c.ganador).length}/16 definidos` : ''
+    return { label: labelsMundial[proximo.ronda], sub }
+  }
+  for (const ronda of ['semis', 'cuartos', 'octavos', 'dieciseisavos']) {
+    if ((b[ronda] || []).some(c => c.local && c.visitante)) return { label: labelsMundial[ronda], sub: '' }
+  }
   return { label: 'Bracket por generar', sub: '' }
 }
 

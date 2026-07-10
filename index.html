@@ -1743,9 +1743,22 @@ function getMasRondasGanadasMundial() {
 
 function getProximoPartidoMundial() {
   if (!estado?.bracket) return null
-  for (const ronda of RONDAS_MUNDIAL_ORDEN) {
+  for (let i = 0; i < RONDAS_MUNDIAL_ORDEN.length; i++) {
+    const ronda = RONDAS_MUNDIAL_ORDEN[i]
+    // Equipos que ya figuran en una ronda posterior: si alguno de los dos lados de este
+    // cruce ya avanzó más adelante en el bracket, este cruce quedó obsoleto (viejo cruce
+    // sin resultado cargado pero superado por una edición manual) y no cuenta como pendiente.
+    const yaAvanzaron = new Set()
+    for (const rondaPost of RONDAS_MUNDIAL_ORDEN.slice(i + 1)) {
+      for (const c of estado.bracket[rondaPost] || []) {
+        if (c.local) yaAvanzaron.add(c.local)
+        if (c.visitante) yaAvanzaron.add(c.visitante)
+      }
+    }
     for (const c of estado.bracket[ronda] || []) {
-      if (c.local && c.visitante && c.golesLocal === null) return { ...c, ronda }
+      if (!c.local || !c.visitante || c.golesLocal !== null) continue
+      if (yaAvanzaron.has(c.local) || yaAvanzaron.has(c.visitante)) continue
+      return { ...c, ronda }
     }
   }
   return null
@@ -1875,9 +1888,19 @@ function getMasRondasGanadasCopa() {
 
 function getProximoPartidoCopa() {
   if (!estado?.copaArgentina?.bracket) return null
-  for (const ronda of RONDAS_COPA_ORDEN) {
+  for (let i = 0; i < RONDAS_COPA_ORDEN.length; i++) {
+    const ronda = RONDAS_COPA_ORDEN[i]
+    const yaAvanzaron = new Set()
+    for (const rondaPost of RONDAS_COPA_ORDEN.slice(i + 1)) {
+      for (const c of estado.copaArgentina.bracket[rondaPost] || []) {
+        if (c.local) yaAvanzaron.add(c.local)
+        if (c.visitante) yaAvanzaron.add(c.visitante)
+      }
+    }
     for (const c of estado.copaArgentina.bracket[ronda] || []) {
-      if (c.local && c.visitante && c.golesLocal === null) return { ...c, ronda }
+      if (!c.local || !c.visitante || c.golesLocal !== null) continue
+      if (yaAvanzaron.has(c.local) || yaAvanzaron.has(c.visitante)) continue
+      return { ...c, ronda }
     }
   }
   return null

@@ -2115,16 +2115,15 @@ function renderEstadoInicio() {
   const contadorGeneral = getContadorGeneral()
   const tituloEl = document.getElementById('sec-titulo-inicio')
   if (tituloEl) {
-    tituloEl.innerHTML = `<div style="display:flex;align-items:center;justify-content:center;gap:10px;flex-wrap:wrap;font-size:13px;">
-      <span style="display:flex;align-items:center;gap:6px;font-weight:800;color:#e74c3c;letter-spacing:0.5px;text-transform:uppercase;">
-        <span class="dot-en-vivo"></span>En vivo
+    tituloEl.innerHTML = `<div style="display:flex;align-items:center;justify-content:center;gap:5px;flex-wrap:nowrap;white-space:nowrap;font-size:11px;overflow-x:auto;max-width:100%;padding-bottom:2px;">
+      <span style="display:flex;align-items:center;gap:4px;font-weight:800;color:#e74c3c;letter-spacing:0.5px;text-transform:uppercase;flex-shrink:0;">
+        <span class="dot-en-vivo"></span>Vivo
       </span>
-      <span style="color:var(--gris);">·</span>
-      <span style="color:#4a9eff;font-weight:800;">SANTI</span>
-      <span style="font-weight:600;">${contadorGeneral.santi.pg} PG — ${contadorGeneral.santi.goles} ⚽</span>
-      <span style="color:var(--gris);">vs</span>
-      <span style="font-weight:600;">${contadorGeneral.luciano.pg} PG — ${contadorGeneral.luciano.goles} ⚽</span>
-      <span style="color:#ff6b6b;font-weight:800;">LUCIANO</span>
+      <span style="color:#4a9eff;font-weight:800;flex-shrink:0;">SANTI</span>
+      <span style="font-weight:600;flex-shrink:0;">${contadorGeneral.santi.pg}G ${contadorGeneral.santi.goles}⚽</span>
+      <span style="color:var(--gris);flex-shrink:0;">vs</span>
+      <span style="font-weight:600;flex-shrink:0;">${contadorGeneral.luciano.pg}G ${contadorGeneral.luciano.goles}⚽</span>
+      <span style="color:#ff6b6b;font-weight:800;flex-shrink:0;">LUCIANO</span>
     </div>`
   }
 

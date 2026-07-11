@@ -702,6 +702,17 @@
       0% { opacity: 0; transform: scale(0.85); }
       100% { opacity: 1; transform: scale(1); }
     }
+
+    /* Contador en vivo */
+    .dot-en-vivo {
+      width: 8px; height: 8px; border-radius: 50%; background: #e74c3c;
+      display: inline-block; flex-shrink: 0;
+      animation: pulse-en-vivo 1.2s ease-in-out infinite;
+    }
+    @keyframes pulse-en-vivo {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.35; transform: scale(0.7); }
+    }
   </style>
 </head>
 <body>
@@ -743,7 +754,7 @@
 
   <!-- INICIO -->
   <div id="sec-inicio" class="seccion activa">
-    <div class="sec-titulo">🏆 Torneo de Campeones</div>
+    <div class="sec-titulo" id="sec-titulo-inicio">🏆 Torneo de Campeones</div>
     <div id="inicio-contenido"><div class="loading">Cargando...</div></div>
     <div class="flex-gap mt">
       <button class="btn btn-secondary" onclick="this.textContent='⏳ Actualizando...';this.disabled=true;location.href = location.pathname + '?t=' + Date.now()">🔄 Actualizar</button>
@@ -2036,6 +2047,49 @@ function getTitulosPorDueno() {
   return conteo
 }
 
+function getContadorGeneral() {
+  // Suma partidos ganados y goles por dueño, mirando TODAS las competencias
+  // que ya tengan partidos jugados (Mundial, Copa, Liga, Promoción, Supercopa).
+  // Las que todavía no arrancaron simplemente no aportan nada — así que hoy
+  // esto va a reflejar solo el Mundial, y se va sumando solo a medida que las
+  // demás competencias se juegan.
+  const conteo = { santi: { pg: 0, goles: 0 }, luciano: { pg: 0, goles: 0 } }
+  function sumar(golesLocal, golesVisitante, duenoLocal, duenoVisitante) {
+    if (golesLocal === null || golesLocal === undefined || golesVisitante === null || golesVisitante === undefined) return
+    if (duenoLocal === 'santi' || duenoLocal === 'luciano') {
+      conteo[duenoLocal].goles += golesLocal
+      if (golesLocal > golesVisitante) conteo[duenoLocal].pg++
+    }
+    if (duenoVisitante === 'santi' || duenoVisitante === 'luciano') {
+      conteo[duenoVisitante].goles += golesVisitante
+      if (golesVisitante > golesLocal) conteo[duenoVisitante].pg++
+    }
+  }
+
+  for (const ronda of RONDAS_MUNDIAL_ORDEN) {
+    for (const c of estado.bracket?.[ronda] || []) {
+      sumar(c.golesLocal, c.golesVisitante, getEquipo(c.local)?.dueno, getEquipo(c.visitante)?.dueno)
+    }
+  }
+  for (const ronda of RONDAS_COPA_ORDEN) {
+    for (const c of estado.copaArgentina?.bracket?.[ronda] || []) {
+      sumar(c.golesLocal, c.golesVisitante, getCopaDueno(c.local), getCopaDueno(c.visitante))
+    }
+  }
+  for (const p of estado.ligaAfa?.partidos || []) {
+    const dL = (estado.ligaAfa.equipos || []).find(e => e.id === p.local)?.dueno
+    const dV = (estado.ligaAfa.equipos || []).find(e => e.id === p.visitante)?.dueno
+    sumar(p.golesLocal, p.golesVisitante, dL, dV)
+  }
+  for (const p of estado.promocion?.partidos || []) {
+    sumar(p.golesDescendido, p.golesRival, p.dueno, getSupercopaDueno(p.rivalId))
+  }
+  const sc = estado.supercopa
+  if (sc) sumar(sc.golesLocal, sc.golesVisitante, getSupercopaDueno(sc.localId), getSupercopaDueno(sc.visitanteId))
+
+  return conteo
+}
+
 function renderEstadoInicio() {
   if (!estado) return
   const cont = document.getElementById('inicio-contenido')
@@ -2056,6 +2110,24 @@ function renderEstadoInicio() {
   const favoritoMundial = getFavoritoMundial()
   const ultima = estado.ultimaActualizacion ? new Date(estado.ultimaActualizacion).toLocaleString('es-AR') : 'Nunca'
   const titulos = getTitulosPorDueno()
+
+  // ── Título de la sección: reemplazar el texto fijo por un contador en vivo ──
+  const contadorGeneral = getContadorGeneral()
+  const tituloEl = document.getElementById('sec-titulo-inicio')
+  if (tituloEl) {
+    tituloEl.innerHTML = `<div style="display:flex;align-items:center;justify-content:center;gap:10px;flex-wrap:wrap;font-size:13px;">
+      <span style="display:flex;align-items:center;gap:6px;font-weight:800;color:#e74c3c;letter-spacing:0.5px;text-transform:uppercase;">
+        <span class="dot-en-vivo"></span>En vivo
+      </span>
+      <span style="color:var(--gris);">·</span>
+      <span style="color:#4a9eff;font-weight:800;">SANTI</span>
+      <span style="font-weight:600;">${contadorGeneral.santi.pg} PG — ${contadorGeneral.santi.goles} ⚽</span>
+      <span style="color:var(--gris);">vs</span>
+      <span style="font-weight:600;">${contadorGeneral.luciano.pg} PG — ${contadorGeneral.luciano.goles} ⚽</span>
+      <span style="color:#ff6b6b;font-weight:800;">LUCIANO</span>
+    </div>`
+  }
+
   const vsBannerHTML = `<div class="card" style="margin-bottom:14px;padding:0;overflow:hidden;">
     <div style="display:flex;align-items:flex-end;justify-content:center;position:relative;background:linear-gradient(180deg, var(--azul2) 0%, var(--azul) 100%);min-height:150px;">
       <div style="flex:1;display:flex;justify-content:flex-end;overflow:hidden;">

@@ -4157,6 +4157,17 @@ function filtrarLiga(filtro, btn) {
   }
 }
 
+function asegurarPromoEnLiga() {
+  if (!estado.ligaAfa.equipos) estado.ligaAfa.equipos = []
+  const equipos = estado.ligaAfa.equipos
+  for (const ep of getEquiposPromocion()) {
+    const ex = equipos.find(e => e.id === ep.id)
+    if (!ex) equipos.push({ id: ep.id, dueno: ep.dueno })
+    else ex.dueno = ep.dueno
+  }
+  return equipos
+}
+
 function renderLigaConfig(cont) {
   const pool = estado.poolArgentino || POOL_ARG
 
@@ -4165,12 +4176,7 @@ function renderLigaConfig(cont) {
   const desdePromoIds = new Set(desdePromo.map(e => e.id))
 
   // Asegurarse de que los equipos de promoción estén en ligaAfa.equipos
-  if (!estado.ligaAfa.equipos) estado.ligaAfa.equipos = []
-  for (const ep of desdePromo) {
-    if (!estado.ligaAfa.equipos.find(e => e.id === ep.id)) {
-      estado.ligaAfa.equipos.push({ id: ep.id, dueno: ep.dueno })
-    }
-  }
+  asegurarPromoEnLiga()
 
   const selSanti = estado.ligaAfa.equipos.filter(e => e.dueno === 'santi').map(e => e.id)
   const selLuciano = estado.ligaAfa.equipos.filter(e => e.dueno === 'luciano').map(e => e.id)
@@ -4231,10 +4237,9 @@ function renderLigaConfig(cont) {
 }
 
 function togglePoolLiga(id) {
-  if (!estado.ligaAfa.equipos) estado.ligaAfa.equipos = []
   const desdePromoIds = new Set(getEquiposPromocion().map(e => e.id))
-  if (desdePromoIds.has(id)) return
-  const equipos = estado.ligaAfa.equipos
+  if (desdePromoIds.has(id)) { toast('Ese equipo ya está elegido desde la Promoción 🔒'); return }
+  const equipos = asegurarPromoEnLiga()
   const idx = equipos.findIndex(e => e.id === id)
 
   if (idx === -1) {
@@ -4279,7 +4284,7 @@ function togglePoolLiga(id) {
 }
 
 async function confirmarLiga() {
-  const eq = estado.ligaAfa.equipos || []
+  const eq = asegurarPromoEnLiga()
   const s = eq.filter(e => e.dueno === 'santi').length
   const l = eq.filter(e => e.dueno === 'luciano').length
   if (s !== 10 || l !== 10) { toast(`Necesitás 10 por jugador. Santi: ${s}, Luciano: ${l}`, true); return }

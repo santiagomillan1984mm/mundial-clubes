@@ -390,6 +390,46 @@
     @keyframes bp-latido { to { transform: scale(1.07); } }
     @keyframes bp-fondo { from { opacity: 0; } }
     @keyframes bp-fondo-out { to { opacity: 0; } }
+    /* ── MARCADOR GENERAL ── */
+    .mg { position: relative; overflow: hidden; cursor: pointer; margin-bottom: 14px; border-radius: 18px; padding: 14px 14px 12px;
+      background: radial-gradient(circle at 0% 50%, rgba(74,158,255,.22), transparent 45%), radial-gradient(circle at 100% 50%, rgba(255,107,107,.22), transparent 45%), linear-gradient(180deg, #17244a, #0e1631);
+      border: 1px solid rgba(255,255,255,.08); box-shadow: 0 10px 30px rgba(0,0,0,.35); transition: transform .15s; }
+    .mg:active { transform: scale(.985); }
+    .mg::after { content: ''; position: absolute; inset: 0; background: linear-gradient(100deg, transparent 35%, rgba(255,255,255,.07) 50%, transparent 65%); transform: translateX(-100%); animation: hl-brillo 6s ease-in-out infinite; pointer-events: none; }
+    .mg-top { display: flex; align-items: center; gap: 10px; margin-bottom: 12px; }
+    .mg-vivo { display: flex; align-items: center; gap: 5px; font-size: 11px; font-weight: 900; color: #e74c3c; letter-spacing: 1px; background: rgba(231,76,60,.12); padding: 3px 8px; border-radius: 10px; }
+    .mg-tit { flex: 1; font-size: 12px; font-weight: 800; letter-spacing: 2px; text-transform: uppercase; color: var(--gris); }
+    .mg-mas { font-size: 11px; font-weight: 800; color: var(--dorado2); }
+    .mg-jug { display: grid; grid-template-columns: 74px 1fr 74px; align-items: center; gap: 8px; }
+    .mg-lado { display: flex; flex-direction: column; align-items: center; gap: 5px; font-size: 11px; letter-spacing: 1px; }
+    .mg-lado img { width: 66px; height: 66px; border-radius: 50%; object-fit: cover; }
+    .mg-tro { font-size: 12px; font-weight: 800; color: var(--dorado2); background: rgba(0,0,0,.3); border-radius: 10px; padding: 2px 8px; }
+    .mg-fila { display: grid; grid-template-columns: 1fr auto 1fr; align-items: end; margin-bottom: 5px; }
+    .mg-col { text-align: center; }
+    .mg-lab { font-size: 10px; color: var(--gris); text-transform: uppercase; letter-spacing: 1px; padding-bottom: 6px; }
+    .mg-num { font-size: 40px; font-weight: 900; line-height: 1; font-variant-numeric: tabular-nums; }
+    .mg-num.chico { font-size: 24px; }
+    .mg-num.az { color: #4a9eff; text-shadow: 0 0 18px rgba(74,158,255,.45); }
+    .mg-num.ro { color: #ff6b6b; text-shadow: 0 0 18px rgba(255,107,107,.45); }
+    .mg-barra { display: flex; height: 8px; border-radius: 6px; overflow: hidden; background: var(--azul3); gap: 2px; }
+    .mg-barra > div { transition: width 1.2s cubic-bezier(.2,.9,.3,1); }
+    .mg-lider { text-align: center; margin-top: 12px; font-size: 13px; font-weight: 700; color: var(--texto); }
+    .mg-detalle { width: min(94vw, 460px); max-height: 86vh; overflow-y: auto; background: linear-gradient(180deg, #17244a, #0d1530); border: 1px solid rgba(255,255,255,.1);
+      border-radius: 22px; padding: 18px 16px; animation: bp-zoom-in .45s cubic-bezier(.2,1.3,.4,1); cursor: default; }
+    .mg-dtit { text-align: center; font-size: 13px; font-weight: 900; letter-spacing: 2px; text-transform: uppercase; color: var(--dorado2); margin-bottom: 12px; }
+    .mg-dtotal { display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; text-align: center; margin-bottom: 10px; }
+    .mg-dtotal img { width: 64px; height: 64px; border-radius: 50%; object-fit: cover; }
+    .mg-dn { font-size: 46px; font-weight: 900; line-height: 1.05; }
+    .mg-dtotal small { font-size: 11px; color: var(--gris); }
+    .mg-dvs { font-size: 20px; font-weight: 900; color: var(--dorado2); }
+    .mg-dsub { font-size: 11px; color: var(--gris); text-transform: uppercase; letter-spacing: 2px; margin: 16px 0 8px; }
+    .mg-dfila { background: rgba(255,255,255,.04); border-radius: 12px; padding: 10px 12px; margin-bottom: 8px; animation: hl-entra .45s cubic-bezier(.2,.9,.3,1.1) both; }
+    .mg-dhead { display: flex; align-items: center; gap: 10px; margin-bottom: 6px; }
+    .mg-dhead b { font-size: 14px; } .mg-dhead small { display: block; font-size: 11px; color: var(--gris); }
+    .mg-dlogo { width: 36px; height: 36px; border-radius: 9px; background: #fff; display: flex; align-items: center; justify-content: center; padding: 3px; flex-shrink: 0; }
+    .mg-dlogo img { max-width: 100%; max-height: 100%; object-fit: contain; }
+    .mg-dlogo.sf { background: none; padding: 0; } .mg-dlogo.emoji { background: var(--azul3); font-size: 20px; }
+    .mg-dnums { display: flex; justify-content: space-between; font-weight: 800; font-size: 14px; margin-bottom: 6px; }
     /* ── INICIO: destacados en paneles ── */
     .hl-titulo { font-size: 15px; font-weight: 900; margin: 18px 2px 10px; display: flex; flex-direction: column; gap: 2px; }
     .hl-titulo span { font-size: 11px; font-weight: 500; color: var(--gris); }
@@ -2613,6 +2653,97 @@ function getContadorGeneral() {
   return conteo
 }
 
+// ═══════════ MARCADOR GENERAL EN VIVO ═══════════
+function getContadorPorComp() {
+  const comps = {}
+  const add = (k, nombre, logo, gl, gv, dl, dv) => {
+    if (gl == null || gv == null) return
+    const c = comps[k] ||= { nombre, logo, santi: { pg: 0, pe: 0, goles: 0 }, luciano: { pg: 0, pe: 0, goles: 0 }, pj: 0 }
+    c.pj++
+    for (const [d, gf, gc] of [[dl, gl, gv], [dv, gv, gl]]) {
+      if (d !== 'santi' && d !== 'luciano') continue
+      c[d].goles += gf; if (gf > gc) c[d].pg++; else if (gf === gc) c[d].pe++
+    }
+  }
+  for (const r of RONDAS_MUNDIAL_ORDEN) for (const c of estado.bracket?.[r] || []) add('mundial', 'Mundial de Clubes', 'mundial', c.golesLocal, c.golesVisitante, getEquipo(c.local)?.dueno, getEquipo(c.visitante)?.dueno)
+  for (const a of estado.archivo || []) for (const m of a.partidos || []) add('arch_' + a.id, a.nombre, a.competencia, m.gl, m.gv, m.l?.dueno, m.v?.dueno)
+  for (const p of estado.ligaAfa?.partidos || []) {
+    const eqs = estado.ligaAfa.equipos || []
+    add('liga', 'Liga AFA', 'liga', p.golesLocal, p.golesVisitante, eqs.find(e => e.id === p.local)?.dueno, eqs.find(e => e.id === p.visitante)?.dueno)
+  }
+  for (const r of RONDAS_COPA_ORDEN) for (const c of estado.copaArgentina?.bracket?.[r] || []) add('copa', 'Copa Argentina', 'copa', c.golesLocal, c.golesVisitante, getCopaDueno(c.local), getCopaDueno(c.visitante))
+  for (const p of estado.promocion?.partidos || []) add('promo', 'Promoción', 'promocion', p.golesDescendido, p.golesRival, p.dueno, getSupercopaDueno(p.rivalId))
+  const sc = estado.supercopa
+  if (sc) add('super', 'Supercopa Argentina', 'supercopa', sc.golesLocal, sc.golesVisitante, getSupercopaDueno(sc.localId), getSupercopaDueno(sc.visitanteId))
+  try {
+    const { sf, a, b } = sfEstado()
+    if (a && b) sf.legs.forEach((l, i) => { if (!l) return; const loc = i % 2 === 0 ? a : b, vis = i % 2 === 0 ? b : a; add('superfinal', 'Súper Final', 'superfinal', i % 2 === 0 ? l.ga : l.gb, i % 2 === 0 ? l.gb : l.ga, loc.dueno, vis.dueno) })
+  } catch(e) {}
+  return comps
+}
+function barraDuelo(a, b) {
+  const t = a + b, pa = t ? a / t * 100 : 50
+  return `<div class="mg-barra"><div style="width:${pa}%;background:linear-gradient(90deg,#2f7de0,#4a9eff)"></div><div style="width:${100 - pa}%;background:linear-gradient(90deg,#ff6b6b,#e0404f)"></div></div>`
+}
+function marcadorGeneralHTML(c) {
+  const S = c.santi, L = c.luciano, tit = getTitulosPorDueno()
+  const dif = S.pg - L.pg
+  const lider = dif === 0 ? (S.goles === L.goles ? '⚖️ Empate total' : `⚽ Empatados en victorias · más goles: ${S.goles > L.goles ? 'Santi' : 'Luciano'}`)
+    : `👑 Manda <b style="color:${dif > 0 ? '#4a9eff' : '#ff6b6b'}">${dif > 0 ? 'Santi' : 'Luciano'}</b> por ${Math.abs(dif)} victoria${Math.abs(dif) === 1 ? '' : 's'}`
+  const num = (v, cls) => `<span class="mg-num ${cls}" data-v="${v}">${v}</span>`
+  return `<div class="mg" onclick="abrirMarcadorDetalle()" role="button">
+    <div class="mg-top"><span class="mg-vivo"><span class="dot-en-vivo"></span>EN VIVO</span><span class="mg-tit">Marcador general</span><span class="mg-mas">Ver detalle ›</span></div>
+    <div class="mg-jug">
+      <div class="mg-lado"><img src="santi-avatar.png" alt="" style="box-shadow:0 0 0 3px #4a9eff,0 0 18px rgba(74,158,255,.5)"><b style="color:#4a9eff">SANTI</b><span class="mg-tro">🏆 ${tit.santi}</span></div>
+      <div class="mg-centro">
+        <div class="mg-fila"><div class="mg-col">${num(S.pg, 'az')}</div><div class="mg-lab">Victorias</div><div class="mg-col">${num(L.pg, 'ro')}</div></div>
+        ${barraDuelo(S.pg, L.pg)}
+        <div class="mg-fila" style="margin-top:10px"><div class="mg-col">${num(S.goles, 'az chico')}</div><div class="mg-lab">Goles ⚽</div><div class="mg-col">${num(L.goles, 'ro chico')}</div></div>
+        ${barraDuelo(S.goles, L.goles)}
+      </div>
+      <div class="mg-lado"><img src="luciano-avatar.png" alt="" style="box-shadow:0 0 0 3px #ff6b6b,0 0 18px rgba(255,107,107,.5)"><b style="color:#ff6b6b">LUCIANO</b><span class="mg-tro">🏆 ${tit.luciano}</span></div>
+    </div>
+    <div class="mg-lider">${lider}</div>
+  </div>`
+}
+let marcadorAnimado = false
+function animarMarcador() {
+  const els = document.querySelectorAll('.mg .mg-num')
+  if (marcadorAnimado || !els.length) return
+  marcadorAnimado = true
+  const t0 = performance.now(), dur = 1200
+  const paso = t => {
+    const k = Math.min(1, (t - t0) / dur), e = 1 - Math.pow(1 - k, 3)
+    els.forEach(el => { el.textContent = Math.round(e * +el.dataset.v) })
+    if (k < 1) requestAnimationFrame(paso)
+  }
+  els.forEach(el => el.textContent = '0')
+  requestAnimationFrame(paso)
+  document.querySelectorAll('.mg .mg-barra > div').forEach(d => { const w = d.style.width; d.style.width = '50%'; requestAnimationFrame(() => requestAnimationFrame(() => d.style.width = w)) })
+}
+function abrirMarcadorDetalle() {
+  const total = getContadorGeneral(), comps = getContadorPorComp()
+  const logo = k => k === 'superfinal' ? `<span class="mg-dlogo sf">${SF_LOGO}</span>` : (compLogos[k] ? `<span class="mg-dlogo"><img src="${compLogos[k]}" alt=""></span>` : `<span class="mg-dlogo emoji">${{ promocion: '🔃', mundial: '🌍', liga: '🇦🇷', copa: '🏆', supercopa: '🥇' }[k] || '⚽'}</span>`)
+  const filas = Object.values(comps).map((c, i) => `<div class="mg-dfila" style="animation-delay:${.15 + i * .08}s">
+    <div class="mg-dhead">${logo(c.logo)}<div><b>${c.nombre}</b><small>${c.pj} partidos</small></div></div>
+    <div class="mg-dnums"><span style="color:#4a9eff">${c.santi.pg}G · ${c.santi.goles}⚽</span><span class="text-gris">vs</span><span style="color:#ff6b6b">${c.luciano.pg}G · ${c.luciano.goles}⚽</span></div>
+    ${barraDuelo(c.santi.pg, c.luciano.pg)}
+  </div>`).join('')
+  sfx.whoosh(.15)
+  fxMostrar(`<div class="mg-detalle" onclick="event.stopPropagation()">
+    <div class="mg-dtit">📊 Marcador general</div>
+    <div class="mg-dtotal">
+      <div><img src="santi-avatar.png" alt=""><div class="mg-dn" style="color:#4a9eff">${total.santi.pg}</div><small>victorias · ${total.santi.goles} goles</small></div>
+      <div class="mg-dvs">VS</div>
+      <div><img src="luciano-avatar.png" alt=""><div class="mg-dn" style="color:#ff6b6b">${total.luciano.pg}</div><small>victorias · ${total.luciano.goles} goles</small></div>
+    </div>
+    ${barraDuelo(total.santi.pg, total.luciano.pg)}
+    <div class="mg-dsub">Por competencia</div>
+    ${filas || '<p class="text-gris" style="text-align:center">Todavía no hay partidos jugados.</p>'}
+    <button class="btn btn-secondary" style="width:100%;margin-top:14px" onclick="fxActual && fxActual.click()">Cerrar</button>
+  </div>`, '#f5a623', 0)
+}
+
 const HL_KEY = 'tdc_hl_abiertos'
 function hlAbiertos() {
   try { const v = JSON.parse(localStorage.getItem(HL_KEY)); if (Array.isArray(v)) return new Set(v) } catch(e) {}
@@ -2653,18 +2784,8 @@ function renderEstadoInicio() {
   // ── Título de la sección: reemplazar el texto fijo por un contador en vivo ──
   const contadorGeneral = getContadorGeneral()
   const tituloEl = document.getElementById('sec-titulo-inicio')
-  if (tituloEl) {
-    tituloEl.innerHTML = `<div style="display:flex;align-items:center;justify-content:center;gap:5px;flex-wrap:nowrap;white-space:nowrap;font-size:11px;overflow-x:auto;max-width:100%;padding-bottom:2px;">
-      <span style="display:flex;align-items:center;gap:4px;font-weight:800;color:#e74c3c;letter-spacing:0.5px;text-transform:uppercase;flex-shrink:0;">
-        <span class="dot-en-vivo"></span>Vivo
-      </span>
-      <span style="color:#4a9eff;font-weight:800;flex-shrink:0;">SANTI</span>
-      <span style="font-weight:600;flex-shrink:0;">${contadorGeneral.santi.pg}G ${contadorGeneral.santi.goles}⚽</span>
-      <span style="color:var(--gris);flex-shrink:0;">vs</span>
-      <span style="font-weight:600;flex-shrink:0;">${contadorGeneral.luciano.pg}G ${contadorGeneral.luciano.goles}⚽</span>
-      <span style="color:#ff6b6b;font-weight:800;flex-shrink:0;">LUCIANO</span>
-    </div>`
-  }
+  if (tituloEl) tituloEl.innerHTML = '🏆 Torneo de Campeones'
+  const marcadorHTML = marcadorGeneralHTML(contadorGeneral)
 
   const avatarJugador = (img, nombre, color, tit) => `<div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:8px;min-width:0;">
       <div style="width:112px;height:112px;border-radius:50%;padding:3px;background:${color};box-shadow:0 0 0 4px rgba(0,0,0,0.25),0 6px 22px ${color}66;">
@@ -3255,7 +3376,7 @@ function renderEstadoInicio() {
   const fasePromo = { label: promoJugados === 4 ? '¡Finalizada!' : promoJugados ? 'En juego' : 'Por jugar', sub: promoJugados ? `${promoJugados}/4 partidos` : '' }
 
   cont.innerHTML = `
-    ${vsBannerHTML}
+    ${marcadorHTML}
     <div class="hl-titulo">✨ Destacados del torneo <span>Toca una competencia para ver su resumen</span></div>
     ${panel('mundial', 'mundial', '⚽', 'Mundial de Clubes', faseMundial, '#e94560', contMundial)}
     ${panel('liga', 'liga', '🇦🇷', 'Liga AFA', faseLiga, '#4a9eff', contLiga)}
@@ -3265,6 +3386,7 @@ function renderEstadoInicio() {
     ${panel('superfinal', 'superfinal', '👑', 'Súper Final', faseSF, '#f5c542', contSF)}
     <div style="font-size:11px;color:var(--gris);margin-top:8px;">Actualizado: ${ultima}</div>
   `
+  setTimeout(animarMarcador, 30)
 }
 
 function getFaseActual() {

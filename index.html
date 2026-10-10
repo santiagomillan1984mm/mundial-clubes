@@ -261,7 +261,7 @@
     .bp-full-top { display: none; align-items: center; justify-content: space-between; padding: 10px 2px 0; }
     .bp-full-top .bp-full-tit { font-size: 15px; font-weight: 900; letter-spacing: 2px; text-transform: uppercase; color: var(--dorado2); display: flex; align-items: center; gap: 8px; }
     .bp-full-top button { background: rgba(255,255,255,.08); border: 1px solid rgba(255,255,255,.15); color: #fff; border-radius: 10px; width: 36px; height: 36px; font-size: 16px; cursor: pointer; }
-    #bolillero-container.bp-full .bp-stage { transform: scale(.86); transform-origin: top center; margin-bottom: -46px; }
+    #bolillero-container.bp-full .bp-stage { transform: scale(.86); transform-origin: top center; margin-bottom: -50px; }
     #bolillero-container.bp-full .sorteo-grid { grid-template-columns: minmax(0,1fr) minmax(0,1fr) !important; gap: 10px; }
     #bolillero-container.bp-full .sorteo-grid > div { min-width: 0; }
     #bolillero-container.bp-full .equipo-row > span:first-child { min-width: 0; flex: 1; overflow: hidden; }
@@ -273,10 +273,36 @@
     #bolillero-container.bp-full .sorteo-col-titulo { font-size: 12px; position: sticky; top: 0; z-index: 1; }
     #bolillero-container.bp-full #bol-botones { position: sticky; bottom: 0; padding: 12px 0 6px; background: linear-gradient(transparent, #060a17 35%); justify-content: center; }
     body.bp-bloqueo { overflow: hidden; }
+    /* ── EL PRESIDENTE (personaje que saca las bolillas) ── */
+    .bp-presi { position: absolute; left: calc(50% - 166px); top: 40px; width: 110px; z-index: 3; transform-origin: 50% 100%; animation: bp-respira 3.2s ease-in-out infinite; }
+    .bp-presi svg { width: 110px; height: 230px; display: block; filter: drop-shadow(0 6px 10px rgba(0,0,0,.45)); }
+    .bp-presi .bp-cabeza { transform-origin: 60px 80px; transition: transform .3s; }
+    .bp-presi .bp-ojos { transform-origin: 60px 51px; animation: bp-parpadeo 4.2s infinite; }
+    .bp-presi .bp-boca-presi { transform-origin: 60px 75px; }
+    .bp-presi.habla .bp-boca-presi { animation: bp-hablar .16s ease-in-out infinite alternate; }
+    .bp-presi.habla .bp-cabeza { animation: bp-cabecea .5s ease-in-out infinite alternate; }
+    .bp-presi.mira .bp-cabeza { transform: rotate(8deg) translateX(2px); }
+    .bp-presi.festeja { animation: bp-salta .45s ease-in-out 3 alternate; }
+    .bp-cartel { position: absolute; left: 50%; bottom: -2px; transform: translateX(-50%); font-size: 8px; font-weight: 900; letter-spacing: 1.5px; color: #1a1a2e; background: #f5c542; padding: 2px 6px; border-radius: 4px; white-space: nowrap; }
+    @keyframes bp-respira { 0%,100% { transform: scaleY(1); } 50% { transform: scaleY(1.012); } }
+    @keyframes bp-parpadeo { 0%, 94%, 100% { transform: scaleY(1); } 96% { transform: scaleY(.1); } }
+    @keyframes bp-hablar { from { transform: scaleY(.6); } to { transform: scaleY(2.6) scaleX(.85); } }
+    @keyframes bp-cabecea { from { transform: rotate(-3deg); } to { transform: rotate(4deg); } }
+    @keyframes bp-salta { to { transform: translateY(-10px); } }
+    .bp-mano.bp-brazo { left: calc(50% - 78px); top: 114px; width: 96px; height: 28px; margin-left: 0; transform-origin: 0 50%;
+      transform: rotate(78deg); transition: transform .62s cubic-bezier(.45,.05,.35,1); z-index: 7; filter: drop-shadow(0 4px 6px rgba(0,0,0,.4)); }
+    .bp-mano.bp-brazo svg { width: 96px; height: 28px; }
+    .bp-mano.bp-brazo.baja { transform: rotate(17deg); }
+    .bp-mano.bp-brazo.sube { transform: rotate(-58deg); transition-duration: .7s; transition-timing-function: cubic-bezier(.2,.9,.3,1.25); }
+    .bp-mano.bp-brazo .bp-tomada { left: auto; right: -26px; bottom: auto; top: -9px; margin: 0; }
+    .bp-burbuja { position: absolute; left: calc(50% + 10px); top: 6px; max-width: 148px; z-index: 8; background: #fff; color: #1a1a2e; font-weight: 900; font-size: 14px; line-height: 1.15;
+      padding: 8px 12px; border-radius: 14px; box-shadow: 0 6px 16px rgba(0,0,0,.4); opacity: 0; transform: scale(.4); transform-origin: 0% 100%; transition: .25s cubic-bezier(.34,1.56,.64,1); pointer-events: none; }
+    .bp-burbuja::after { content: ''; position: absolute; left: -7px; bottom: 8px; border: 8px solid transparent; border-right-color: #fff; border-left: 0; }
+    .bp-burbuja.si { opacity: 1; transform: scale(1); }
     /* ── BOLILLERO PRO ── */
-    .bp-stage { position: relative; height: 330px; max-width: 320px; margin: 0 auto; overflow: hidden; }
+    .bp-stage { position: relative; height: 360px; max-width: 320px; margin: 0 auto; overflow: hidden; }
     .bp-drum {
-      position: absolute; left: 50%; top: 122px; width: 176px; height: 176px; margin-left: -88px;
+      position: absolute; left: 50%; top: 150px; width: 176px; height: 176px; margin-left: -88px;
       border-radius: 50%;
       background: radial-gradient(circle at 50% 55%, rgba(80,140,230,0.10) 0%, rgba(40,90,180,0.28) 60%, rgba(20,50,120,0.55) 100%);
       border: 4px solid #c9962b;
@@ -291,15 +317,15 @@
     .bp-drum::after { /* aro de alambre */
       content: ''; position: absolute; inset: 10px; border-radius: 50%; border: 1px dashed rgba(201,150,43,.35); z-index: 4;
     }
-    .bp-boca { position: absolute; left: 50%; top: 116px; width: 58px; height: 16px; margin-left: -29px; border-radius: 50%;
+    .bp-boca { position: absolute; left: 50%; top: 144px; width: 58px; height: 16px; margin-left: -29px; border-radius: 50%;
       background: radial-gradient(ellipse at 50% 60%, #05080f 40%, #c9962b 42%, #8a6418 70%); z-index: 3; }
-    .bp-eje { position: absolute; top: 206px; width: 26px; height: 8px; background: linear-gradient(#e2b34a,#8a6418); border-radius: 3px; z-index: 1; }
+    .bp-eje { position: absolute; top: 234px; width: 26px; height: 8px; background: linear-gradient(#e2b34a,#8a6418); border-radius: 3px; z-index: 1; }
     .bp-eje.izq { left: calc(50% - 112px); } .bp-eje.der { left: calc(50% + 86px); }
-    .bp-manivela { position: absolute; top: 192px; left: calc(50% + 108px); width: 8px; height: 34px; background: linear-gradient(90deg,#e2b34a,#8a6418); border-radius: 4px; transform-origin: 50% 85%; z-index: 1; }
+    .bp-manivela { position: absolute; top: 220px; left: calc(50% + 108px); width: 8px; height: 34px; background: linear-gradient(90deg,#e2b34a,#8a6418); border-radius: 4px; transform-origin: 50% 85%; z-index: 1; }
     .bp-manivela::after { content: ''; position: absolute; top: -8px; left: -4px; width: 16px; height: 12px; border-radius: 6px; background: #5a1d1d; }
-    .bp-pata { position: absolute; top: 280px; width: 10px; height: 46px; background: linear-gradient(90deg,#e2b34a,#8a6418); border-radius: 3px; z-index: 1; }
+    .bp-pata { position: absolute; top: 308px; width: 10px; height: 46px; background: linear-gradient(90deg,#e2b34a,#8a6418); border-radius: 3px; z-index: 1; }
     .bp-pata.izq { left: calc(50% - 70px); transform: rotate(14deg); } .bp-pata.der { left: calc(50% + 60px); transform: rotate(-14deg); }
-    .bp-base { position: absolute; top: 318px; left: 50%; width: 190px; height: 10px; margin-left: -95px; border-radius: 6px; background: linear-gradient(#3a2a10,#1a1206); }
+    .bp-base { position: absolute; top: 346px; left: 50%; width: 190px; height: 10px; margin-left: -95px; border-radius: 6px; background: linear-gradient(#3a2a10,#1a1206); }
     .bp-mix { position: absolute; inset: 0; animation: bp-rodar 6s linear infinite; }
     .bp-drum.girando .bp-mix { animation-duration: .9s; }
     .bp-drum.girando ~ .bp-manivela { animation: bp-crank .6s linear infinite; }
@@ -3323,20 +3349,55 @@ function renderSorteo() {
             <div class="bp-drum" id="bolillero-esfera"><div class="bp-mix"><div class="bp-b" style="--c:#4a9eff;left:94px;top:89px;--x:10px;--y:-29px;--d:0.84s"></div><div class="bp-b" style="--c:#ff6b6b;left:36px;top:116px;--x:34px;--y:-67px;--d:1.53s"></div><div class="bp-b" style="--c:#f5a623;left:66px;top:74px;--x:-29px;--y:-43px;--d:1.13s"></div><div class="bp-b" style="--c:#ffffff;left:73px;top:81px;--x:30px;--y:-43px;--d:0.85s"></div><div class="bp-b" style="--c:#2ecc71;left:43px;top:98px;--x:40px;--y:-30px;--d:1.27s"></div><div class="bp-b" style="--c:#4a9eff;left:27px;top:143px;--x:34px;--y:-45px;--d:0.84s"></div><div class="bp-b" style="--c:#ff6b6b;left:68px;top:75px;--x:31px;--y:-62px;--d:1.03s"></div><div class="bp-b" style="--c:#f5a623;left:48px;top:139px;--x:-25px;--y:-34px;--d:1.05s"></div><div class="bp-b" style="--c:#ffffff;left:58px;top:83px;--x:34px;--y:-34px;--d:1.31s"></div><div class="bp-b" style="--c:#4a9eff;left:107px;top:82px;--x:30px;--y:-25px;--d:0.85s"></div><div class="bp-b" style="--c:#ff6b6b;left:27px;top:96px;--x:23px;--y:-27px;--d:1.23s"></div><div class="bp-b" style="--c:#f5a623;left:92px;top:129px;--x:34px;--y:-41px;--d:1.09s"></div><div class="bp-b" style="--c:#2ecc71;left:75px;top:93px;--x:-9px;--y:-65px;--d:1.26s"></div><div class="bp-b" style="--c:#ffffff;left:138px;top:113px;--x:17px;--y:-52px;--d:1.29s"></div><div class="bp-b" style="--c:#4a9eff;left:30px;top:85px;--x:25px;--y:-44px;--d:0.93s"></div><div class="bp-b" style="--c:#ff6b6b;left:99px;top:89px;--x:22px;--y:-44px;--d:0.83s"></div></div></div>
             <div class="bp-manivela"></div>
             <div class="bp-boca"></div>
-            <div class="bp-mano" id="bp-mano">
-              <svg viewBox="0 0 100 170" aria-hidden="true">
-                <rect x="31" y="0" width="38" height="78" rx="7" fill="#1d2b4f"/>
-                <rect x="31" y="0" width="38" height="78" rx="7" fill="url(#bpManga)"/>
-                <rect x="28" y="70" width="44" height="14" rx="4" fill="#f2f2f2"/>
-                <circle cx="62" cy="77" r="2.6" fill="#f5a623"/>
-                <path d="M30 84 C27 100 28 112 31 120 L69 120 C72 112 73 100 70 84 Z" fill="#e3ad85"/>
-                <path d="M24 98 C17 108 18 122 26 132 C29 136 34 134 33 129 C30 121 30 112 33 104 Z" fill="#d79c73"/>
-                <rect x="33" y="112" width="9" height="40" rx="4.5" fill="#e3ad85"/>
-                <rect x="43" y="114" width="9" height="44" rx="4.5" fill="#e8b48d"/>
-                <rect x="53" y="114" width="9" height="43" rx="4.5" fill="#e3ad85"/>
-                <rect x="63" y="111" width="8" height="37" rx="4" fill="#d79c73"/>
-                <path d="M37 150 h1 M47 155 h1 M57 154 h1" stroke="#c48a63" stroke-width="2" stroke-linecap="round"/>
-                <defs><linearGradient id="bpManga" x1="0" x2="1"><stop offset="0" stop-color="#000" stop-opacity=".35"/><stop offset=".5" stop-color="#fff" stop-opacity=".08"/><stop offset="1" stop-color="#000" stop-opacity=".35"/></linearGradient></defs>
+            <div class="bp-presi" id="bp-presi">
+              <svg viewBox="0 0 110 230" aria-hidden="true">
+                <g class="bp-cuerpo">
+                  <path d="M22 92 C12 120 12 160 16 190 L30 190 C30 160 30 125 34 100Z" fill="#1c2747"/>
+                  <rect x="12" y="186" width="20" height="8" rx="3" fill="#f2f2f2"/>
+                  <circle cx="22" cy="200" r="8" fill="#f1c7a1"/>
+                  <path d="M20 92 Q60 72 100 92 L104 230 L16 230 Z" fill="#1f2b52"/>
+                  <path d="M20 92 Q60 72 100 92 L104 230 L16 230 Z" fill="url(#bpTraje)"/>
+                  <path d="M48 84 L60 122 L72 84 Z" fill="#fff"/>
+                  <path d="M57 88 L63 88 L66 96 L62 128 L58 128 L54 96Z" fill="#c8102e"/>
+                  <path d="M57 88 L63 88 L62 93 L58 93Z" fill="#a00d24"/>
+                  <path d="M45 83 L60 124 L40 102 Z" fill="#16203f"/><path d="M75 83 L60 124 L80 102 Z" fill="#16203f"/>
+                  <path d="M44 86 L60 140 L76 86" fill="none" stroke="#f5c542" stroke-width="3"/>
+                  <circle cx="60" cy="147" r="9.5" fill="#f5c542" stroke="#c8901c" stroke-width="2"/>
+                  <path d="M60 141.5l1.7 3.4 3.7.5-2.7 2.6.6 3.7-3.3-1.7-3.3 1.7.6-3.7-2.7-2.6 3.7-.5z" fill="#c8901c"/>
+                  <path d="M80 112 l13 -3 l-2 9 z" fill="#f5c542"/>
+                  <circle cx="60" cy="170" r="2" fill="#0f1730"/><circle cx="60" cy="190" r="2" fill="#0f1730"/>
+                </g>
+                <g class="bp-cabeza">
+                  <rect x="52" y="74" width="16" height="12" fill="#e9b48e"/>
+                  <ellipse cx="34" cy="52" rx="5" ry="8" fill="#e9b48e"/><ellipse cx="86" cy="52" rx="5" ry="8" fill="#e9b48e"/>
+                  <ellipse cx="60" cy="52" rx="26" ry="30" fill="#f1c7a1"/>
+                  <path d="M33 50 C29 22 48 12 62 14 C80 14 92 26 87 50 C85 38 77 31 66 31 C55 31 43 35 37 50 Z" fill="#d9dde3"/>
+                  <path d="M40 24 C50 18 66 17 78 22" stroke="#eef0f3" stroke-width="3" fill="none" stroke-linecap="round"/>
+                  <path d="M42 40 q7-6 15-1" stroke="#b9c0c8" stroke-width="4" fill="none" stroke-linecap="round"/>
+                  <path d="M63 39 q8-5 15 1" stroke="#b9c0c8" stroke-width="4" fill="none" stroke-linecap="round"/>
+                  <g class="bp-ojos"><ellipse cx="50" cy="51" rx="2.4" ry="3" fill="#222"/><ellipse cx="70" cy="51" rx="2.4" ry="3" fill="#222"/></g>
+                  <circle cx="50" cy="50" r="8" fill="rgba(255,255,255,.18)" stroke="#2b2b2b" stroke-width="2"/>
+                  <circle cx="70" cy="50" r="8" fill="rgba(255,255,255,.18)" stroke="#2b2b2b" stroke-width="2"/>
+                  <path d="M58 50 h4 M42 49 l-7 -2 M78 49 l7 -2" stroke="#2b2b2b" stroke-width="2"/>
+                  <ellipse cx="60" cy="61" rx="4.5" ry="5.5" fill="#e3a77f"/>
+                  <circle cx="41" cy="63" r="4" fill="#f29b9b" opacity=".45"/><circle cx="79" cy="63" r="4" fill="#f29b9b" opacity=".45"/>
+                  <ellipse class="bp-boca-presi" cx="60" cy="75" rx="6" ry="2.4" fill="#6e2323"/>
+                  <path d="M43 69 C47 61 55 63 60 67 C65 63 73 61 77 69 C73 74 66 71 60 70 C54 71 47 74 43 69Z" fill="#cfd4da"/>
+                </g>
+                <defs><linearGradient id="bpTraje" x1="0" x2="1"><stop offset="0" stop-color="#000" stop-opacity=".25"/><stop offset=".5" stop-color="#fff" stop-opacity=".06"/><stop offset="1" stop-color="#000" stop-opacity=".25"/></linearGradient></defs>
+              </svg>
+              <div class="bp-cartel">EL PRESIDENTE</div>
+            </div>
+            <div class="bp-burbuja" id="bp-burbuja"></div>
+            <div class="bp-mano bp-brazo" id="bp-mano">
+              <svg viewBox="0 0 96 28" aria-hidden="true">
+                <rect x="0" y="3" width="66" height="22" rx="10" fill="#1f2b52"/>
+                <rect x="0" y="3" width="66" height="9" rx="4" fill="#fff" opacity=".06"/>
+                <rect x="60" y="2" width="10" height="24" rx="3" fill="#f2f2f2"/>
+                <circle cx="65" cy="8" r="1.8" fill="#f5c542"/>
+                <ellipse cx="80" cy="14" rx="13" ry="11" fill="#f1c7a1"/>
+                <path d="M83 3 q11 2 12 11 q-1 9 -12 11" fill="#e9b48e"/>
+                <ellipse cx="76" cy="4" rx="5.5" ry="3.3" fill="#e9b48e"/>
               </svg>
               <div class="bp-tomada" id="bp-tomada"><div class="bp-esc" id="bp-tomada-esc"></div></div>
             </div>
@@ -3743,6 +3804,9 @@ function animarBolillero(bolillas, idx, animId = sorteoAnimId) {
   if (idx >= bolillas.length) {
     esfera.classList.remove('girando')
     document.getElementById('bp-mano')?.classList.remove('baja', 'sube')
+    const presiF = document.getElementById('bp-presi'), burF = document.getElementById('bp-burbuja')
+    if (presiF) { presiF.classList.remove('mira'); presiF.classList.add('habla', 'festeja'); setTimeout(() => presiF.classList.remove('habla'), 1800) }
+    if (burF) { burF.innerHTML = '¡Sorteo terminado! 🏆'; burF.classList.add('si') }
     const rv = document.getElementById('bp-revela'); if (rv) rv.innerHTML = `<div class="bolillero-texto" id="bol-texto">¡Listo!</div>`
     sfx.tribuna(2.5, .25)
     const textoFin = document.getElementById('bol-texto'); if (textoFin) textoFin.textContent = '¡Listo!'
@@ -3785,7 +3849,10 @@ function animarBolillero(bolillas, idx, animId = sorteoAnimId) {
   duenoEl.innerHTML = ''
   if (revela) revela.innerHTML = `<div class="bolillero-texto" id="bol-texto">🎲 Sacando bolilla…</div>`
   if (tomada) tomada.classList.remove('si')
-  if (mano) { mano.classList.remove('sube'); mano.classList.add('baja') }   // la mano entra al bolillero
+  if (mano) { mano.classList.remove('sube'); mano.classList.add('baja') }   // el presidente mete la mano al bolillero
+  const presi = document.getElementById('bp-presi'), burbuja = document.getElementById('bp-burbuja')
+  if (presi) { presi.classList.remove('habla', 'festeja'); presi.classList.add('mira') }
+  if (burbuja) burbuja.classList.remove('si')
   sfx.rattle(700)
 
   setTimeout(() => {
@@ -3801,6 +3868,12 @@ function animarBolillero(bolillas, idx, animId = sorteoAnimId) {
     }
     if (mano) { mano.classList.remove('baja'); mano.classList.add('sube') }
     sfx.pop()
+    if (presi) { presi.classList.remove('mira'); presi.classList.add('habla'); setTimeout(() => presi.classList.remove('habla'), 1500) }
+    if (burbuja) {
+      const frases = ['¡Y sale…', '¡Atención!', '¡Bolilla para', '¡Le toca a', '¡Qué equipazo!']
+      burbuja.innerHTML = `<div style="font-size:10px;color:#666;font-weight:700;">${frases[idx % frases.length]}${idx % frases.length === 2 || idx % frases.length === 3 ? ` ${club.dueno === 'santi' ? 'Santi' : 'Luciano'}!` : ''}</div>${club.nombre}`
+      burbuja.classList.add('si')
+    }
     numEl.textContent = `${idx + 1} / ${bolillas.length}`
     if (revela) revela.innerHTML = `<div class="bp-card" style="--c:${colorD}">${esc ? `<img src="${esc}" alt="">` : ''}<div><div class="bp-nom" style="color:${colorD}">${club.nombre}</div><div class="bp-liga">${club.liga}</div></div></div><div class="bolillero-texto" id="bol-texto" style="display:none">${club.nombre}</div>`
     duenoEl.innerHTML = `<span class="badge-${club.dueno}" style="font-size:13px;">${club.dueno === 'santi' ? 'Santi' : 'Luciano'}</span>`

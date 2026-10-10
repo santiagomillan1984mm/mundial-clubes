@@ -253,6 +253,26 @@
     .text-gris { color: var(--gris); font-size: 13px; }
 
 
+    /* ── BOLILLERO A PANTALLA COMPLETA ── */
+    #bolillero-container.bp-full { position: fixed; inset: 0; z-index: 9000; overflow-y: auto; -webkit-overflow-scrolling: touch;
+      background: radial-gradient(ellipse at 50% 0%, #22346a 0%, #0d1530 55%, #060a17 100%); padding: env(safe-area-inset-top) 0 env(safe-area-inset-bottom); animation: bp-fondo .3s ease-out; }
+    #bolillero-container.bp-full > .card { background: transparent; border: none; box-shadow: none; max-width: 640px; margin: 0 auto; padding: 8px 14px 20px; }
+    #bolillero-container.bp-full .bp-full-top { display: flex; }
+    .bp-full-top { display: none; align-items: center; justify-content: space-between; padding: 10px 2px 0; }
+    .bp-full-top .bp-full-tit { font-size: 15px; font-weight: 900; letter-spacing: 2px; text-transform: uppercase; color: var(--dorado2); display: flex; align-items: center; gap: 8px; }
+    .bp-full-top button { background: rgba(255,255,255,.08); border: 1px solid rgba(255,255,255,.15); color: #fff; border-radius: 10px; width: 36px; height: 36px; font-size: 16px; cursor: pointer; }
+    #bolillero-container.bp-full .bp-stage { transform: scale(.86); transform-origin: top center; margin-bottom: -46px; }
+    #bolillero-container.bp-full .sorteo-grid { grid-template-columns: minmax(0,1fr) minmax(0,1fr) !important; gap: 10px; }
+    #bolillero-container.bp-full .sorteo-grid > div { min-width: 0; }
+    #bolillero-container.bp-full .equipo-row > span:first-child { min-width: 0; flex: 1; overflow: hidden; }
+    #bolillero-container.bp-full .lapiz-reemplazo { flex-shrink: 0; padding: 2px !important; }
+    #bolillero-container.bp-full .equipo-row { padding: 5px 0; font-size: 12px; flex-wrap: nowrap; }
+    #bolillero-container.bp-full .equipo-row .equipo-nombre { font-size: 12.5px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    #bolillero-container.bp-full .equipo-row .equipo-liga { display: none; }
+    #bolillero-container.bp-full .equipo-row img { width: 18px !important; height: 18px !important; }
+    #bolillero-container.bp-full .sorteo-col-titulo { font-size: 12px; position: sticky; top: 0; z-index: 1; }
+    #bolillero-container.bp-full #bol-botones { position: sticky; bottom: 0; padding: 12px 0 6px; background: linear-gradient(transparent, #060a17 35%); justify-content: center; }
+    body.bp-bloqueo { overflow: hidden; }
     /* ── BOLILLERO PRO ── */
     .bp-stage { position: relative; height: 330px; max-width: 320px; margin: 0 auto; overflow: hidden; }
     .bp-drum {
@@ -3203,6 +3223,7 @@ async function guardarArgentinos() {
 // SORTEO
 // ══════════════════════════════════════════════
 function renderSorteo() {
+  document.body.classList.remove('bp-bloqueo')
   const cont = document.getElementById('sorteo-contenido')
   if (!estado) return
 
@@ -3291,6 +3312,7 @@ function renderSorteo() {
     </div>
     <div id="bolillero-container" style="display:none;">
       <div class="card">
+        <div class="bp-full-top"><div class="bp-full-tit"><span class="comp-ic" data-comp="mundial"></span>Sorteo Mundial de Clubes</div><button onclick="salirBolilleroFull()" title="Salir de pantalla completa">✕</button></div>
         <div class="bolillero-wrap">
           <div class="bp-stage">
             <div class="bp-eje izq"></div><div class="bp-eje der"></div>
@@ -3333,6 +3355,7 @@ function renderSorteo() {
         <div id="bol-botones" class="flex-gap mt" style="display:none;">
           <button class="btn btn-gold" onclick="confirmarSorteo()">✅ Confirmar sorteo</button>
           <button class="btn btn-secondary" onclick="hacerSorteo()">🔀 Sortear de nuevo</button>
+          <button class="btn btn-secondary" onclick="salirBolilleroFull()">⬇️ Ver en la página</button>
         </div>
       </div>
     </div>
@@ -3349,6 +3372,10 @@ function elegirPorLiga(lista) {
   const liga = ligas[Math.floor(Math.random() * ligas.length)]
   const eqs = porLiga[liga]
   return eqs[Math.floor(Math.random() * eqs.length)]
+}
+function salirBolilleroFull() {
+  document.getElementById('bolillero-container')?.classList.remove('bp-full')
+  document.body.classList.remove('bp-bloqueo')
 }
 function hacerSorteo() {
   if (poolClubes.length < 10) { toast('Pool de clubes no cargado', true); return }
@@ -3393,7 +3420,11 @@ function hacerSorteo() {
   estado.sorteo.confirmado = false
 
   // Mostrar bolillero
-  document.getElementById('bolillero-container').style.display = 'block'
+  const contBol = document.getElementById('bolillero-container')
+  contBol.style.display = 'block'
+  contBol.classList.add('bp-full'); contBol.scrollTop = 0
+  document.body.classList.add('bp-bloqueo')
+  pintarCompLogos()
   document.getElementById('bol-botones').style.display = 'none'
   document.getElementById('col-santi').innerHTML = ''
   document.getElementById('col-luciano').innerHTML = ''
@@ -3802,7 +3833,7 @@ function animarBolillero(bolillas, idx, animId = sorteoAnimId) {
       div.innerHTML = `<span style="display:flex;align-items:center;gap:8px;min-width:0;">${escudoNombre(club.nombre, 20)}<span class="equipo-nombre">${club.nombre}</span></span><span class="equipo-liga">${club.liga}</span>`
       col.appendChild(div)
       cntEl.textContent = col.children.length
-      div.scrollIntoView({ behavior: 'smooth', block: 'nearest' })
+      if (!document.getElementById('bolillero-container')?.classList.contains('bp-full')) div.scrollIntoView({ behavior: 'smooth', block: 'nearest' })
     }, 2150)
 
     setTimeout(() => {
@@ -3813,6 +3844,7 @@ function animarBolillero(bolillas, idx, animId = sorteoAnimId) {
 }
 
 async function confirmarSorteo() {
+  salirBolilleroFull()
   estado.sorteo.confirmado = true
   await guardarEstado()
   renderTodo()

@@ -1,6 +1,6 @@
 {
   "version": "1.0",
-  "ultimaActualizacion": "2026-10-10T22:17:30.604Z",
+  "ultimaActualizacion": "2026-10-10T22:17:45.222Z",
   "equiposArgentinos": [
     {
       "id": "arg1",
@@ -44,154 +44,9 @@
     }
   ],
   "sorteo": {
-    "realizado": true,
-    "confirmado": true,
-    "internacionales": [
-      {
-        "id": "int_s1",
-        "nombre": "Pogoń Szczecin",
-        "liga": "Polonia - Ekstraklasa",
-        "dueno": "santi"
-      },
-      {
-        "id": "int_s2",
-        "nombre": "Dinamo Zagreb",
-        "liga": "Resto del Mundo",
-        "dueno": "santi"
-      },
-      {
-        "id": "int_s3",
-        "nombre": "Stockport County",
-        "liga": "Inglaterra - League One",
-        "dueno": "santi"
-      },
-      {
-        "id": "int_s4",
-        "nombre": "Wycombe Wanderers",
-        "liga": "Inglaterra - League One",
-        "dueno": "santi"
-      },
-      {
-        "id": "int_s5",
-        "nombre": "Seongnam FC",
-        "liga": "Corea del Sur - K League 2",
-        "dueno": "santi"
-      },
-      {
-        "id": "int_s6",
-        "nombre": "Gwangju FC",
-        "liga": "Corea del Sur - K League 1",
-        "dueno": "santi"
-      },
-      {
-        "id": "int_s7",
-        "nombre": "SK Beveren",
-        "liga": "Bélgica - Pro League",
-        "dueno": "santi"
-      },
-      {
-        "id": "int_s8",
-        "nombre": "Inter Miami CF",
-        "liga": "Estados Unidos - MLS",
-        "dueno": "santi"
-      },
-      {
-        "id": "int_s9",
-        "nombre": "Liaoning Tieren",
-        "liga": "China - Super League",
-        "dueno": "santi"
-      },
-      {
-        "id": "int_s10",
-        "nombre": "Stoke City",
-        "liga": "Inglaterra - Championship",
-        "dueno": "santi"
-      },
-      {
-        "id": "int_s11",
-        "nombre": "Odisha FC",
-        "liga": "India - ISL",
-        "dueno": "santi"
-      },
-      {
-        "id": "int_s12",
-        "nombre": "Paris FC",
-        "liga": "Francia - Ligue 1",
-        "dueno": "santi"
-      },
-      {
-        "id": "int_l1",
-        "nombre": "Sevilla FC",
-        "liga": "España - LaLiga",
-        "dueno": "luciano"
-      },
-      {
-        "id": "int_l2",
-        "nombre": "TSG Hoffenheim",
-        "liga": "Alemania - Bundesliga",
-        "dueno": "luciano"
-      },
-      {
-        "id": "int_l3",
-        "nombre": "Südtirol",
-        "liga": "Italia - Serie B",
-        "dueno": "luciano"
-      },
-      {
-        "id": "int_l4",
-        "nombre": "FC St. Pauli",
-        "liga": "Alemania - 2. Bundesliga",
-        "dueno": "luciano"
-      },
-      {
-        "id": "int_l5",
-        "nombre": "Elche CF",
-        "liga": "España - LaLiga",
-        "dueno": "luciano"
-      },
-      {
-        "id": "int_l6",
-        "nombre": "Frosinone",
-        "liga": "Italia - Serie A",
-        "dueno": "luciano"
-      },
-      {
-        "id": "int_l7",
-        "nombre": "Viktoria Plzeň",
-        "liga": "Resto del Mundo",
-        "dueno": "luciano"
-      },
-      {
-        "id": "int_l8",
-        "nombre": "Atlético de Madrid",
-        "liga": "España - LaLiga",
-        "dueno": "luciano"
-      },
-      {
-        "id": "int_l9",
-        "nombre": "SCR Altach",
-        "liga": "Austria - Bundesliga",
-        "dueno": "luciano"
-      },
-      {
-        "id": "int_l10",
-        "nombre": "FK Austria Wien",
-        "liga": "Austria - Bundesliga",
-        "dueno": "luciano"
-      },
-      {
-        "id": "int_l11",
-        "nombre": "Derby County",
-        "liga": "Inglaterra - Championship",
-        "dueno": "luciano"
-      },
-      {
-        "id": "int_l12",
-        "nombre": "FC Annecy",
-        "liga": "Francia - Ligue 2",
-        "dueno": "luciano"
-      }
-    ]
+    "realizado": false,
+    "confirmado": false,
+    "internacionales": []
   },
   "bracket": {
     "dieciseisavos": [],

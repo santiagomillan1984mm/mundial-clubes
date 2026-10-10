@@ -1,5 +1,5 @@
 {
-  "_nota": "Pool del sorteo del Mundial de Clubes: todos los clubes masculinos de EA FC 27 excepto la Liga Profesional Argentina (ya está en AFA2026) y equipos especiales (Soccer Aid, Classic XI, etc.). Fuente: FIFPlay, octubre 2026.",
+  "_nota": "Pool del sorteo del Mundial de Clubes: todos los clubes masculinos de EA FC 27 excepto la Liga Profesional Argentina (ya está en AFA2026) y equipos especiales (Soccer Aid, Classic XI, etc.). Fuente: FIFPlay, octubre 2026. Equipos sin licencia en el juego llevan entre paréntesis el nombre con el que aparecen en FC 27.",
   "ligas": {
     "Inglaterra - Premier League": [
       "Arsenal",
@@ -164,10 +164,10 @@
       "Torino",
       "Udinese",
       "Venezia",
-      "Atalanta",
-      "Inter de Milán",
-      "AC Milán",
-      "Monza"
+      "Atalanta (Bergamo Calcio)",
+      "Inter de Milán (Lombardia FC)",
+      "AC Milán (Milano FC)",
+      "Monza (Brianza Calcio)"
     ],
     "Italia - Serie B": [
       "Ascoli",
@@ -543,7 +543,7 @@
       "Guadalajara",
       "FC Juárez",
       "León",
-      "Mazatlán FC",
+      "Atlante",
       "Monterrey",
       "Necaxa",
       "Pachuca",

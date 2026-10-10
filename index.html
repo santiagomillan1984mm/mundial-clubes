@@ -1300,7 +1300,7 @@ function limpiarFondoSiHace(url) {
 }
 async function buscarLogoIntl(nombre) {
   const u = 'https://en.wikipedia.org/w/api.php?action=query&format=json&origin=*&generator=search&gsrnamespace=0&gsrlimit=3' +
-    '&gsrsearch=' + encodeURIComponent(nombre + ' football club') + '&prop=pageimages&piprop=thumbnail&pithumbsize=200&pilicense=any'
+    '&gsrsearch=' + encodeURIComponent(nombre.replace(/\s*\(.*?\)\s*/g, ' ').trim() + ' football club') + '&prop=pageimages&piprop=thumbnail&pithumbsize=200&pilicense=any'
   const r = await fetch(u); if (!r.ok) return null
   const d = await r.json()
   const pages = Object.values(d.query?.pages || {}).sort((a, b) => a.index - b.index).filter(p => p.thumbnail)
@@ -3332,6 +3332,7 @@ function renderSorteo() {
     cont.innerHTML = `
       <div class="card">
         <div class="card-titulo">✅ Sorteo confirmado</div>
+        <p class="text-gris" style="margin:-4px 0 12px;">👆 Toca un equipo para verlo en grande y buscarlo en FC 27.</p>
         <div class="sorteo-grid">
           <div>
             <div style="font-weight:700; margin-bottom:10px;" class="badge-santi">SANTI (${santi.length})</div>
@@ -3358,7 +3359,7 @@ function renderSorteo() {
     cont.innerHTML = `
       <div class="card">
         <div class="card-titulo">🎲 Sorteo realizado — pendiente de confirmación</div>
-        ${esAdmin ? `<p class="text-gris" style="margin:-4px 0 12px;">¿Algún equipo no está en FC 27? Toca ✏️ para resortear solo ese.</p>` : ''}
+        <p class="text-gris" style="margin:-4px 0 12px;">👆 Toca un equipo para verlo en grande y buscarlo en FC 27.${esAdmin ? ' ¿Alguno no está en el juego? Toca ✏️ para resortear solo ese.' : ''}</p>
         <div class="sorteo-grid">
           <div>
             <div style="font-weight:700; margin-bottom:10px;" class="badge-santi">SANTI (${santi.length})</div>
@@ -3899,7 +3900,7 @@ function animarBolillero(bolillas, idx, animId = sorteoAnimId) {
     const presiF = document.getElementById('bp-presi'), burF = document.getElementById('bp-burbuja')
     if (presiF) { presiF.classList.remove('mira'); presiF.classList.add('habla', 'festeja'); setTimeout(() => presiF.classList.remove('habla'), 1800) }
     if (burF) { burF.innerHTML = '¡Sorteo terminado! 🏆'; burF.classList.add('si') }
-    const rv = document.getElementById('bp-revela'); if (rv) rv.innerHTML = `<div class="bolillero-texto" id="bol-texto">¡Listo!</div>`
+    const rv = document.getElementById('bp-revela'); if (rv) rv.innerHTML = `<div class="bolillero-texto" id="bol-texto">¡Listo!</div><div class="text-gris" style="margin-top:4px;">👆 Toca un equipo para verlo en grande y buscarlo en FC 27</div>`
     sfx.tribuna(2.5, .25)
     const textoFin = document.getElementById('bol-texto'); if (textoFin) textoFin.textContent = '¡Listo!'
     numEl.textContent = ''

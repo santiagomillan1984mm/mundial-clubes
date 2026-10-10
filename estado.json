@@ -1,6 +1,6 @@
 {
   "version": "1.0",
-  "ultimaActualizacion": "2026-10-10T22:20:56.000Z",
+  "ultimaActualizacion": "2026-10-10T22:23:13.000Z",
   "equiposArgentinos": [
     {
       "id": "arg1",
@@ -1164,5 +1164,393 @@
     "legs": [],
     "equipos": null,
     "registrado": false
-  }
+  },
+  "archivo": [
+    {
+      "id": "mundial_2026_anterior",
+      "competencia": "mundial",
+      "nombre": "Mundial de Clubes 2026 (temporada anterior)",
+      "campeon": "LOSC Lille",
+      "dueno": "luciano",
+      "partidos": [
+        {
+          "ronda": "dieciseisavos",
+          "l": {
+            "nombre": "Korona Kielce",
+            "dueno": "santi"
+          },
+          "v": {
+            "nombre": "Talleres",
+            "dueno": "luciano"
+          },
+          "gl": 0,
+          "gv": 8
+        },
+        {
+          "ronda": "dieciseisavos",
+          "l": {
+            "nombre": "Olympique Lyonnais",
+            "dueno": "santi"
+          },
+          "v": {
+            "nombre": "Stevenage",
+            "dueno": "luciano"
+          },
+          "gl": 4,
+          "gv": 5
+        },
+        {
+          "ronda": "dieciseisavos",
+          "l": {
+            "nombre": "Unión de Santa Fe",
+            "dueno": "santi"
+          },
+          "v": {
+            "nombre": "Randers FC",
+            "dueno": "luciano"
+          },
+          "gl": 3,
+          "gv": 2
+        },
+        {
+          "ronda": "dieciseisavos",
+          "l": {
+            "nombre": "Racing Club",
+            "dueno": "luciano"
+          },
+          "v": {
+            "nombre": "İstanbul Başakşehir",
+            "dueno": "santi"
+          },
+          "gl": 5,
+          "gv": 2
+        },
+        {
+          "ronda": "dieciseisavos",
+          "l": {
+            "nombre": "Rio Ave",
+            "dueno": "santi"
+          },
+          "v": {
+            "nombre": "Samsunspor",
+            "dueno": "luciano"
+          },
+          "gl": 5,
+          "gv": 6
+        },
+        {
+          "ronda": "dieciseisavos",
+          "l": {
+            "nombre": "Toronto FC",
+            "dueno": "santi"
+          },
+          "v": {
+            "nombre": "Nottingham Forest",
+            "dueno": "luciano"
+          },
+          "gl": 6,
+          "gv": 5
+        },
+        {
+          "ronda": "dieciseisavos",
+          "l": {
+            "nombre": "Huracán",
+            "dueno": "santi"
+          },
+          "v": {
+            "nombre": "Queens Park Rangers",
+            "dueno": "luciano"
+          },
+          "gl": 3,
+          "gv": 11
+        },
+        {
+          "ronda": "dieciseisavos",
+          "l": {
+            "nombre": "Vélez Sarsfield",
+            "dueno": "santi"
+          },
+          "v": {
+            "nombre": "Barnsley",
+            "dueno": "luciano"
+          },
+          "gl": 7,
+          "gv": 1
+        },
+        {
+          "ronda": "dieciseisavos",
+          "l": {
+            "nombre": "Colchester United",
+            "dueno": "santi"
+          },
+          "v": {
+            "nombre": "KV Mechelen",
+            "dueno": "luciano"
+          },
+          "gl": 6,
+          "gv": 4
+        },
+        {
+          "ronda": "dieciseisavos",
+          "l": {
+            "nombre": "FK Austria Wien",
+            "dueno": "santi"
+          },
+          "v": {
+            "nombre": "Zhejiang FC",
+            "dueno": "luciano"
+          },
+          "gl": 4,
+          "gv": 3
+        },
+        {
+          "ronda": "dieciseisavos",
+          "l": {
+            "nombre": "Bolton Wanderers",
+            "dueno": "santi"
+          },
+          "v": {
+            "nombre": "Hannover 96",
+            "dueno": "luciano"
+          },
+          "gl": 4,
+          "gv": 5
+        },
+        {
+          "ronda": "dieciseisavos",
+          "l": {
+            "nombre": "Boca Juniors",
+            "dueno": "santi"
+          },
+          "v": {
+            "nombre": "LOSC Lille",
+            "dueno": "luciano"
+          },
+          "gl": 5,
+          "gv": 6
+        },
+        {
+          "ronda": "dieciseisavos",
+          "l": {
+            "nombre": "River Plate",
+            "dueno": "luciano"
+          },
+          "v": {
+            "nombre": "FC Volendam",
+            "dueno": "santi"
+          },
+          "gl": 2,
+          "gv": 3
+        },
+        {
+          "ronda": "dieciseisavos",
+          "l": {
+            "nombre": "Luton Town",
+            "dueno": "santi"
+          },
+          "v": {
+            "nombre": "CD Tondela",
+            "dueno": "luciano"
+          },
+          "gl": 4,
+          "gv": 8
+        },
+        {
+          "ronda": "octavos",
+          "l": {
+            "nombre": "Talleres",
+            "dueno": "luciano"
+          },
+          "v": {
+            "nombre": "Shrewsbury Town",
+            "dueno": "santi"
+          },
+          "gl": 4,
+          "gv": 5
+        },
+        {
+          "ronda": "octavos",
+          "l": {
+            "nombre": "Stevenage",
+            "dueno": "luciano"
+          },
+          "v": {
+            "nombre": "Unión de Santa Fe",
+            "dueno": "santi"
+          },
+          "gl": 4,
+          "gv": 6
+        },
+        {
+          "ronda": "octavos",
+          "l": {
+            "nombre": "Racing Club",
+            "dueno": "luciano"
+          },
+          "v": {
+            "nombre": "Vélez Sarsfield",
+            "dueno": "santi"
+          },
+          "gl": 3,
+          "gv": 4
+        },
+        {
+          "ronda": "octavos",
+          "l": {
+            "nombre": "Toronto FC",
+            "dueno": "santi"
+          },
+          "v": {
+            "nombre": "Queens Park Rangers",
+            "dueno": "luciano"
+          },
+          "gl": 4,
+          "gv": 3
+        },
+        {
+          "ronda": "octavos",
+          "l": {
+            "nombre": "Samsunspor",
+            "dueno": "luciano"
+          },
+          "v": {
+            "nombre": "Colchester United",
+            "dueno": "santi"
+          },
+          "gl": 3,
+          "gv": 5
+        },
+        {
+          "ronda": "octavos",
+          "l": {
+            "nombre": "CD Nacional",
+            "dueno": "luciano"
+          },
+          "v": {
+            "nombre": "FK Austria Wien",
+            "dueno": "santi"
+          },
+          "gl": 3,
+          "gv": 4
+        },
+        {
+          "ronda": "octavos",
+          "l": {
+            "nombre": "Hannover 96",
+            "dueno": "luciano"
+          },
+          "v": {
+            "nombre": "LOSC Lille",
+            "dueno": "luciano"
+          },
+          "gl": 0,
+          "gv": 1
+        },
+        {
+          "ronda": "octavos",
+          "l": {
+            "nombre": "FC Volendam",
+            "dueno": "santi"
+          },
+          "v": {
+            "nombre": "CD Tondela",
+            "dueno": "luciano"
+          },
+          "gl": 6,
+          "gv": 1
+        },
+        {
+          "ronda": "cuartos",
+          "l": {
+            "nombre": "Shrewsbury Town",
+            "dueno": "santi"
+          },
+          "v": {
+            "nombre": "Unión de Santa Fe",
+            "dueno": "santi"
+          },
+          "gl": 0,
+          "gv": 1
+        },
+        {
+          "ronda": "cuartos",
+          "l": {
+            "nombre": "Vélez Sarsfield",
+            "dueno": "santi"
+          },
+          "v": {
+            "nombre": "Toronto FC",
+            "dueno": "santi"
+          },
+          "gl": 1,
+          "gv": 0
+        },
+        {
+          "ronda": "cuartos",
+          "l": {
+            "nombre": "Colchester United",
+            "dueno": "santi"
+          },
+          "v": {
+            "nombre": "FK Austria Wien",
+            "dueno": "santi"
+          },
+          "gl": 0,
+          "gv": 1
+        },
+        {
+          "ronda": "cuartos",
+          "l": {
+            "nombre": "LOSC Lille",
+            "dueno": "luciano"
+          },
+          "v": {
+            "nombre": "FC Volendam",
+            "dueno": "santi"
+          },
+          "gl": 11,
+          "gv": 2
+        },
+        {
+          "ronda": "semis",
+          "l": {
+            "nombre": "Unión de Santa Fe",
+            "dueno": "santi"
+          },
+          "v": {
+            "nombre": "Vélez Sarsfield",
+            "dueno": "santi"
+          },
+          "gl": 0,
+          "gv": 1
+        },
+        {
+          "ronda": "semis",
+          "l": {
+            "nombre": "FK Austria Wien",
+            "dueno": "santi"
+          },
+          "v": {
+            "nombre": "LOSC Lille",
+            "dueno": "luciano"
+          },
+          "gl": 4,
+          "gv": 5
+        },
+        {
+          "ronda": "final",
+          "l": {
+            "nombre": "Vélez Sarsfield",
+            "dueno": "santi"
+          },
+          "v": {
+            "nombre": "LOSC Lille",
+            "dueno": "luciano"
+          },
+          "gl": 4,
+          "gv": 7
+        }
+      ]
+    }
+  ]
 }

@@ -2607,6 +2607,8 @@ function getContadorGeneral() {
   }
   const sc = estado.supercopa
   if (sc) sumar(sc.golesLocal, sc.golesVisitante, getSupercopaDueno(sc.localId), getSupercopaDueno(sc.visitanteId))
+  // Temporadas anteriores archivadas (por ej. un Mundial que se rehízo para la nueva temporada)
+  for (const a of estado.archivo || []) for (const m of a.partidos || []) sumar(m.gl, m.gv, m.l?.dueno, m.v?.dueno)
 
   return conteo
 }
@@ -4138,8 +4140,23 @@ function cerrarReemplazo() {
   _reemplazoCandidato = null
 }
 
+// Antes de borrar un Mundial jugado, lo guarda en el archivo para no perder los goles y victorias del historial
+function archivarMundialActual() {
+  const partidos = []
+  for (const r of RONDAS_MUNDIAL_ORDEN) for (const c of estado.bracket?.[r] || []) {
+    if (c.golesLocal == null || c.golesVisitante == null) continue
+    const L = getEquipo(c.local), V = getEquipo(c.visitante)
+    partidos.push({ ronda: r, l: { nombre: L?.nombre || '?', dueno: L?.dueno || '' }, v: { nombre: V?.nombre || '?', dueno: V?.dueno || '' }, gl: c.golesLocal, gv: c.golesVisitante })
+  }
+  if (!partidos.length) return
+  const fin = estado.bracket?.final?.[0], camp = fin?.ganador ? getEquipo(fin.ganador) : null
+  if (!estado.archivo) estado.archivo = []
+  estado.archivo.push({ id: 'mundial_' + Date.now(), competencia: 'mundial', nombre: `Mundial de Clubes (archivado ${new Date().toLocaleDateString('es-MX')})`, campeon: camp?.nombre || null, dueno: camp?.dueno || null, partidos })
+}
+
 async function resetSorteo() {
-  if (!confirm('¿Rehacer el sorteo? Se perderá el actual.')) return
+  if (!confirm('¿Rehacer el sorteo? El Mundial actual se archiva: sus goles y victorias siguen contando en el historial.')) return
+  archivarMundialActual()
   estado.sorteo.realizado = false
   estado.sorteo.confirmado = false
   estado.sorteo.internacionales = []

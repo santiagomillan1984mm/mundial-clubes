@@ -996,6 +996,77 @@ function quitarFondoBlanco(url) {
   })
 }
 
+// ── Escudos de clubes internacionales (por nombre, vía Wikipedia) ──
+const INTL_LOGO_KEY = 'tdc_logos_intl_v1'
+let logosIntl = {}
+try { logosIntl = JSON.parse(localStorage.getItem(INTL_LOGO_KEY) || '{}') || {} } catch(e) { logosIntl = {} }
+const intlBuscando = new Set()
+
+function logoPorNombre(nombre) {
+  if (!nombre) return null
+  if (logosIntl[nombre]) return logosIntl[nombre]
+  const pa = (estado?.poolArgentino || POOL_ARG).find(e => e.nombre === nombre)
+  return pa ? (resolvedLogos[pa.id] || null) : null
+}
+function escudoNombre(nombre, size = 20) {
+  const u = logoPorNombre(nombre)
+  return u ? `<img src="${u}" alt="" style="width:${size}px;height:${size}px;object-fit:contain;flex-shrink:0;" onerror="this.remove()">` : ''
+}
+function limpiarFondoSiHace(url) {
+  // Solo quita fondo blanco si al menos 3 esquinas son blancas
+  return new Promise(resolve => {
+    const img = new Image(); img.crossOrigin = 'anonymous'
+    img.onload = () => {
+      try {
+        const w = img.naturalWidth, h = img.naturalHeight
+        const c = document.createElement('canvas'); c.width = w; c.height = h
+        const ctx = c.getContext('2d'); ctx.drawImage(img, 0, 0)
+        const px = ctx.getImageData(0, 0, w, h).data
+        const bl = i => px[i+3] > 200 && px[i] > 230 && px[i+1] > 230 && px[i+2] > 230
+        const esq = [0, (w-1)*4, (h-1)*w*4, ((h-1)*w + w-1)*4].filter(bl).length
+        if (esq < 3) { resolve(url); return }
+        quitarFondoBlanco(url).then(r => resolve(r || url))
+      } catch(e) { resolve(url) }
+    }
+    img.onerror = () => resolve(url)
+    img.src = url
+  })
+}
+async function buscarLogoIntl(nombre) {
+  const u = 'https://en.wikipedia.org/w/api.php?action=query&format=json&origin=*&generator=search&gsrnamespace=0&gsrlimit=3' +
+    '&gsrsearch=' + encodeURIComponent(nombre + ' football club') + '&prop=pageimages&piprop=thumbnail&pithumbsize=200&pilicense=any'
+  const r = await fetch(u); if (!r.ok) return null
+  const d = await r.json()
+  const pages = Object.values(d.query?.pages || {}).sort((a, b) => a.index - b.index).filter(p => p.thumbnail)
+  const url = pages[0]?.thumbnail?.source
+  return url ? await limpiarFondoSiHace(url) : null
+}
+async function cargarLogosIntl(nombres) {
+  const pend = [...new Set(nombres)].filter(n => n && !logoPorNombre(n) && !intlBuscando.has(n))
+  if (!pend.length) return false
+  pend.forEach(n => intlBuscando.add(n))
+  let i = 0, nuevos = 0
+  async function w() {
+    while (i < pend.length) {
+      const n = pend[i++]
+      try { const u = await buscarLogoIntl(n); if (u) { logosIntl[n] = u; nuevos++ } } catch(e) {}
+    }
+  }
+  await Promise.all([w(), w(), w(), w()])
+  pend.forEach(n => intlBuscando.delete(n))
+  try { localStorage.setItem(INTL_LOGO_KEY, JSON.stringify(logosIntl)) } catch(e) {}
+  return nuevos > 0
+}
+function nombresMundial() {
+  return [...(estado?.sorteo?.internacionales || []).map(e => e.nombre), ...(estado?.equiposArgentinos || []).map(e => e.nombre)]
+}
+function renderSiQuieto() {
+  const a = document.activeElement
+  if (a && (a.tagName === 'INPUT' || a.tagName === 'SELECT' || a.tagName === 'TEXTAREA')) return
+  if (document.getElementById('bolillero-container')?.style.display === 'block') return
+  renderTodo()
+}
+
 async function loadLogos() {
   // Aplicar overrides primero
   Object.assign(resolvedLogos, LOGO_OVERRIDES)
@@ -1961,6 +2032,8 @@ function getProximoPartidoMundial() {
 }
 
 function avatarIniciales(nombre, size = 28) {
+  const u = logoPorNombre(nombre)
+  if (u) return `<img src="${u}" alt="" style="width:${size}px;height:${size}px;object-fit:contain;flex-shrink:0;">`
   const ini = (nombre || '?').split(' ').map(w => w[0]).filter(Boolean).slice(0, 2).join('').toUpperCase()
   const fs = Math.max(8, Math.floor(size * 0.34))
   return `<div class="logo-init" style="width:${size}px;height:${size}px;font-size:${fs}px;">${ini}</div>`
@@ -2924,11 +2997,11 @@ function renderSorteo() {
         <div class="sorteo-grid">
           <div>
             <div style="font-weight:700; margin-bottom:10px;" class="badge-santi">SANTI (${santi.length})</div>
-            ${santi.map(e => `<div class="equipo-row"><span class="equipo-nombre">${e.nombre}</span><span class="equipo-liga">${e.liga}</span>${lapiz(e.id)}</div>`).join('')}
+            ${santi.map(e => `<div class="equipo-row"><span style="display:flex;align-items:center;gap:8px;min-width:0;">${escudoNombre(e.nombre, 20)}<span class="equipo-nombre">${e.nombre}</span></span><span class="equipo-liga">${e.liga}</span>${lapiz(e.id)}</div>`).join('')}
           </div>
           <div>
             <div style="font-weight:700; margin-bottom:10px;" class="badge-luciano">LUCIANO (${luciano.length})</div>
-            ${luciano.map(e => `<div class="equipo-row"><span class="equipo-nombre">${e.nombre}</span><span class="equipo-liga">${e.liga}</span>${lapiz(e.id)}</div>`).join('')}
+            ${luciano.map(e => `<div class="equipo-row"><span style="display:flex;align-items:center;gap:8px;min-width:0;">${escudoNombre(e.nombre, 20)}<span class="equipo-nombre">${e.nombre}</span></span><span class="equipo-liga">${e.liga}</span>${lapiz(e.id)}</div>`).join('')}
           </div>
         </div>
         ${esAdmin ? `<div class="mt flex-gap"><button class="btn btn-secondary btn-sm" onclick="resetSorteo()">↺ Rehacer sorteo</button></div>` : ''}
@@ -2947,11 +3020,11 @@ function renderSorteo() {
         <div class="sorteo-grid">
           <div>
             <div style="font-weight:700; margin-bottom:10px;" class="badge-santi">SANTI (${santi.length})</div>
-            ${santi.map(e => `<div class="equipo-row"><span class="equipo-nombre">${e.nombre}</span><span class="equipo-liga">${e.liga}</span></div>`).join('')}
+            ${santi.map(e => `<div class="equipo-row"><span style="display:flex;align-items:center;gap:8px;min-width:0;">${escudoNombre(e.nombre, 20)}<span class="equipo-nombre">${e.nombre}</span></span><span class="equipo-liga">${e.liga}</span></div>`).join('')}
           </div>
           <div>
             <div style="font-weight:700; margin-bottom:10px;" class="badge-luciano">LUCIANO (${luciano.length})</div>
-            ${luciano.map(e => `<div class="equipo-row"><span class="equipo-nombre">${e.nombre}</span><span class="equipo-liga">${e.liga}</span></div>`).join('')}
+            ${luciano.map(e => `<div class="equipo-row"><span style="display:flex;align-items:center;gap:8px;min-width:0;">${escudoNombre(e.nombre, 20)}<span class="equipo-nombre">${e.nombre}</span></span><span class="equipo-liga">${e.liga}</span></div>`).join('')}
           </div>
         </div>
         ${esAdmin ? `
@@ -3055,6 +3128,7 @@ function hacerSorteo() {
   }
 
   estado.sorteo.internacionales = [...santiTeams, ...lucianoTeams]
+  cargarLogosIntl(estado.sorteo.internacionales.map(e => e.nombre))
   estado.sorteo.realizado = true
   estado.sorteo.confirmado = false
 
@@ -3152,7 +3226,7 @@ function animarBolillero(bolillas, idx) {
     const cntEl = document.getElementById(`cnt-${club.dueno}`)
     const div   = document.createElement('div')
     div.className = 'equipo-row bolilla-item'
-    div.innerHTML = `<span class="equipo-nombre">${club.nombre}</span><span class="equipo-liga">${club.liga}</span>`
+    div.innerHTML = `<span style="display:flex;align-items:center;gap:8px;min-width:0;">${escudoNombre(club.nombre, 20)}<span class="equipo-nombre">${club.nombre}</span></span><span class="equipo-liga">${club.liga}</span>`
     col.appendChild(div)
     cntEl.textContent = col.children.length
     div.scrollIntoView({ behavior: 'smooth', block: 'nearest' })
@@ -3384,7 +3458,7 @@ function renderEquipoCard(eqId, goles, ganador, esTop) {
   else if (ganador && ganador !== eqId && eqId) cls += ' perdedor'
   const radio = esTop ? 'border-radius:6px 6px 0 0;border-bottom:1px solid var(--azul3);' : 'border-radius:0 0 6px 6px;'
   // Mostrar logo si el id es del pool argentino (pa*)
-  const logoTag = eqId && eqId.startsWith('pa') ? `<span style="display:flex;align-items:center;margin-right:5px;flex-shrink:0;">${logoHTML(eqId, 18)}</span>` : ''
+  const logoTag = eqId && (eqId.startsWith('pa') || logoPorNombre(nombre)) ? `<span style="display:flex;align-items:center;margin-right:5px;flex-shrink:0;">${logoHTML(eqId, 18)}</span>` : ''
   return `<div class="${cls}" style="${radio}">
     ${logoTag}<span class="bracket-nombre">${nombre}</span>
     ${goles !== null && goles !== undefined && goles !== '' ? `<span class="bracket-goles">${goles}</span>` : ''}
@@ -3822,8 +3896,10 @@ function getPoolLogo(id) {
 }
 
 function logoHTML(id, size = 28) {
-  const logo = getPoolLogo(id)
-  const nombre = getPoolNombre(id)
+  let logo = getPoolLogo(id)
+  let nombre = getPoolNombre(id)
+  if (nombre === id) { const eq = (typeof getEquipo === 'function' && getEquipo(id)) || null; nombre = eq?.nombre || getMundialNombre(id) }
+  if (!logo) logo = logoPorNombre(nombre)
   const ini = nombre.split(' ').map(w => w[0]).filter(Boolean).slice(0, 2).join('').toUpperCase()
   const fs = Math.max(8, Math.floor(size * 0.34))
   if (logo) {
@@ -4762,7 +4838,7 @@ function renderCopaBracket(cont) {
     if (ganador && ganador === id) cls += ' ganador'
     else if (ganador && ganador !== id && id) cls += ' perdedor'
     const radio = esTop ? 'border-radius:6px 6px 0 0;border-bottom:1px solid var(--azul3);' : 'border-radius:0 0 6px 6px;'
-    const logoTag = id && id.startsWith('pa') ? `<span style="display:flex;align-items:center;margin-right:5px;flex-shrink:0;">${logoHTML(id, 18)}</span>` : ''
+    const logoTag = id && (id.startsWith('pa') || logoPorNombre(nombre)) ? `<span style="display:flex;align-items:center;margin-right:5px;flex-shrink:0;">${logoHTML(id, 18)}</span>` : ''
     return `<div class="${cls}" style="${radio}">
       ${logoTag}<span class="bracket-nombre">${nombre}</span>
       ${goles !== null && goles !== undefined ? `<span class="bracket-goles">${goles}</span>` : ''}
@@ -5975,7 +6051,7 @@ async function init() {
   // Cargar logos en segundo plano; re-renderizar cuando terminen
   renderTodo()
   ocultarSplash()
-  loadLogos().then(() => renderTodo())
+  loadLogos().then(() => renderTodo()).then(() => cargarLogosIntl(nombresMundial())).then(n => { if (n) renderSiQuieto() })
 }
 
 init()

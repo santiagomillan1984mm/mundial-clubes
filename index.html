@@ -5929,7 +5929,9 @@ const PREMIOS_CONFIG = [
   { id: 'copa', label: 'Copa Argentina', emoji: '🥤', item: 'Bebida', tope: 750 },
   { id: 'supercopa', label: 'Supercopa Argentina', emoji: '🥐', item: 'Medialunas y alfajores', tope: 400 },
   { id: 'mundial', label: 'Mundial de Clubes', emoji: '🍮', item: 'Postre', tope: 600 },
+  { id: 'superfinal', label: 'Súper Final', emoji: '🎮', item: 'El FC 28', itemDeuda: 'el FC 28', topeTexto: 'edición estándar, cuando salga' },
 ]
+const topePremio = p => p.topeTexto || `tope $${p.tope.toLocaleString('es-AR')}`
 
 function getPerdedorPremio(competId) {
   if (competId === 'liga') {
@@ -5965,6 +5967,19 @@ function getPerdedorPremio(competId) {
     const eq = getEquipo(perdedorId)
     return { id: perdedorId, dueno: eq?.dueno || '', nombre: eq?.nombre || '?' }
   }
+  if (competId === 'superfinal') {
+    const { sf, a, b } = sfEstado()
+    if (!a || !b) return null
+    if (a.nombre === b.nombre) {
+      // campeón automático: paga el otro jugador
+      const d = a.dueno === 'santi' ? 'luciano' : 'santi'
+      return { id: null, dueno: d, nombre: 'campeón automático del rival' }
+    }
+    const calc = sfCalculo(sf)
+    if (!calc.ganador) return null
+    const perd = calc.ganador === 'a' ? b : a
+    return { id: perd.logoId || null, dueno: perd.dueno, nombre: perd.nombre }
+  }
   return null
 }
 
@@ -5983,15 +5998,15 @@ function renderPremios() {
         const logo = perdedor?.id && perdedor.id.startsWith('pa') ? logoHTML(perdedor.id, 28) : ''
         const detalle = perdedor
           ? (p.id === 'liga'
-              ? `🔔 <strong style="color:${dColor};">${duenoLabel}</strong> debe ${p.item.toLowerCase()} de <strong>${p.label}</strong> <span style="color:var(--gris);">(tope $${p.tope.toLocaleString('es-AR')})</span>`
-              : `🔔 <strong style="color:${dColor};">${duenoLabel} (${perdedor.nombre})</strong> debe ${p.item.toLowerCase()} de <strong>${p.label}</strong> <span style="color:var(--gris);">(tope $${p.tope.toLocaleString('es-AR')})</span>`)
+              ? `🔔 <strong style="color:${dColor};">${duenoLabel}</strong> debe ${p.itemDeuda || p.item.toLowerCase()} de <strong>${p.label}</strong> <span style="color:var(--gris);">(${topePremio(p)})</span>`
+              : `🔔 <strong style="color:${dColor};">${duenoLabel} (${perdedor.nombre})</strong> debe ${p.itemDeuda || p.item.toLowerCase()} de <strong>${p.label}</strong> <span style="color:var(--gris);">(${topePremio(p)})</span>`)
           : ''
         return `<div style="background:var(--card);border:1px solid var(--border);border-radius:10px;padding:16px;">
           <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;">
             <div style="font-size:32px;line-height:1;">${p.emoji}</div>
             <div style="flex:1;min-width:180px;">
               <div style="font-size:14px;font-weight:700;color:var(--texto);">${p.label}</div>
-              <div style="font-size:12px;color:var(--gris);">${p.item} — tope $${p.tope.toLocaleString('es-AR')}</div>
+              <div style="font-size:12px;color:var(--gris);">${p.item} — ${topePremio(p)}</div>
             </div>
           </div>
           ${perdedor

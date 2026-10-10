@@ -352,8 +352,8 @@
     .comp-ic:empty { display: none; }
     .comp-ic img { height: 18px; width: auto; max-width: 30px; object-fit: contain; }
     .comp-ic.grande img { height: 30px; max-width: 46px; margin-right: 4px; }
-    .comp-ic[data-comp="liga"] img { height: 28px; max-width: 44px; }
-    .comp-ic.grande[data-comp="liga"] img { height: 46px; max-width: 70px; }
+    .comp-ic[data-comp="liga"] img { height: 28px; max-width: 56px; background: #fff; border-radius: 6px; padding: 2px 4px; }
+    .comp-ic.grande[data-comp="liga"] img { height: 46px; max-width: 90px; border-radius: 9px; padding: 4px 7px; }
     .comp-ic[data-comp="mundial"] img { background: #fff; border-radius: 5px; padding: 2px 3px; height: 20px; max-width: 36px; }
     .comp-ic.grande[data-comp="mundial"] img { border-radius: 8px; padding: 3px 5px; height: 34px; max-width: 56px; }
     .fx-capa img { max-width: 100%; max-height: 100%; object-fit: contain; }
@@ -891,8 +891,8 @@
   <button class="nav-btn" onclick="mostrarSeccion('liga')"><span class="comp-ic" data-comp="liga">🇦🇷</span> Liga AFA</button>
   <button class="nav-btn" onclick="mostrarSeccion('copa')"><span class="comp-ic" data-comp="copa">🏆</span> Copa Arg.</button>
   <button class="nav-btn" onclick="mostrarSeccion('argentinos')"><span class="comp-ic" data-comp="mundial"></span> Clasificados 🇦🇷</button>
-  <button class="nav-btn" onclick="mostrarSeccion('sorteo')"><span class="comp-ic" data-comp="mundial"></span> Sorteo</button>
-  <button class="nav-btn" onclick="mostrarSeccion('bracket')"><span class="comp-ic" data-comp="mundial"></span> Eliminatorias</button>
+  <button class="nav-btn" onclick="mostrarSeccion('sorteo')"><span class="comp-ic" data-comp="mundial"></span> Sorteo Mundial de Clubes</button>
+  <button class="nav-btn" onclick="mostrarSeccion('bracket')"><span class="comp-ic" data-comp="mundial"></span> Eliminatorias Mundial de Clubes</button>
   <button class="nav-btn" onclick="mostrarSeccion('supercopa')">🥇 Supercopa</button>
   <button class="nav-btn" onclick="mostrarSeccion('historial')">🏅 Historial</button>
   <button class="nav-btn" onclick="mostrarSeccion('relampago')">⚡ Relámpago</button>
@@ -937,13 +937,13 @@
 
   <!-- SORTEO -->
   <div id="sec-sorteo" class="seccion">
-    <div class="sec-titulo"><span class="comp-ic grande" data-comp="mundial">🎲</span> Sorteo Internacional</div>
+    <div class="sec-titulo"><span class="comp-ic grande" data-comp="mundial">🎲</span> Sorteo Mundial de Clubes</div>
     <div id="sorteo-contenido"></div>
   </div>
 
   <!-- BRACKET -->
   <div id="sec-bracket" class="seccion">
-    <div class="sec-titulo"><span class="comp-ic grande" data-comp="mundial">⚽</span> Eliminatorias</div>
+    <div class="sec-titulo"><span class="comp-ic grande" data-comp="mundial">⚽</span> Eliminatorias Mundial de Clubes</div>
     <div id="bracket-contenido">
       <div class="card">
         <p class="text-gris">El bracket se genera automáticamente cuando se confirme el sorteo.</p>
@@ -1208,7 +1208,7 @@ async function cargarLogosIntl(nombres) {
   return nuevos > 0
 }
 // Logos oficiales de las competencias (Wikipedia), con caché local
-const COMP_LOGO_KEY = 'tdc_comp_logos_v2'
+const COMP_LOGO_KEY = 'tdc_comp_logos_v3'
 const COMP_CANDIDATOS = {
   liga: [['es', 'Liga Profesional de Fútbol (Argentina)'], ['en', 'Argentine Primera División'], ['es', 'Primera División de Argentina']],
   copa: [['es', 'Copa Argentina'], ['en', 'Copa Argentina']],
@@ -1232,7 +1232,7 @@ async function cargarCompLogos() {
         const d = await r.json()
         const pg = Object.values(d.query?.pages || {})[0]
         const url = pg?.thumbnail?.source
-        if (url) { compLogos[comp] = comp === 'mundial' ? url : await limpiarFondoSiHace(url); break }
+        if (url) { compLogos[comp] = (comp === 'mundial' || comp === 'liga') ? url : await limpiarFondoSiHace(url); break }
       } catch(e) {}
     }
   }

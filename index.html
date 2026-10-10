@@ -348,6 +348,10 @@
     .fx-capa { position: fixed; inset: 0; z-index: 9998; display: flex; align-items: center; justify-content: center; cursor: pointer;
       background: radial-gradient(circle at 50% 45%, rgba(10,16,32,.9), rgba(3,5,10,.97)); backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px); animation: bp-fondo .25s ease-out; overflow: hidden; }
     .fx-capa.fuera { animation: bp-fondo-out .35s ease-in forwards; }
+    .comp-ic { display: inline-flex; align-items: center; justify-content: center; vertical-align: middle; }
+    .comp-ic:empty { display: none; }
+    .comp-ic img { height: 18px; width: auto; max-width: 30px; object-fit: contain; }
+    .comp-ic.grande img { height: 30px; max-width: 46px; margin-right: 4px; }
     .fx-capa img { max-width: 100%; max-height: 100%; object-fit: contain; }
     .fx-titulo { position: absolute; top: 14%; left: 0; right: 0; text-align: center; font-size: 13px; font-weight: 800; letter-spacing: 3px;
       text-transform: uppercase; color: var(--dorado2); animation: bp-pop .5s ease-out; }
@@ -880,11 +884,11 @@
 <nav>
   <button class="nav-btn active" onclick="mostrarSeccion('inicio')">Inicio</button>
   <button class="nav-btn" onclick="mostrarSeccion('promocion')">🔃 Promoción</button>
-  <button class="nav-btn" onclick="mostrarSeccion('liga')">🇦🇷 Liga AFA</button>
-  <button class="nav-btn" onclick="mostrarSeccion('copa')">🏆 Copa Arg.</button>
-  <button class="nav-btn" onclick="mostrarSeccion('argentinos')">Mundial Arg.</button>
-  <button class="nav-btn" onclick="mostrarSeccion('sorteo')">Sorteo</button>
-  <button class="nav-btn" onclick="mostrarSeccion('bracket')">Eliminatorias</button>
+  <button class="nav-btn" onclick="mostrarSeccion('liga')"><span class="comp-ic" data-comp="liga">🇦🇷</span> Liga AFA</button>
+  <button class="nav-btn" onclick="mostrarSeccion('copa')"><span class="comp-ic" data-comp="copa">🏆</span> Copa Arg.</button>
+  <button class="nav-btn" onclick="mostrarSeccion('argentinos')"><span class="comp-ic" data-comp="mundial"></span> Mundial Arg.</button>
+  <button class="nav-btn" onclick="mostrarSeccion('sorteo')"><span class="comp-ic" data-comp="mundial"></span> Sorteo</button>
+  <button class="nav-btn" onclick="mostrarSeccion('bracket')"><span class="comp-ic" data-comp="mundial"></span> Eliminatorias</button>
   <button class="nav-btn" onclick="mostrarSeccion('supercopa')">🥇 Supercopa</button>
   <button class="nav-btn" onclick="mostrarSeccion('historial')">🏅 Historial</button>
   <button class="nav-btn" onclick="mostrarSeccion('relampago')">⚡ Relámpago</button>
@@ -905,19 +909,19 @@
 
   <!-- LIGA AFA -->
   <div id="sec-liga" class="seccion">
-    <div class="sec-titulo">🇦🇷 Liga AFA</div>
+    <div class="sec-titulo"><span class="comp-ic grande" data-comp="liga">🇦🇷</span> Liga AFA</div>
     <div id="liga-contenido"><div class="loading">Cargando...</div></div>
   </div>
 
   <!-- COPA ARGENTINA -->
   <div id="sec-copa" class="seccion">
-    <div class="sec-titulo">🏆 Copa Argentina</div>
+    <div class="sec-titulo"><span class="comp-ic grande" data-comp="copa">🏆</span> Copa Argentina</div>
     <div id="copa-contenido"><div class="loading">Cargando...</div></div>
   </div>
 
   <!-- ARGENTINOS MUNDIAL -->
   <div id="sec-argentinos" class="seccion">
-    <div class="sec-titulo">🇦🇷 Equipos Argentinos</div>
+    <div class="sec-titulo"><span class="comp-ic grande" data-comp="mundial">🇦🇷</span> Equipos Argentinos</div>
     <div class="card">
       <div class="card-titulo">Los 8 equipos de AFA2026</div>
       <div id="lista-argentinos"></div>
@@ -929,13 +933,13 @@
 
   <!-- SORTEO -->
   <div id="sec-sorteo" class="seccion">
-    <div class="sec-titulo">🎲 Sorteo Internacional</div>
+    <div class="sec-titulo"><span class="comp-ic grande" data-comp="mundial">🎲</span> Sorteo Internacional</div>
     <div id="sorteo-contenido"></div>
   </div>
 
   <!-- BRACKET -->
   <div id="sec-bracket" class="seccion">
-    <div class="sec-titulo">⚽ Eliminatorias</div>
+    <div class="sec-titulo"><span class="comp-ic grande" data-comp="mundial">⚽</span> Eliminatorias</div>
     <div id="bracket-contenido">
       <div class="card">
         <p class="text-gris">El bracket se genera automáticamente cuando se confirme el sorteo.</p>
@@ -1199,6 +1203,39 @@ async function cargarLogosIntl(nombres) {
   try { localStorage.setItem(INTL_LOGO_KEY, JSON.stringify(logosIntl)) } catch(e) {}
   return nuevos > 0
 }
+// Logos oficiales de las competencias (Wikipedia), con caché local
+const COMP_LOGO_KEY = 'tdc_comp_logos_v1'
+const COMP_CANDIDATOS = {
+  liga: [['es', 'Liga Profesional de Fútbol (Argentina)'], ['en', 'Argentine Primera División'], ['es', 'Primera División de Argentina']],
+  copa: [['es', 'Copa Argentina'], ['en', 'Copa Argentina']],
+  mundial: [['en', 'FIFA Club World Cup'], ['en', '2025 FIFA Club World Cup'], ['es', 'Copa Mundial de Clubes de la FIFA']],
+}
+let compLogos = {}
+try { compLogos = JSON.parse(localStorage.getItem(COMP_LOGO_KEY) || '{}') || {} } catch(e) { compLogos = {} }
+function pintarCompLogos() {
+  document.querySelectorAll('.comp-ic[data-comp]').forEach(el => {
+    const u = compLogos[el.dataset.comp]
+    if (u && !el.querySelector('img')) el.innerHTML = `<img src="${u}" alt="" onerror="this.remove()">`
+  })
+}
+async function cargarCompLogos() {
+  pintarCompLogos()
+  for (const [comp, cands] of Object.entries(COMP_CANDIDATOS)) {
+    if (compLogos[comp]) continue
+    for (const [lang, titulo] of cands) {
+      try {
+        const r = await fetch(`https://${lang}.wikipedia.org/w/api.php?action=query&format=json&origin=*&redirects=1&prop=pageimages&piprop=thumbnail&pithumbsize=160&pilicense=any&titles=${encodeURIComponent(titulo)}`)
+        const d = await r.json()
+        const pg = Object.values(d.query?.pages || {})[0]
+        const url = pg?.thumbnail?.source
+        if (url) { compLogos[comp] = await limpiarFondoSiHace(url); break }
+      } catch(e) {}
+    }
+  }
+  try { localStorage.setItem(COMP_LOGO_KEY, JSON.stringify(compLogos)) } catch(e) {}
+  pintarCompLogos()
+}
+
 function nombresMundial() {
   return [...(estado?.sorteo?.internacionales || []).map(e => e.nombre), ...(estado?.equiposArgentinos || []).map(e => e.nombre),
     ...(estado?.torneosRelampago || []).flatMap(t => (t.equipos || []).map(e => e.nombre))]
@@ -3162,17 +3199,21 @@ function renderSorteo() {
     // Mostrar sorteo pendiente de confirmación
     const santi = estado.sorteo.internacionales.filter(e => e.dueno === 'santi')
     const luciano = estado.sorteo.internacionales.filter(e => e.dueno === 'luciano')
+    const lapiz = esAdmin
+      ? (id) => `<button onclick="abrirReemplazoEquipo('${id}')" title="Resortear solo este equipo" style="background:none;border:none;cursor:pointer;font-size:14px;padding:2px 4px;opacity:0.75;">✏️</button>`
+      : () => ''
     cont.innerHTML = `
       <div class="card">
         <div class="card-titulo">🎲 Sorteo realizado — pendiente de confirmación</div>
+        ${esAdmin ? `<p class="text-gris" style="margin:-4px 0 12px;">¿Algún equipo no está en FC 27? Toca ✏️ para resortear solo ese.</p>` : ''}
         <div class="sorteo-grid">
           <div>
             <div style="font-weight:700; margin-bottom:10px;" class="badge-santi">SANTI (${santi.length})</div>
-            ${santi.map(e => `<div class="equipo-row"><span style="display:flex;align-items:center;gap:8px;min-width:0;">${escudoNombre(e.nombre, 20)}<span class="equipo-nombre">${e.nombre}</span></span><span class="equipo-liga">${e.liga}</span></div>`).join('')}
+            ${santi.map(e => `<div class="equipo-row"><span style="display:flex;align-items:center;gap:8px;min-width:0;">${escudoNombre(e.nombre, 20)}<span class="equipo-nombre">${e.nombre}</span></span><span class="equipo-liga">${e.liga}</span>${lapiz(e.id)}</div>`).join('')}
           </div>
           <div>
             <div style="font-weight:700; margin-bottom:10px;" class="badge-luciano">LUCIANO (${luciano.length})</div>
-            ${luciano.map(e => `<div class="equipo-row"><span style="display:flex;align-items:center;gap:8px;min-width:0;">${escudoNombre(e.nombre, 20)}<span class="equipo-nombre">${e.nombre}</span></span><span class="equipo-liga">${e.liga}</span></div>`).join('')}
+            ${luciano.map(e => `<div class="equipo-row"><span style="display:flex;align-items:center;gap:8px;min-width:0;">${escudoNombre(e.nombre, 20)}<span class="equipo-nombre">${e.nombre}</span></span><span class="equipo-liga">${e.liga}</span>${lapiz(e.id)}</div>`).join('')}
           </div>
         </div>
         ${esAdmin ? `
@@ -3492,6 +3533,11 @@ function animarBolillero(bolillas, idx, animId = sorteoAnimId) {
     duenoEl.innerHTML = ''
     document.getElementById('bol-botones').style.display = 'flex'
     document.querySelectorAll('[onclick="hacerSorteo()"]').forEach(b => b.disabled = false)
+    // agregar ✏️ a cada equipo para resortearlo individualmente
+    if (esAdmin) document.querySelectorAll('#col-santi .bolilla-item, #col-luciano .bolilla-item').forEach(row => {
+      const id = row.dataset.id
+      if (id && !row.querySelector('.lapiz-reemplazo')) row.insertAdjacentHTML('beforeend', `<button class="lapiz-reemplazo" onclick="abrirReemplazoEquipo('${id}')" title="Resortear solo este equipo" style="background:none;border:none;cursor:pointer;font-size:14px;padding:2px 4px;opacity:0.75;">✏️</button>`)
+    })
     // Confeti rápido al terminar
     for (let i = 0; i < 18; i++) {
       setTimeout(() => {
@@ -3566,6 +3612,7 @@ function animarBolillero(bolillas, idx, animId = sorteoAnimId) {
       const cntEl = document.getElementById(`cnt-${club.dueno}`)
       const div   = document.createElement('div')
       div.className = 'equipo-row bolilla-item'
+      div.dataset.id = club.id
       div.innerHTML = `<span style="display:flex;align-items:center;gap:8px;min-width:0;">${escudoNombre(club.nombre, 20)}<span class="equipo-nombre">${club.nombre}</span></span><span class="equipo-liga">${club.liga}</span>`
       col.appendChild(div)
       cntEl.textContent = col.children.length
@@ -6418,6 +6465,7 @@ async function init() {
   // Cargar logos en segundo plano; re-renderizar cuando terminen
   renderTodo()
   ocultarSplash()
+  cargarCompLogos()
   loadLogos().then(() => renderTodo()).then(() => cargarLogosIntl(nombresMundial())).then(n => { if (n) renderSiQuieto() })
 }
 

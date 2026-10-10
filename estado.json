@@ -1,6 +1,6 @@
 {
   "version": "1.0",
-  "ultimaActualizacion": "2026-10-10T06:15:14.979Z",
+  "ultimaActualizacion": "2026-10-10T06:15:26.304Z",
   "equiposArgentinos": [
     {
       "id": "arg1",
@@ -668,7 +668,7 @@
         "id": "prom2",
         "dueno": "santi",
         "descendidoId": "pa23",
-        "rivalId": null,
+        "rivalId": "pa13",
         "golesDescendido": null,
         "golesRival": null,
         "decision": null

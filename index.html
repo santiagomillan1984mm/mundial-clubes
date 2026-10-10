@@ -1944,6 +1944,8 @@ function renderPromocion() {
               style="width:44px;text-align:center;font-size:16px;font-weight:700;padding:4px;border-radius:6px;border:1px solid var(--border);background:var(--azul);color:var(--texto);">
             <span style="flex:1;font-size:13px;font-weight:600;text-align:right;">${rival.nombre}</span>
           </div>
+          ${(() => { const j = jugadoresPromo(p); const sel = (id, v) => `<select id="${id}" style="padding:4px;background:var(--azul);color:var(--texto);border:1px solid var(--border);border-radius:6px;font-size:12px;"><option value="santi" ${v === 'santi' ? 'selected' : ''}>Santi</option><option value="luciano" ${v === 'luciano' ? 'selected' : ''}>Luciano</option></select>`
+            return `<div style="display:flex;justify-content:space-between;gap:8px;margin:-4px 0 12px;font-size:12px;color:var(--gris);flex-wrap:wrap;"><span>Jugó con ${desc.nombre}: ${sel('jd-' + p.id, j.desc)}</span><span>Jugó con ${rival.nombre}: ${sel('jr-' + p.id, j.rival)}</span></div>` })()}
           <button class="btn btn-primary btn-sm" onclick="guardarResultadoPromocion('${p.id}')">💾 Guardar resultado</button>
           <button class="btn btn-secondary btn-sm" onclick="vsPromocion('${p.id}')">⚔️ Ver VS</button>`
       } else if (jugado) {
@@ -1951,11 +1953,11 @@ function renderPromocion() {
         const grColor = rivalGana ? '#2ecc71' : descGana ? '#e74c3c' : 'var(--gris)'
         resultadoHTML = `
           <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px;flex-wrap:wrap;">
-            <span style="flex:1;font-size:13px;font-weight:700;color:${color};">${desc.nombre}</span>
+            <span style="flex:1;font-size:13px;font-weight:700;color:${colorDe(jugadoresPromo(p).desc)};">${desc.nombre} <small style="opacity:.75;">(${etiquetaDueno(jugadoresPromo(p).desc)})</small></span>
             <span style="font-size:20px;font-weight:800;color:${gdColor};">${p.golesDescendido}</span>
             <span style="color:var(--gris);font-weight:700;">-</span>
             <span style="font-size:20px;font-weight:800;color:${grColor};">${p.golesRival}</span>
-            <span style="flex:1;font-size:13px;font-weight:700;text-align:right;">${rival.nombre}</span>
+            <span style="flex:1;font-size:13px;font-weight:700;text-align:right;color:${colorDe(jugadoresPromo(p).rival)};">${rival.nombre} <small style="opacity:.75;">(${etiquetaDueno(jugadoresPromo(p).rival)})</small></span>
           </div>
           ${esAdmin ? `<button class="btn btn-secondary btn-sm" onclick="borrarResultadoPromocion('${p.id}')" style="margin-bottom:10px;">↺ Borrar resultado</button>` : ''}`
       } else {
@@ -2036,11 +2038,13 @@ async function guardarResultadoPromocion(id) {
   if (gd === gr) { toast('No puede terminar empatado', true); return }
   p.golesDescendido = gd
   p.golesRival = gr
+  p.jugadorDescendido = document.getElementById(`jd-${id}`)?.value || p.jugadorDescendido || p.dueno
+  p.jugadorRival = document.getElementById(`jr-${id}`)?.value || p.jugadorRival || otroJugador(p.jugadorDescendido)
   p.decision = null
   await guardarEstado()
   renderPromocion()
   toast('¡Resultado guardado!')
-  zoomResultado({ nombre: getPoolNombre(p.descendidoId), dueno: p.dueno, logoId: p.descendidoId }, { nombre: getPoolNombre(p.rivalId), dueno: '', logoId: p.rivalId }, gd, gr,
+  zoomResultado({ nombre: getPoolNombre(p.descendidoId), dueno: p.jugadorDescendido, logoId: p.descendidoId }, { nombre: getPoolNombre(p.rivalId), dueno: p.jugadorRival, logoId: p.rivalId }, gd, gr,
     { titulo: '🔃 Promoción', mensaje: gd > gr ? `¡${getPoolNombre(p.descendidoId)} se salva!` : `¡Ganó ${getPoolNombre(p.rivalId)}! Hay que decidir` })
 }
 
@@ -2643,7 +2647,8 @@ function getContadorGeneral() {
     sumar(p.golesLocal, p.golesVisitante, dL, dV)
   }
   for (const p of estado.promocion?.partidos || []) {
-    sumar(p.golesDescendido, p.golesRival, p.dueno, getSupercopaDueno(p.rivalId))
+    const j = jugadoresPromo(p)
+    sumar(p.golesDescendido, p.golesRival, j.desc, j.rival)
   }
   const sc = estado.supercopa
   if (sc) sumar(sc.golesLocal, sc.golesVisitante, getSupercopaDueno(sc.localId), getSupercopaDueno(sc.visitanteId))
@@ -2652,6 +2657,10 @@ function getContadorGeneral() {
 
   return conteo
 }
+
+// Quién jugó cada lado de un partido de Promoción (por persona, no por dueño del equipo)
+const otroJugador = d => d === 'santi' ? 'luciano' : d === 'luciano' ? 'santi' : ''
+function jugadoresPromo(p) { return { desc: p.jugadorDescendido || p.dueno, rival: p.jugadorRival || otroJugador(p.jugadorDescendido || p.dueno) } }
 
 // ═══════════ MARCADOR GENERAL EN VIVO ═══════════
 function getContadorPorComp() {
@@ -2672,7 +2681,7 @@ function getContadorPorComp() {
     add('liga', 'Liga AFA', 'liga', p.golesLocal, p.golesVisitante, eqs.find(e => e.id === p.local)?.dueno, eqs.find(e => e.id === p.visitante)?.dueno)
   }
   for (const r of RONDAS_COPA_ORDEN) for (const c of estado.copaArgentina?.bracket?.[r] || []) add('copa', 'Copa Argentina', 'copa', c.golesLocal, c.golesVisitante, getCopaDueno(c.local), getCopaDueno(c.visitante))
-  for (const p of estado.promocion?.partidos || []) add('promo', 'Promoción', 'promocion', p.golesDescendido, p.golesRival, p.dueno, getSupercopaDueno(p.rivalId))
+  for (const p of estado.promocion?.partidos || []) { const j = jugadoresPromo(p); add('promo', 'Promoción', 'promocion', p.golesDescendido, p.golesRival, j.desc, j.rival) }
   const sc = estado.supercopa
   if (sc) add('super', 'Supercopa Argentina', 'supercopa', sc.golesLocal, sc.golesVisitante, getSupercopaDueno(sc.localId), getSupercopaDueno(sc.visitanteId))
   try {
@@ -3942,7 +3951,8 @@ function vsSupercopa() {
 }
 function vsPromocion(pid) {
   const p = estado.promocion.partidos.find(x => x.id === pid); if (!p) return
-  mostrarVS({ nombre: getPoolNombre(p.descendidoId), dueno: p.dueno, logoId: p.descendidoId }, { nombre: getPoolNombre(p.rivalId), dueno: '', logoId: p.rivalId }, '🔃 Promoción')
+  const j = jugadoresPromo(p)
+  mostrarVS({ nombre: getPoolNombre(p.descendidoId), dueno: j.desc, logoId: p.descendidoId }, { nombre: getPoolNombre(p.rivalId), dueno: j.rival, logoId: p.rivalId }, '🔃 Promoción')
 }
 const btnVS = onclick => `<button onclick="event.stopPropagation();${onclick}" title="Ver VS" style="background:none;border:none;cursor:pointer;font-size:15px;padding:2px 4px;flex-shrink:0;">⚔️</button>`
 

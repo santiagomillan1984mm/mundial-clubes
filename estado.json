@@ -1,6 +1,6 @@
 {
   "version": "1.0",
-  "ultimaActualizacion": "2026-10-10T22:23:13.000Z",
+  "ultimaActualizacion": "2026-10-10T22:29:48.000Z",
   "equiposArgentinos": [
     {
       "id": "arg1",
@@ -1129,7 +1129,9 @@
         "rivalId": "pa19",
         "golesDescendido": 4,
         "golesRival": 5,
-        "decision": "cambia"
+        "decision": "cambia",
+        "jugadorDescendido": "santi",
+        "jugadorRival": "luciano"
       },
       {
         "id": "prom2",
@@ -1138,7 +1140,9 @@
         "rivalId": "pa13",
         "golesDescendido": 2,
         "golesRival": 3,
-        "decision": "cambia"
+        "decision": "cambia",
+        "jugadorDescendido": "luciano",
+        "jugadorRival": "santi"
       },
       {
         "id": "prom3",
@@ -1147,7 +1151,9 @@
         "rivalId": "pa11",
         "golesDescendido": 2,
         "golesRival": 3,
-        "decision": "cambia"
+        "decision": "cambia",
+        "jugadorDescendido": "santi",
+        "jugadorRival": "luciano"
       },
       {
         "id": "prom4",
@@ -1156,7 +1162,9 @@
         "rivalId": "pa21",
         "golesDescendido": 1,
         "golesRival": 4,
-        "decision": "mantiene"
+        "decision": "mantiene",
+        "jugadorDescendido": "santi",
+        "jugadorRival": "luciano"
       }
     ]
   },

@@ -350,6 +350,19 @@
     .fx-capa.fuera { animation: bp-fondo-out .35s ease-in forwards; }
     .comp-ic { display: inline-flex; align-items: center; justify-content: center; vertical-align: middle; }
     .comp-ic:empty { display: none; }
+    .sf-ic { width: 22px; height: 22px; } .sf-ic.grande { width: 40px; height: 40px; margin-right: 4px; }
+    .sf-logo-xl { width: 92px; height: 92px; margin: 0 auto 6px; filter: drop-shadow(0 0 18px rgba(245,197,66,.45)); }
+    .sf-legs { display: flex; flex-direction: column; gap: 10px; }
+    .sf-leg { background: var(--azul3); border-radius: 10px; padding: 10px 12px; }
+    .sf-leg-t { font-size: 11px; color: var(--gris); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 8px; }
+    .sf-fila { display: flex; align-items: center; gap: 8px; }
+    .sf-fila .sf-nom { flex: 1; min-width: 0; font-weight: 700; font-size: 14px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; display: flex; align-items: center; gap: 6px; }
+    .sf-fila .sf-nom.der { justify-content: flex-end; text-align: right; }
+    .sf-in { width: 46px; text-align: center; font-size: 18px; font-weight: 800; padding: 6px; border-radius: 8px; border: 1px solid var(--border); background: var(--azul); color: var(--texto); }
+    .sf-res { font-size: 20px; font-weight: 900; min-width: 64px; text-align: center; }
+    .sf-tabla { display: grid; grid-template-columns: 1fr auto auto auto; gap: 6px 14px; align-items: center; font-size: 14px; }
+    .sf-tabla .h { font-size: 10px; color: var(--gris); text-transform: uppercase; text-align: center; }
+    .sf-tabla .n { text-align: center; font-weight: 800; }
     .comp-ic img { height: 18px; width: auto; max-width: 30px; object-fit: contain; }
     .comp-ic.grande img { height: 30px; max-width: 46px; margin-right: 4px; }
     .comp-ic[data-comp="liga"] img { height: 28px; max-width: 56px; background: #fff; border-radius: 6px; padding: 2px 4px; }
@@ -898,6 +911,7 @@
   <button class="nav-btn" onclick="mostrarSeccion('sorteo')"><span class="comp-ic" data-comp="mundial"></span> Sorteo Mundial de Clubes</button>
   <button class="nav-btn" onclick="mostrarSeccion('bracket')"><span class="comp-ic" data-comp="mundial"></span> Eliminatorias Mundial de Clubes</button>
   <button class="nav-btn" onclick="mostrarSeccion('supercopa')"><span class="comp-ic" data-comp="supercopa">🥇</span> Supercopa</button>
+  <button class="nav-btn" onclick="mostrarSeccion('superfinal')"><span class="comp-ic sf-ic"><svg viewBox="0 0 64 64" width="100%" height="100%" aria-hidden="true"><circle cx="32" cy="32" r="30" fill="#101a33" stroke="#f5c542" stroke-width="3"/><circle cx="32" cy="32" r="25" fill="none" stroke="#f5c542" stroke-opacity=".35" stroke-width="1"/><path d="M22 17h20v7c0 7-4.5 12-10 12s-10-5-10-12z" fill="#f5c542"/><path d="M22 19h-5c0 6 3 9 6 9M42 19h5c0 6-3 9-6 9" fill="none" stroke="#f5c542" stroke-width="2.4"/><rect x="29.5" y="35" width="5" height="7" fill="#d9a521"/><rect x="24" y="42" width="16" height="4" rx="1.5" fill="#f5c542"/><rect x="21" y="46" width="22" height="4" rx="1.5" fill="#c8901c"/><path d="M32 20.5l1.6 3.3 3.6.5-2.6 2.5.6 3.6-3.2-1.7-3.2 1.7.6-3.6-2.6-2.5 3.6-.5z" fill="#101a33"/><path d="M14 52l4-2 4 2M42 52l4-2 4 2" stroke="#f5c542" stroke-width="1.6" fill="none"/></svg></span> Súper Final</button>
   <button class="nav-btn" onclick="mostrarSeccion('historial')">🏅 Historial</button>
   <button class="nav-btn" onclick="mostrarSeccion('relampago')">⚡ Relámpago</button>
   <button class="nav-btn" onclick="mostrarSeccion('premios')">🎁 Premios</button>
@@ -959,6 +973,12 @@
   <div id="sec-supercopa" class="seccion">
     <div class="sec-titulo"><span class="comp-ic grande" data-comp="supercopa">🥇</span> Supercopa Argentina</div>
     <div id="supercopa-contenido"><div class="loading">Cargando...</div></div>
+  </div>
+
+  <!-- SÚPER FINAL: campeón Supercopa vs campeón Mundial de Clubes -->
+  <div id="sec-superfinal" class="seccion">
+    <div class="sec-titulo"><span class="comp-ic grande sf-ic"><svg viewBox="0 0 64 64" width="100%" height="100%" aria-hidden="true"><circle cx="32" cy="32" r="30" fill="#101a33" stroke="#f5c542" stroke-width="3"/><circle cx="32" cy="32" r="25" fill="none" stroke="#f5c542" stroke-opacity=".35" stroke-width="1"/><path d="M22 17h20v7c0 7-4.5 12-10 12s-10-5-10-12z" fill="#f5c542"/><path d="M22 19h-5c0 6 3 9 6 9M42 19h5c0 6-3 9-6 9" fill="none" stroke="#f5c542" stroke-width="2.4"/><rect x="29.5" y="35" width="5" height="7" fill="#d9a521"/><rect x="24" y="42" width="16" height="4" rx="1.5" fill="#f5c542"/><rect x="21" y="46" width="22" height="4" rx="1.5" fill="#c8901c"/><path d="M32 20.5l1.6 3.3 3.6.5-2.6 2.5.6 3.6-3.2-1.7-3.2 1.7.6-3.6-2.6-2.5 3.6-.5z" fill="#101a33"/><path d="M14 52l4-2 4 2M42 52l4-2 4 2" stroke="#f5c542" stroke-width="1.6" fill="none"/></svg></span> Súper Final</div>
+    <div id="superfinal-contenido"><div class="loading">Cargando...</div></div>
   </div>
 
   <!-- ADMIN -->
@@ -1490,7 +1510,7 @@ async function cargarPool() {
 // ══════════════════════════════════════════════
 // HISTORIAL
 // ══════════════════════════════════════════════
-const COMPETENCIAS_LABEL = { liga: 'Liga AFA', copa: 'Copa Argentina', mundial: 'Mundial de Clubes', supercopa: 'Supercopa Argentina' }
+const COMPETENCIAS_LABEL = { liga: 'Liga AFA', copa: 'Copa Argentina', mundial: 'Mundial de Clubes', supercopa: 'Supercopa Argentina', superfinal: 'Súper Final' }
 const MEDALLAS = ['🥇','🥈','🥉']
 
 function renderHistorial() {
@@ -1550,6 +1570,7 @@ function renderHistorial() {
             <option value="copa">Copa Argentina</option>
             <option value="mundial">Mundial de Clubes</option>
             <option value="supercopa">Supercopa Argentina</option>
+            <option value="superfinal">Súper Final</option>
           </select>
         </div>
         <div>
@@ -1600,12 +1621,13 @@ function renderHistorial() {
 // ══════════════════════════════════════════════
 // TABLA HISTÓRICA
 // ══════════════════════════════════════════════
-const PUNTOS_TITULO = { mundial: 5, liga: 4, copa: 3, supercopa: 2 }
+const PUNTOS_TITULO = { superfinal: 6, mundial: 5, liga: 4, copa: 3, supercopa: 2 }
 const COMPS_HIST = [
   { id: 'liga', corto: 'Liga', icono: '🇦🇷' },
   { id: 'copa', corto: 'Copa', icono: '🏆' },
   { id: 'mundial', corto: 'Mundial', icono: '🌍' },
   { id: 'supercopa', corto: 'Super', icono: '⭐' },
+  { id: 'superfinal', corto: 'Súper Final', icono: '👑' },
 ]
 
 function tablaHistoricaHTML(historial) {
@@ -1940,6 +1962,7 @@ function renderTodo() {
   renderLiga()
   renderCopa()
   renderSupercopa()
+  renderSuperFinal()
   renderArgentinos()
   renderSorteo()
   renderBracket()
@@ -5549,7 +5572,10 @@ function mostrarSeccion(id) {
   document.querySelectorAll('.seccion').forEach(s => s.classList.remove('activa'))
   document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'))
   document.getElementById(`sec-${id}`).classList.add('activa')
-  event.target.classList.add('active')
+  const btn = event?.target?.closest ? event.target.closest('.nav-btn') : null
+  if (btn) btn.classList.add('active')
+  if (id === 'superfinal') renderSuperFinal()
+  if (id === 'admin') renderHimnos()
 }
 
 // ══════════════════════════════════════════════
@@ -5728,6 +5754,147 @@ function renderSupercopa() {
   }
 
   cont.innerHTML = reqHTML + partidoHTML + campeonHTML + adminHTML
+}
+
+// ══════════════════════════════════════════════
+// SÚPER FINAL — campeón Supercopa vs campeón Mundial de Clubes
+// Ida y vuelta. Gana quien sume más puntos (3 ganar, 1 empate);
+// si empatan en puntos, diferencia de gol global; si sigue igual, partido desempate.
+// Si el mismo equipo ganó ambas, es campeón automático.
+// ══════════════════════════════════════════════
+const SF_LOGO = `<svg viewBox="0 0 64 64" width="100%" height="100%" aria-hidden="true"><circle cx="32" cy="32" r="30" fill="#101a33" stroke="#f5c542" stroke-width="3"/><circle cx="32" cy="32" r="25" fill="none" stroke="#f5c542" stroke-opacity=".35" stroke-width="1"/><path d="M22 17h20v7c0 7-4.5 12-10 12s-10-5-10-12z" fill="#f5c542"/><path d="M22 19h-5c0 6 3 9 6 9M42 19h5c0 6-3 9-6 9" fill="none" stroke="#f5c542" stroke-width="2.4"/><rect x="29.5" y="35" width="5" height="7" fill="#d9a521"/><rect x="24" y="42" width="16" height="4" rx="1.5" fill="#f5c542"/><rect x="21" y="46" width="22" height="4" rx="1.5" fill="#c8901c"/><path d="M32 20.5l1.6 3.3 3.6.5-2.6 2.5.6 3.6-3.2-1.7-3.2 1.7.6-3.6-2.6-2.5 3.6-.5z" fill="#101a33"/><path d="M14 52l4-2 4 2M42 52l4-2 4 2" stroke="#f5c542" stroke-width="1.6" fill="none"/></svg>`
+function sfParticipantes() {
+  const sc = estado.supercopa || {}
+  const mf = estado.bracket?.final?.[0]
+  const a = sc.ganador ? { nombre: getSupercopaNombre(sc.ganador), dueno: getSupercopaDueno(sc.ganador), logoId: sc.ganador } : null
+  const b = mf?.ganador ? { nombre: getMundialNombre(mf.ganador), dueno: getMundialDueno(mf.ganador), logoId: String(mf.ganador).startsWith('pa') ? mf.ganador : null } : null
+  if (b && !b.logoId) { const pa = (estado.poolArgentino || POOL_ARG).find(e => e.nombre === b.nombre); if (pa) b.logoId = pa.id }
+  return { a, b }
+}
+function sfEstado() {
+  if (!estado.superFinal) estado.superFinal = { legs: [], equipos: null, registrado: false }
+  const sf = estado.superFinal
+  const { a, b } = sfParticipantes()
+  const firma = a && b ? `${a.nombre}|${b.nombre}` : null
+  if (sf.equipos !== firma) { sf.equipos = firma; sf.legs = []; sf.registrado = false }
+  return { sf, a, b }
+}
+function sfCalculo(sf) {
+  let pa = 0, pb = 0, ga = 0, gb = 0, jugados = 0
+  for (const l of sf.legs) {
+    if (l?.ga == null || l?.gb == null) continue
+    jugados++; ga += l.ga; gb += l.gb
+    if (l.ga > l.gb) pa += 3; else if (l.gb > l.ga) pb += 3; else { pa++; pb++ }
+  }
+  let ganador = null
+  const completos = jugados === sf.legs.length
+  if (jugados >= 2 && completos) {
+    if (pa !== pb) ganador = pa > pb ? 'a' : 'b'
+    else if (ga !== gb) ganador = ga > gb ? 'a' : 'b'
+  }
+  const necesitaDesempate = jugados >= 2 && completos && !ganador
+  return { pa, pb, ga, gb, jugados, ganador, necesitaDesempate }
+}
+function sfEscudo(e, size) { return `<span style="width:${size}px;height:${size}px;display:inline-flex;align-items:center;justify-content:center;flex-shrink:0;">${escudoFX(e.nombre, size, colorDe(e.dueno), e.logoId)}</span>` }
+function renderSuperFinal() {
+  const cont = document.getElementById('superfinal-contenido')
+  if (!cont || !estado) return
+  const { sf, a, b } = sfEstado()
+  const intro = `<div class="card" style="text-align:center;">
+    <div class="sf-logo-xl">${SF_LOGO}</div>
+    <div style="font-size:22px;font-weight:900;color:var(--dorado2);letter-spacing:1px;">SÚPER FINAL</div>
+    <div class="text-gris" style="margin-top:4px;">Campeón de la Supercopa vs campeón del Mundial de Clubes · ida y vuelta · gana quien sume más puntos</div>
+  </div>`
+  const slot = (e, txt) => e ? `<div style="display:flex;align-items:center;gap:10px;">${sfEscudo(e, 36)}<div><div style="font-weight:800;color:${colorDe(e.dueno)}">${e.nombre}</div><div class="text-gris">${txt} · ${etiquetaDueno(e.dueno)}</div></div></div>`
+    : `<div style="display:flex;align-items:center;gap:10px;opacity:.6;"><div class="logo-init" style="width:36px;height:36px;">?</div><div><div style="font-weight:700;">Por definir</div><div class="text-gris">${txt}</div></div></div>`
+  if (!a || !b) {
+    cont.innerHTML = intro + `<div class="card"><div class="card-titulo">Esperando a los campeones</div>
+      <div style="display:flex;flex-direction:column;gap:12px;">${slot(a, '🥇 Campeón Supercopa')}${slot(b, '🌍 Campeón Mundial de Clubes')}</div></div>`
+    return
+  }
+  if (a.nombre === b.nombre) {
+    cont.innerHTML = intro + `<div class="card" style="text-align:center;border:2px solid #f5c542;">
+      ${sfEscudo(a, 84)}<div style="font-size:24px;font-weight:900;color:#f5c542;margin-top:8px;">${a.nombre}</div>
+      <div style="color:${colorDe(a.dueno)};font-weight:800;margin-top:4px;">👑 Campeón automático de ${etiquetaDueno(a.dueno)}</div>
+      <div class="text-gris" style="margin-top:6px;">Ganó la Supercopa y el Mundial de Clubes</div></div>`
+    sfCelebrar(a)
+    return
+  }
+  const calc = sfCalculo(sf)
+  const nLegs = Math.max(2, sf.legs.length + (calc.necesitaDesempate ? 1 : 0))
+  window._sfEq = { a, b }
+  const legsHTML = Array.from({ length: nLegs }, (_, i) => {
+    const l = sf.legs[i] || {}
+    const local = i % 2 === 0 ? a : b, visita = i % 2 === 0 ? b : a
+    const gLocal = i % 2 === 0 ? l.ga : l.gb, gVisita = i % 2 === 0 ? l.gb : l.ga
+    const titulo = i === 0 ? 'Ida' : i === 1 ? 'Vuelta' : `Desempate ${i - 1}`
+    const jugado = l.ga != null && l.gb != null
+    const caja = (id, val) => esAdmin
+      ? `<input class="sf-in" type="number" min="0" max="99" id="${id}" value="${val ?? ''}" placeholder="-">`
+      : `<span class="sf-res" style="min-width:40px;">${jugado ? val : '-'}</span>`
+    const linea = (e, id, val, otro) => `<div class="sf-fila" style="padding:3px 0;"><span class="sf-nom" style="color:${colorDe(e.dueno)};font-weight:${jugado && val > otro ? 900 : 700}">${sfEscudo(e, 26)}${e.nombre}<span class="text-gris" style="font-size:11px;font-weight:600;">${etiquetaDueno(e.dueno)}</span></span>${caja(id, val)}</div>`
+    const vsArgs = i % 2 === 0 ? 'window._sfEq.a,window._sfEq.b' : 'window._sfEq.b,window._sfEq.a'
+    return `<div class="sf-leg"><div class="sf-leg-t">${titulo} · local ${local.nombre}</div>
+      ${linea(local, `sf-l-${i}`, gLocal, gVisita)}${linea(visita, `sf-v-${i}`, gVisita, gLocal)}
+      <div style="display:flex;gap:8px;margin-top:8px;">
+        ${esAdmin ? `<button class="btn btn-primary btn-sm" onclick="guardarSuperFinal(${i})">💾 Guardar</button>` : ''}
+        ${!jugado ? `<button class="btn btn-secondary btn-sm" onclick="mostrarVS(${vsArgs},'👑 Súper Final · ${titulo}')">⚔️ Ver VS</button>` : (esAdmin ? `<button class="btn btn-secondary btn-sm" onclick="borrarSuperFinal(${i})">↺ Borrar</button>` : '')}
+      </div></div>`
+  }).join('')
+  const ganador = calc.ganador ? (calc.ganador === 'a' ? a : b) : null
+  const tabla = `<div class="sf-tabla"><div></div><div class="h">PJ</div><div class="h">Goles</div><div class="h">Pts</div>
+    ${[[a, calc.pa, calc.ga], [b, calc.pb, calc.gb]].map(([e, pts, g]) => `<div style="display:flex;align-items:center;gap:8px;font-weight:800;color:${colorDe(e.dueno)};min-width:0;">${sfEscudo(e, 22)}<span style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${e.nombre}</span></div><div class="n">${calc.jugados}</div><div class="n">${g}</div><div class="n" style="color:var(--dorado2);font-size:18px;">${pts}</div>`).join('')}
+  </div>`
+  let estadoTxt = ''
+  if (ganador) estadoTxt = `<div style="text-align:center;margin-top:12px;font-size:18px;font-weight:900;color:#f5c542;">👑 ¡${ganador.nombre} campeón de la Súper Final!</div>`
+  else if (calc.necesitaDesempate) estadoTxt = `<div style="text-align:center;margin-top:12px;font-weight:800;color:var(--dorado2);">⚖️ Empatados en puntos y goles: se juega partido desempate</div>`
+  cont.innerHTML = intro + `
+    <div class="card"><div class="card-titulo">Los finalistas</div>
+      <div style="display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:8px;text-align:center;">
+        <div>${sfEscudo(a, 64)}<div style="font-weight:900;color:${colorDe(a.dueno)};margin-top:6px;">${a.nombre}</div><div class="text-gris">🥇 Supercopa · ${etiquetaDueno(a.dueno)}</div></div>
+        <div style="font-size:26px;font-weight:900;color:var(--dorado2);">VS</div>
+        <div>${sfEscudo(b, 64)}<div style="font-weight:900;color:${colorDe(b.dueno)};margin-top:6px;">${b.nombre}</div><div class="text-gris">🌍 Mundial · ${etiquetaDueno(b.dueno)}</div></div>
+      </div></div>
+    <div class="card"><div class="card-titulo">Partidos</div><div class="sf-legs">${legsHTML}</div></div>
+    <div class="card"><div class="card-titulo">Suma de puntos</div>${tabla}${estadoTxt}
+      <p class="text-gris" style="margin-top:10px;">3 puntos por ganar y 1 por empatar. Si quedan iguales, define la diferencia de gol; si sigue igual, partido desempate.</p></div>`
+  if (ganador) sfCelebrar(ganador)
+}
+function sfCelebrar(e) {
+  const key = `superfinal_${e.nombre}`
+  const sf = estado.superFinal
+  if (esAdmin && sf && !sf.registrado) {
+    sf.registrado = true
+    if (!estado.historial) estado.historial = []
+    if (!estado.historial.some(h => h.competencia === 'superfinal' && h.campeon === e.nombre && h.temporada === new Date().getFullYear()))
+      estado.historial.push({ id: Date.now().toString(), temporada: new Date().getFullYear(), competencia: 'superfinal', campeon: e.nombre, dueno: e.dueno })
+    guardarEstado()
+  }
+  if (campeonesYaCelebrados.has(key)) return
+  campeonesYaCelebrados.add(key)
+  if (document.getElementById('sec-superfinal')?.classList.contains('activa')) mostrarCampeon(e.nombre, e.logoId, e.dueno, '👑 Súper Final', true, { icono: '👑🏆👑', mensaje: '🎉 ¡{dueno} ES EL REY DE LA SÚPER FINAL! 🎉' })
+  else campeonesYaCelebrados.delete(key)
+}
+async function guardarSuperFinal(i) {
+  const { sf, a, b } = sfEstado()
+  const vl = document.getElementById(`sf-l-${i}`)?.value, vv = document.getElementById(`sf-v-${i}`)?.value
+  if (vl === '' || vv === '' || vl == null || vv == null) { toast('Ingresá los goles', true); return }
+  const gl = parseInt(vl), gv = parseInt(vv)
+  for (let k = 0; k < i; k++) if (!sf.legs[k]) { toast('Primero cargá los partidos anteriores', true); return }
+  sf.legs[i] = { ga: i % 2 === 0 ? gl : gv, gb: i % 2 === 0 ? gv : gl }
+  await guardarEstado()
+  const local = i % 2 === 0 ? a : b, visita = i % 2 === 0 ? b : a
+  const calc = sfCalculo(sf)
+  if (!calc.ganador) zoomResultado(local, visita, gl, gv, { titulo: '👑 Súper Final', mensaje: calc.necesitaDesempate ? '⚖️ ¡Hay desempate!' : null })
+  renderSuperFinal()
+}
+async function borrarSuperFinal(i) {
+  const { sf } = sfEstado()
+  sf.legs = sf.legs.slice(0, i)
+  sf.registrado = false
+  if (estado.historial) estado.historial = estado.historial.filter(h => !(h.competencia === 'superfinal' && h.temporada === new Date().getFullYear()))
+  await guardarEstado()
+  renderSuperFinal()
 }
 
 function guardarResultadoSupercopa() {
@@ -6442,7 +6609,7 @@ function lanzarConfeti() {
   setTimeout(() => wrap.remove(), 6000)
 }
 
-function mostrarCampeon(nombre, logoId, dueno, competencia, esGrande = false) {
+function mostrarCampeon(nombre, logoId, dueno, competencia, esGrande = false, opciones = {}) {
   lanzarConfeti()
   setTimeout(() => lanzarConfeti(), 700)
   if (esGrande) { setTimeout(() => lanzarConfeti(), 1400); setTimeout(() => lanzarConfeti(), 2100) }
@@ -6451,11 +6618,11 @@ function mostrarCampeon(nombre, logoId, dueno, competencia, esGrande = false) {
   cargarLogosIntl([nombre])
   sonarHimno(dueno).then(ok => { if (ok) { if (fxActual) fxActual.dataset.himno = '1' } else sfx.fanfarria() })
   fxMostrar(`<div class="fx-rayos-oro"></div><div class="fx-camp" onclick="event.stopPropagation();this.parentNode.click()">
-    <div class="fx-copa">${esGrande ? '🏆🌍🏆' : '🏆'}</div>
+    <div class="fx-copa">${opciones.icono || (esGrande ? '🏆🌍🏆' : '🏆')}</div>
     <div class="fx-esc">${escudoFX(nombre, 130, '#f5c542', logoId)}</div>
     <div class="fx-comp">${competencia}</div>
     <div class="fx-cnom">${nombre}</div>
-    ${duenoLabel ? `<div class="fx-cdueno" style="color:${color}">${esGrande ? `🎉 ¡${duenoLabel.toUpperCase()} SE CONSAGRÓ CAMPEÓN DEL MUNDO! 🎉` : `🎉 ¡Campeón de ${duenoLabel}!`}</div>` : ''}
+    ${duenoLabel ? `<div class="fx-cdueno" style="color:${color}">${opciones.mensaje ? opciones.mensaje.replace('{dueno}', duenoLabel.toUpperCase()) : esGrande ? `🎉 ¡${duenoLabel.toUpperCase()} SE CONSAGRÓ CAMPEÓN DEL MUNDO! 🎉` : `🎉 ¡Campeón de ${duenoLabel}!`}</div>` : ''}
   </div>`, '#f5c542', esGrande ? 16000 : 12000)
 }
 

@@ -3221,8 +3221,8 @@ function renderEstadoInicio() {
     ${miniCards2.length ? `<div class="hl-fila">${miniCards2.join('')}</div>` : ''}
     ${top5HTML}
     ${ultimosHTML}` : ''
-  const contSuper = (hayStatsSupercopa || hayStatsPromocion) ? `
-    ${scHTML ? `<div class="hl-fila">${scHTML}</div>` : ''}
+  const contSuper = hayStatsSupercopa ? `<div class="hl-fila">${scHTML}</div>` : ''
+  const contPromo = hayStatsPromocion ? `
     ${pMiniCards.length ? `<div class="hl-fila">${pMiniCards.join('')}</div>` : ''}
     ${pUltimosHTML}` : ''
   let contSF = ''
@@ -3250,7 +3250,9 @@ function renderEstadoInicio() {
       <div class="hl-body"><div class="hl-inner">${contenido}</div></div>
     </div>`
   }
-  const faseSuper = { label: estado.supercopa?.ganador ? 'Supercopa finalizada' : hayStatsSupercopa ? 'Supercopa por jugar' : hayStatsPromocion ? 'Resumen de la Promoción' : 'Sin jugar todavía', sub: estado.supercopa?.ganador ? getSupercopaNombre(estado.supercopa.ganador) : '' }
+  const faseSuper = { label: estado.supercopa?.ganador ? '¡Finalizado!' : hayStatsSupercopa ? 'Por jugar' : 'Esperando campeones', sub: estado.supercopa?.ganador ? getSupercopaNombre(estado.supercopa.ganador) : '' }
+  const promoJugados = (estado.promocion?.partidos || []).filter(p => p.golesDescendido != null).length
+  const fasePromo = { label: promoJugados === 4 ? '¡Finalizada!' : promoJugados ? 'En juego' : 'Por jugar', sub: promoJugados ? `${promoJugados}/4 partidos` : '' }
 
   cont.innerHTML = `
     ${vsBannerHTML}
@@ -3258,7 +3260,8 @@ function renderEstadoInicio() {
     ${panel('mundial', 'mundial', '⚽', 'Mundial de Clubes', faseMundial, '#e94560', contMundial)}
     ${panel('liga', 'liga', '🇦🇷', 'Liga AFA', faseLiga, '#4a9eff', contLiga)}
     ${panel('copa', 'copa', '🏆', 'Copa Argentina', faseCopa, '#f5a623', contCopa)}
-    ${panel('super', 'supercopa', '🥇', 'Supercopa y Promoción', faseSuper, '#2ecc71', contSuper)}
+    ${panel('promo', 'promocion', '🔃', 'Promoción', fasePromo, '#a855f7', contPromo)}
+    ${panel('super', 'supercopa', '🥇', 'Supercopa Argentina', faseSuper, '#2ecc71', contSuper)}
     ${panel('superfinal', 'superfinal', '👑', 'Súper Final', faseSF, '#f5c542', contSF)}
     <div style="font-size:11px;color:var(--gris);margin-top:8px;">Actualizado: ${ultima}</div>
   `

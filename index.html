@@ -3261,7 +3261,7 @@ function renderSorteo() {
     const santi = estado.sorteo.internacionales.filter(e => e.dueno === 'santi')
     const luciano = estado.sorteo.internacionales.filter(e => e.dueno === 'luciano')
     const lapiz = esAdmin
-      ? (id) => `<button onclick="abrirReemplazoEquipo('${id}')" title="Reemplazar equipo" style="background:none;border:none;cursor:pointer;font-size:14px;padding:2px 4px;opacity:0.6;" onmouseover="this.style.opacity=1" onmouseout="this.style.opacity=0.6">✏️</button>`
+      ? (id) => `<button onclick="event.stopPropagation();abrirReemplazoEquipo('${id}')" title="Reemplazar equipo" style="background:none;border:none;cursor:pointer;font-size:14px;padding:2px 4px;opacity:0.6;" onmouseover="this.style.opacity=1" onmouseout="this.style.opacity=0.6">✏️</button>`
       : () => ''
     cont.innerHTML = `
       <div class="card">
@@ -3269,11 +3269,11 @@ function renderSorteo() {
         <div class="sorteo-grid">
           <div>
             <div style="font-weight:700; margin-bottom:10px;" class="badge-santi">SANTI (${santi.length})</div>
-            ${santi.map(e => `<div class="equipo-row"><span style="display:flex;align-items:center;gap:8px;min-width:0;">${escudoNombre(e.nombre, 20)}<span class="equipo-nombre">${e.nombre}</span></span><span class="equipo-liga">${e.liga}</span>${lapiz(e.id)}</div>`).join('')}
+            ${santi.map(e => `<div class="equipo-row" style="cursor:pointer;" onclick="verEquipoSorteo('${e.id}')"><span style="display:flex;align-items:center;gap:8px;min-width:0;">${escudoNombre(e.nombre, 20)}<span class="equipo-nombre">${e.nombre}</span></span><span class="equipo-liga">${e.liga}</span>${lapiz(e.id)}</div>`).join('')}
           </div>
           <div>
             <div style="font-weight:700; margin-bottom:10px;" class="badge-luciano">LUCIANO (${luciano.length})</div>
-            ${luciano.map(e => `<div class="equipo-row"><span style="display:flex;align-items:center;gap:8px;min-width:0;">${escudoNombre(e.nombre, 20)}<span class="equipo-nombre">${e.nombre}</span></span><span class="equipo-liga">${e.liga}</span>${lapiz(e.id)}</div>`).join('')}
+            ${luciano.map(e => `<div class="equipo-row" style="cursor:pointer;" onclick="verEquipoSorteo('${e.id}')"><span style="display:flex;align-items:center;gap:8px;min-width:0;">${escudoNombre(e.nombre, 20)}<span class="equipo-nombre">${e.nombre}</span></span><span class="equipo-liga">${e.liga}</span>${lapiz(e.id)}</div>`).join('')}
           </div>
         </div>
         ${esAdmin ? `<div class="mt flex-gap"><button class="btn btn-secondary btn-sm" onclick="resetSorteo()">↺ Rehacer sorteo</button></div>` : ''}
@@ -3287,7 +3287,7 @@ function renderSorteo() {
     const santi = estado.sorteo.internacionales.filter(e => e.dueno === 'santi')
     const luciano = estado.sorteo.internacionales.filter(e => e.dueno === 'luciano')
     const lapiz = esAdmin
-      ? (id) => `<button onclick="abrirReemplazoEquipo('${id}')" title="Resortear solo este equipo" style="background:none;border:none;cursor:pointer;font-size:14px;padding:2px 4px;opacity:0.75;">✏️</button>`
+      ? (id) => `<button onclick="event.stopPropagation();abrirReemplazoEquipo('${id}')" title="Resortear solo este equipo" style="background:none;border:none;cursor:pointer;font-size:14px;padding:2px 4px;opacity:0.75;">✏️</button>`
       : () => ''
     cont.innerHTML = `
       <div class="card">
@@ -3296,11 +3296,11 @@ function renderSorteo() {
         <div class="sorteo-grid">
           <div>
             <div style="font-weight:700; margin-bottom:10px;" class="badge-santi">SANTI (${santi.length})</div>
-            ${santi.map(e => `<div class="equipo-row"><span style="display:flex;align-items:center;gap:8px;min-width:0;">${escudoNombre(e.nombre, 20)}<span class="equipo-nombre">${e.nombre}</span></span><span class="equipo-liga">${e.liga}</span>${lapiz(e.id)}</div>`).join('')}
+            ${santi.map(e => `<div class="equipo-row" style="cursor:pointer;" onclick="verEquipoSorteo('${e.id}')"><span style="display:flex;align-items:center;gap:8px;min-width:0;">${escudoNombre(e.nombre, 20)}<span class="equipo-nombre">${e.nombre}</span></span><span class="equipo-liga">${e.liga}</span>${lapiz(e.id)}</div>`).join('')}
           </div>
           <div>
             <div style="font-weight:700; margin-bottom:10px;" class="badge-luciano">LUCIANO (${luciano.length})</div>
-            ${luciano.map(e => `<div class="equipo-row"><span style="display:flex;align-items:center;gap:8px;min-width:0;">${escudoNombre(e.nombre, 20)}<span class="equipo-nombre">${e.nombre}</span></span><span class="equipo-liga">${e.liga}</span>${lapiz(e.id)}</div>`).join('')}
+            ${luciano.map(e => `<div class="equipo-row" style="cursor:pointer;" onclick="verEquipoSorteo('${e.id}')"><span style="display:flex;align-items:center;gap:8px;min-width:0;">${escudoNombre(e.nombre, 20)}<span class="equipo-nombre">${e.nombre}</span></span><span class="equipo-liga">${e.liga}</span>${lapiz(e.id)}</div>`).join('')}
           </div>
         </div>
         ${esAdmin ? `
@@ -3781,6 +3781,32 @@ async function revelarSorteoRL(t) {
   siguiente()
 }
 
+// Vista grande de un equipo sorteado, para buscarlo en el juego (se cierra con un toque)
+function verEquipoSorteo(id) {
+  const e = (estado.sorteo?.internacionales || []).find(x => x.id === id)
+  if (e) verEquipoGrande(e)
+}
+function verEquipoGrande(club) {
+  const color = colorDe(club.dueno)
+  const [pais, ...resto] = String(club.liga || '').split(' - ')
+  const liga = resto.join(' - ')
+  sfx.whoosh(.18)
+  cargarLogosIntl([club.nombre]).then(() => {
+    const el = document.getElementById('veq-esc'), u = logoPorNombre(club.nombre)
+    if (el && u) el.innerHTML = `<img src="${u}" alt="">`
+  })
+  fxMostrar(`<div class="bp-zrayos" style="--c:${color}"></div><div class="bp-zcard" style="--c:${color};position:relative;min-width:270px">
+    <div style="font-size:11px;letter-spacing:2px;text-transform:uppercase;color:var(--gris);margin-bottom:10px;">🎮 Búscalo en FC 27</div>
+    <div class="bp-zesc" id="veq-esc" style="width:150px;height:150px;">${escudoFX(club.nombre, 130, color)}</div>
+    <div class="bp-znom" style="font-size:32px;">${club.nombre}</div>
+    ${liga ? `<div style="margin-top:12px;display:flex;flex-direction:column;gap:6px;align-items:center;">
+      <div style="font-size:13px;color:var(--gris);">País <b style="color:#fff;font-size:16px;">${pais}</b></div>
+      <div style="font-size:13px;color:var(--gris);">Liga <b style="color:#fff;font-size:16px;">${liga}</b></div></div>`
+      : (club.liga ? `<div class="bp-zliga" style="font-size:15px;color:#fff;margin-top:10px;">${club.liga}</div>` : '')}
+    ${club.dueno ? `<div class="bp-zdueno" style="--c:${color}">${etiquetaDueno(club.dueno)}</div>` : ''}
+  </div>`, color, 0)
+}
+
 function zoomEquipo(club, color, esc, duracion) {
   const ini = club.nombre.split(' ').map(w => w[0]).filter(Boolean).slice(0, 2).join('').toUpperCase()
   const z = document.createElement('div')
@@ -3817,7 +3843,7 @@ function animarBolillero(bolillas, idx, animId = sorteoAnimId) {
     // agregar ✏️ a cada equipo para resortearlo individualmente
     if (esAdmin) document.querySelectorAll('#col-santi .bolilla-item, #col-luciano .bolilla-item').forEach(row => {
       const id = row.dataset.id
-      if (id && !row.querySelector('.lapiz-reemplazo')) row.insertAdjacentHTML('beforeend', `<button class="lapiz-reemplazo" onclick="abrirReemplazoEquipo('${id}')" title="Resortear solo este equipo" style="background:none;border:none;cursor:pointer;font-size:14px;padding:2px 4px;opacity:0.75;">✏️</button>`)
+      if (id && !row.querySelector('.lapiz-reemplazo')) row.insertAdjacentHTML('beforeend', `<button class="lapiz-reemplazo" onclick="event.stopPropagation();abrirReemplazoEquipo('${id}')" title="Resortear solo este equipo" style="background:none;border:none;cursor:pointer;font-size:14px;padding:2px 4px;opacity:0.75;">✏️</button>`)
     })
     // Confeti rápido al terminar
     for (let i = 0; i < 18; i++) {
@@ -3906,6 +3932,8 @@ function animarBolillero(bolillas, idx, animId = sorteoAnimId) {
       const div   = document.createElement('div')
       div.className = 'equipo-row bolilla-item'
       div.dataset.id = club.id
+      div.style.cursor = 'pointer'
+      div.onclick = () => verEquipoGrande(club)
       div.innerHTML = `<span style="display:flex;align-items:center;gap:8px;min-width:0;">${escudoNombre(club.nombre, 20)}<span class="equipo-nombre">${club.nombre}</span></span><span class="equipo-liga">${club.liga}</span>`
       col.appendChild(div)
       cntEl.textContent = col.children.length

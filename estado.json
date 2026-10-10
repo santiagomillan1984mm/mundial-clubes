@@ -1,6 +1,6 @@
 {
   "version": "1.0",
-  "ultimaActualizacion": "2026-10-10T06:32:45.793Z",
+  "ultimaActualizacion": "2026-10-10T06:48:36.260Z",
   "equiposArgentinos": [
     {
       "id": "arg1",
@@ -687,8 +687,8 @@
         "dueno": "luciano",
         "descendidoId": "pa7",
         "rivalId": "pa21",
-        "golesDescendido": null,
-        "golesRival": null,
+        "golesDescendido": 1,
+        "golesRival": 4,
         "decision": null
       }
     ]

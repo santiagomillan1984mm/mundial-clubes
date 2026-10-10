@@ -2134,26 +2134,19 @@ function renderEstadoInicio() {
     </div>`
   }
 
-  const vsBannerHTML = `<div class="card" style="margin-bottom:14px;padding:0;overflow:hidden;">
-    <div style="display:flex;align-items:flex-end;justify-content:center;position:relative;background:linear-gradient(180deg, var(--azul2) 0%, var(--azul) 100%);min-height:150px;">
-      <div style="flex:1;display:flex;justify-content:flex-end;overflow:hidden;">
-        <img src="santi.png" alt="Santi" style="max-height:210px;width:auto;object-fit:contain;object-position:bottom;" />
+  const avatarJugador = (img, nombre, color, tit) => `<div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:8px;min-width:0;">
+      <div style="width:112px;height:112px;border-radius:50%;padding:3px;background:${color};box-shadow:0 0 0 4px rgba(0,0,0,0.25),0 6px 22px ${color}66;">
+        <img src="${img}" alt="${nombre}" style="width:100%;height:100%;border-radius:50%;object-fit:cover;display:block;border:3px solid var(--azul);box-sizing:border-box;" />
       </div>
-      <div style="position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);z-index:2;background:var(--dorado2);color:#1a1a2e;font-weight:800;font-size:15px;width:44px;height:44px;border-radius:50%;display:flex;align-items:center;justify-content:center;box-shadow:0 2px 10px rgba(0,0,0,0.4);letter-spacing:0.5px;">VS</div>
-      <div style="flex:1;display:flex;justify-content:flex-start;overflow:hidden;">
-        <img src="luciano.png" alt="Luciano" style="max-height:210px;width:auto;object-fit:contain;object-position:bottom;" />
-      </div>
-    </div>
-    <div style="display:flex;border-top:1px solid var(--border);">
-      <div style="flex:1;text-align:center;padding:10px 6px;">
-        <div style="color:#4a9eff;font-weight:800;font-size:14px;letter-spacing:0.5px;">SANTI</div>
-        <div style="font-size:13px;color:var(--dorado2);font-weight:700;margin-top:2px;">🏆 ${titulos.santi}</div>
-      </div>
-      <div style="width:1px;background:var(--border);"></div>
-      <div style="flex:1;text-align:center;padding:10px 6px;">
-        <div style="color:#ff6b6b;font-weight:800;font-size:14px;letter-spacing:0.5px;">LUCIANO</div>
-        <div style="font-size:13px;color:var(--dorado2);font-weight:700;margin-top:2px;">🏆 ${titulos.luciano}</div>
-      </div>
+      <div style="color:${color};font-weight:800;font-size:15px;letter-spacing:1px;">${nombre.toUpperCase()}</div>
+      <div style="font-size:13px;color:var(--dorado2);font-weight:700;background:rgba(0,0,0,0.25);border-radius:20px;padding:3px 12px;">🏆 ${tit}</div>
+    </div>`
+
+  const vsBannerHTML = `<div class="card" style="margin-bottom:14px;padding:20px 12px 16px;background:radial-gradient(circle at 25% 30%, rgba(74,158,255,0.18), transparent 55%),radial-gradient(circle at 75% 30%, rgba(255,107,107,0.18), transparent 55%),linear-gradient(180deg, var(--azul2) 0%, var(--azul) 100%);">
+    <div style="display:flex;align-items:flex-start;justify-content:center;gap:6px;">
+      ${avatarJugador('santi-avatar.png', 'Santi', '#4a9eff', titulos.santi)}
+      <div style="align-self:flex-start;margin-top:36px;flex-shrink:0;background:var(--dorado2);color:#1a1a2e;font-weight:800;font-size:15px;width:44px;height:44px;border-radius:50%;display:flex;align-items:center;justify-content:center;box-shadow:0 2px 10px rgba(0,0,0,0.4);">VS</div>
+      ${avatarJugador('luciano-avatar.png', 'Luciano', '#ff6b6b', titulos.luciano)}
     </div>
   </div>`
 

@@ -1,6 +1,6 @@
 {
   "version": "1.0",
-  "ultimaActualizacion": "2026-10-10T06:03:18.403Z",
+  "ultimaActualizacion": "2026-10-10T06:03:24.066Z",
   "equiposArgentinos": [
     {
       "id": "arg1",
@@ -680,7 +680,7 @@
         "rivalId": "pa11",
         "golesDescendido": 2,
         "golesRival": 3,
-        "decision": null
+        "decision": "cambia"
       },
       {
         "id": "prom4",

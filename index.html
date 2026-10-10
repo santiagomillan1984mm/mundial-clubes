@@ -390,6 +390,44 @@
     @keyframes bp-latido { to { transform: scale(1.07); } }
     @keyframes bp-fondo { from { opacity: 0; } }
     @keyframes bp-fondo-out { to { opacity: 0; } }
+    /* ── INICIO: destacados en paneles ── */
+    .hl-titulo { font-size: 15px; font-weight: 900; margin: 18px 2px 10px; display: flex; flex-direction: column; gap: 2px; }
+    .hl-titulo span { font-size: 11px; font-weight: 500; color: var(--gris); }
+    .hl-panel { background: var(--card); border: 1px solid var(--border); border-radius: 16px; margin-bottom: 12px; overflow: hidden; position: relative;
+      box-shadow: inset 4px 0 0 var(--c); transition: box-shadow .3s, transform .2s; }
+    .hl-panel.abierto { box-shadow: inset 4px 0 0 var(--c), 0 8px 26px color-mix(in srgb, var(--c) 22%, transparent); }
+    .hl-head { width: 100%; display: flex; align-items: center; gap: 12px; padding: 14px 14px 14px 16px; background: linear-gradient(100deg, color-mix(in srgb, var(--c) 16%, transparent), transparent 60%);
+      border: 0; color: var(--texto); cursor: pointer; text-align: left; position: relative; overflow: hidden; font-family: inherit; }
+    .hl-head::after { content: ''; position: absolute; inset: 0; background: linear-gradient(100deg, transparent 30%, rgba(255,255,255,.08) 50%, transparent 70%); transform: translateX(-100%); animation: hl-brillo 5s ease-in-out infinite; }
+    .hl-panel.abierto .hl-head::after, .hl-panel.vacio .hl-head::after { animation: none; }
+    .hl-head:active { transform: scale(.99); }
+    .hl-head:disabled { cursor: default; opacity: .75; }
+    @keyframes hl-brillo { 0%, 60% { transform: translateX(-100%); } 85%, 100% { transform: translateX(100%); } }
+    .hl-logo { width: 56px; height: 56px; flex-shrink: 0; border-radius: 14px; background: #fff; display: flex; align-items: center; justify-content: center; padding: 6px; box-shadow: 0 4px 12px rgba(0,0,0,.3); }
+    .hl-logo img { max-width: 100%; max-height: 100%; object-fit: contain; }
+    .hl-logo.sf { background: none; padding: 0; box-shadow: 0 0 16px rgba(245,197,66,.35); border-radius: 50%; }
+    .hl-logo.emoji { font-size: 30px; background: var(--azul3); }
+    .hl-tit { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 3px; }
+    .hl-tit b { font-size: 17px; font-weight: 900; }
+    .hl-tit small { font-size: 12px; color: var(--gris); display: flex; align-items: center; gap: 6px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .hl-vivo { width: 8px; height: 8px; border-radius: 50%; background: #e74c3c; flex-shrink: 0; animation: hl-pulso 1.4s ease-in-out infinite; }
+    @keyframes hl-pulso { 0%, 100% { box-shadow: 0 0 0 0 rgba(231,76,60,.7); } 50% { box-shadow: 0 0 0 6px rgba(231,76,60,0); } }
+    .hl-ver { font-size: 11px; font-weight: 800; color: var(--c); text-transform: uppercase; letter-spacing: 1px; }
+    .hl-chev { font-size: 20px; color: var(--c); transition: transform .35s; line-height: 1; }
+    .hl-panel.abierto .hl-chev { transform: rotate(180deg); }
+    .hl-body { display: grid; grid-template-rows: 0fr; transition: grid-template-rows .45s cubic-bezier(.3,.8,.3,1); }
+    .hl-panel.abierto .hl-body { grid-template-rows: 1fr; }
+    .hl-inner { overflow: hidden; padding: 0 12px; }
+    .hl-panel.abierto .hl-inner { padding: 6px 12px 12px; }
+    .hl-fila { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 10px; }
+    .hl-panel.abierto .hl-inner > * { animation: hl-entra .5s cubic-bezier(.2,.9,.3,1.1) both; }
+    .hl-panel.abierto .hl-inner > *:nth-child(2) { animation-delay: .08s; } .hl-panel.abierto .hl-inner > *:nth-child(3) { animation-delay: .16s; }
+    .hl-panel.abierto .hl-inner > *:nth-child(4) { animation-delay: .24s; } .hl-panel.abierto .hl-inner > *:nth-child(n+5) { animation-delay: .32s; }
+    .hl-panel.abierto .hl-fila > * { animation: hl-entra .5s cubic-bezier(.2,.9,.3,1.1) both; }
+    .hl-panel.abierto .hl-fila > *:nth-child(2) { animation-delay: .1s; } .hl-panel.abierto .hl-fila > *:nth-child(3) { animation-delay: .2s; } .hl-panel.abierto .hl-fila > *:nth-child(n+4) { animation-delay: .3s; }
+    .hl-inner .card, .hl-fila > div { transition: transform .2s; }
+    .hl-fila > div:active { transform: scale(.97); }
+    @keyframes hl-entra { from { opacity: 0; transform: translateY(14px) scale(.96); } }
     /* ── EFECTOS: VS, resultado, campeón ── */
     .fx-capa { position: fixed; inset: 0; z-index: 9998; display: flex; align-items: center; justify-content: center; cursor: pointer;
       background: radial-gradient(circle at 50% 45%, rgba(10,16,32,.9), rgba(3,5,10,.97)); backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px); animation: bp-fondo .25s ease-out; overflow: hidden; }
@@ -1317,6 +1355,7 @@ async function cargarCompLogos() {
   }
   try { localStorage.setItem(COMP_LOGO_KEY, JSON.stringify(compLogos)) } catch(e) {}
   pintarCompLogos()
+  try { if (estado) renderEstadoInicio() } catch(e) {}
 }
 
 function nombresMundial() {
@@ -2572,6 +2611,22 @@ function getContadorGeneral() {
   return conteo
 }
 
+const HL_KEY = 'tdc_hl_abiertos'
+function hlAbiertos() {
+  try { const v = JSON.parse(localStorage.getItem(HL_KEY)); if (Array.isArray(v)) return new Set(v) } catch(e) {}
+  return new Set(['mundial'])
+}
+function toggleHL(k) {
+  const set = hlAbiertos()
+  set.has(k) ? set.delete(k) : set.add(k)
+  try { localStorage.setItem(HL_KEY, JSON.stringify([...set])) } catch(e) {}
+  const el = document.querySelector(`.hl-panel[data-k="${k}"]`)
+  if (!el || el.classList.contains('vacio')) return
+  el.classList.toggle('abierto', set.has(k))
+  const v = el.querySelector('.hl-ver'); if (v) v.textContent = set.has(k) ? 'Ocultar' : 'Ver'
+  if (set.has(k)) { sfx.whoosh(.1); setTimeout(() => el.scrollIntoView({ behavior: 'smooth', block: 'nearest' }), 250) }
+}
+
 function renderEstadoInicio() {
   if (!estado) return
   const cont = document.getElementById('inicio-contenido')
@@ -2687,7 +2742,7 @@ function renderEstadoInicio() {
   if (masGoleador) {
     const d = masGoleador.dueno
     goleadorHTML = `<div style="flex:1;min-width:200px;background:var(--card);border:1px solid var(--border);border-radius:10px;padding:16px;display:flex;align-items:center;gap:14px;">
-      ${logoHTML(masGoleador.id, 52)}
+      ${logoHTML(masGoleador.id, 70)}
       <div>
         <div style="font-size:11px;color:var(--gris);text-transform:uppercase;letter-spacing:1px;margin-bottom:4px;">⚽ Más goleador</div>
         <div style="font-size:16px;font-weight:700;color:${d==='santi'?'#4a9eff':'#ff6b6b'};">${getPoolNombre(masGoleador.id)}</div>
@@ -2707,7 +2762,7 @@ function renderEstadoInicio() {
       <div style="font-size:11px;color:var(--gris);text-transform:uppercase;letter-spacing:1px;margin-bottom:12px;">🔥 Mejor partido — ${total} goles</div>
       <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;">
         <div style="display:flex;flex-direction:column;align-items:center;gap:4px;flex:1;">
-          ${logoHTML(mejorPartido.local, 40)}
+          ${logoHTML(mejorPartido.local, 54)}
           <span style="font-size:11px;text-align:center;color:${dL==='santi'?'#4a9eff':'#ff6b6b'};font-weight:600;">${getPoolNombre(mejorPartido.local)}</span>
         </div>
         <div style="text-align:center;flex-shrink:0;">
@@ -2715,7 +2770,7 @@ function renderEstadoInicio() {
           <div style="font-size:10px;color:var(--gris);">J${mejorPartido.jornada}</div>
         </div>
         <div style="display:flex;flex-direction:column;align-items:center;gap:4px;flex:1;">
-          ${logoHTML(mejorPartido.visitante, 40)}
+          ${logoHTML(mejorPartido.visitante, 54)}
           <span style="font-size:11px;text-align:center;color:${dV==='santi'?'#4a9eff':'#ff6b6b'};font-weight:600;">${getPoolNombre(mejorPartido.visitante)}</span>
         </div>
       </div>
@@ -2839,7 +2894,7 @@ function renderEstadoInicio() {
   if (mGoleador) {
     const eq = getEquipo(mGoleador.id)
     mGoleadorHTML = `<div style="flex:1;min-width:200px;background:var(--card);border:1px solid var(--border);border-radius:10px;padding:16px;display:flex;align-items:center;gap:14px;">
-      ${avatarIniciales(eq?.nombre || mGoleador.id, 52)}
+      ${avatarIniciales(eq?.nombre || mGoleador.id, 70)}
       <div>
         <div style="font-size:11px;color:var(--gris);text-transform:uppercase;letter-spacing:1px;margin-bottom:4px;">⚽ Más goleador</div>
         <div style="font-size:16px;font-weight:700;color:${mGoleador.dueno === 'santi' ? '#4a9eff' : '#ff6b6b'};">${eq?.nombre || mGoleador.id}</div>
@@ -2853,7 +2908,7 @@ function renderEstadoInicio() {
   if (mGoleado) {
     const eq = getEquipo(mGoleado.id)
     mGoleadoHTML = `<div style="flex:1;min-width:200px;background:var(--card);border:1px solid var(--border);border-radius:10px;padding:16px;display:flex;align-items:center;gap:14px;">
-      ${avatarIniciales(eq?.nombre || mGoleado.id, 52)}
+      ${avatarIniciales(eq?.nombre || mGoleado.id, 70)}
       <div>
         <div style="font-size:11px;color:var(--gris);text-transform:uppercase;letter-spacing:1px;margin-bottom:4px;">🥅 Más goleado</div>
         <div style="font-size:16px;font-weight:700;color:${mGoleado.dueno === 'santi' ? '#4a9eff' : '#ff6b6b'};">${eq?.nombre || mGoleado.id}</div>
@@ -2871,7 +2926,7 @@ function renderEstadoInicio() {
       <div style="font-size:11px;color:var(--gris);text-transform:uppercase;letter-spacing:1px;margin-bottom:12px;">🔥 Mejor partido — ${total} goles</div>
       <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;">
         <div style="display:flex;flex-direction:column;align-items:center;gap:4px;flex:1;">
-          ${avatarIniciales(eqL?.nombre, 40)}
+          ${avatarIniciales(eqL?.nombre, 54)}
           <span style="font-size:11px;text-align:center;color:${eqL?.dueno === 'santi' ? '#4a9eff' : '#ff6b6b'};font-weight:600;">${eqL?.nombre || mMejorPartido.local}</span>
         </div>
         <div style="text-align:center;flex-shrink:0;">
@@ -2879,7 +2934,7 @@ function renderEstadoInicio() {
           <div style="font-size:10px;color:var(--gris);">${LABELS_RONDA_MUNDIAL[mMejorPartido.ronda]}</div>
         </div>
         <div style="display:flex;flex-direction:column;align-items:center;gap:4px;flex:1;">
-          ${avatarIniciales(eqV?.nombre, 40)}
+          ${avatarIniciales(eqV?.nombre, 54)}
           <span style="font-size:11px;text-align:center;color:${eqV?.dueno === 'santi' ? '#4a9eff' : '#ff6b6b'};font-weight:600;">${eqV?.nombre || mMejorPartido.visitante}</span>
         </div>
       </div>
@@ -2959,7 +3014,7 @@ function renderEstadoInicio() {
   let cGoleadorHTML = ''
   if (cGoleador) {
     cGoleadorHTML = `<div style="flex:1;min-width:200px;background:var(--card);border:1px solid var(--border);border-radius:10px;padding:16px;display:flex;align-items:center;gap:14px;">
-      ${logoHTML(cGoleador.id, 52)}
+      ${logoHTML(cGoleador.id, 70)}
       <div>
         <div style="font-size:11px;color:var(--gris);text-transform:uppercase;letter-spacing:1px;margin-bottom:4px;">⚽ Más goleador</div>
         <div style="font-size:16px;font-weight:700;color:${cGoleador.dueno === 'santi' ? '#4a9eff' : '#ff6b6b'};">${getCopaNombre(cGoleador.id)}</div>
@@ -2972,7 +3027,7 @@ function renderEstadoInicio() {
   let cGoleadoHTML = ''
   if (cGoleado) {
     cGoleadoHTML = `<div style="flex:1;min-width:200px;background:var(--card);border:1px solid var(--border);border-radius:10px;padding:16px;display:flex;align-items:center;gap:14px;">
-      ${logoHTML(cGoleado.id, 52)}
+      ${logoHTML(cGoleado.id, 70)}
       <div>
         <div style="font-size:11px;color:var(--gris);text-transform:uppercase;letter-spacing:1px;margin-bottom:4px;">🥅 Más goleado</div>
         <div style="font-size:16px;font-weight:700;color:${cGoleado.dueno === 'santi' ? '#4a9eff' : '#ff6b6b'};">${getCopaNombre(cGoleado.id)}</div>
@@ -2989,7 +3044,7 @@ function renderEstadoInicio() {
       <div style="font-size:11px;color:var(--gris);text-transform:uppercase;letter-spacing:1px;margin-bottom:12px;">🔥 Mejor partido — ${total} goles</div>
       <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;">
         <div style="display:flex;flex-direction:column;align-items:center;gap:4px;flex:1;">
-          ${logoHTML(cMejorPartido.local, 40)}
+          ${logoHTML(cMejorPartido.local, 54)}
           <span style="font-size:11px;text-align:center;color:${getCopaDueno(cMejorPartido.local) === 'santi' ? '#4a9eff' : '#ff6b6b'};font-weight:600;">${getCopaNombre(cMejorPartido.local)}</span>
         </div>
         <div style="text-align:center;flex-shrink:0;">
@@ -2997,7 +3052,7 @@ function renderEstadoInicio() {
           <div style="font-size:10px;color:var(--gris);">${LABELS_RONDA_COPA[cMejorPartido.ronda]}</div>
         </div>
         <div style="display:flex;flex-direction:column;align-items:center;gap:4px;flex:1;">
-          ${logoHTML(cMejorPartido.visitante, 40)}
+          ${logoHTML(cMejorPartido.visitante, 54)}
           <span style="font-size:11px;text-align:center;color:${getCopaDueno(cMejorPartido.visitante) === 'santi' ? '#4a9eff' : '#ff6b6b'};font-weight:600;">${getCopaNombre(cMejorPartido.visitante)}</span>
         </div>
       </div>
@@ -3068,14 +3123,14 @@ function renderEstadoInicio() {
       <div style="font-size:11px;color:var(--gris);text-transform:uppercase;letter-spacing:1px;margin-bottom:12px;">🥇 Supercopa Argentina</div>
       <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;">
         <div style="display:flex;flex-direction:column;align-items:center;gap:4px;flex:1;">
-          ${logoHTML(scResultado.localId, 40)}
+          ${logoHTML(scResultado.localId, 54)}
           <span style="font-size:11px;text-align:center;color:${dL === 'santi' ? '#4a9eff' : '#ff6b6b'};font-weight:600;">${nL}</span>
         </div>
         <div style="text-align:center;flex-shrink:0;">
           <div style="font-size:26px;font-weight:800;color:var(--dorado2);">${scResultado.golesLocal} - ${scResultado.golesVisitante}</div>
         </div>
         <div style="display:flex;flex-direction:column;align-items:center;gap:4px;flex:1;">
-          ${logoHTML(scResultado.visitanteId, 40)}
+          ${logoHTML(scResultado.visitanteId, 54)}
           <span style="font-size:11px;text-align:center;color:${dV === 'santi' ? '#4a9eff' : '#ff6b6b'};font-weight:600;">${nV}</span>
         </div>
       </div>
@@ -3149,49 +3204,60 @@ function renderEstadoInicio() {
   const miniCards2 = [proximoHTML, copaEliminadoHTML].filter(Boolean)
   const hayStatsLiga = goleadorHTML || mejorHTML || miniCards1.length || top5HTML || ultimosHTML
 
+  // ── Destacados en paneles desplegables, uno por competencia ──
+  const contMundial = hayStatsMundial ? `
+    ${(mGoleadorHTML || mGoleadoHTML || mMejorPartidoHTML) ? `<div class="hl-fila">${mGoleadorHTML}${mGoleadoHTML}${mMejorPartidoHTML}</div>` : ''}
+    ${mMiniCards.length ? `<div class="hl-fila">${mMiniCards.join('')}</div>` : ''}
+    ${mUltimosHTML}` : ''
+  const contCopa = hayStatsCopa ? `
+    ${(cGoleadorHTML || cGoleadoHTML || cMejorPartidoHTML) ? `<div class="hl-fila">${cGoleadorHTML}${cGoleadoHTML}${cMejorPartidoHTML}</div>` : ''}
+    ${cMiniCards.length ? `<div class="hl-fila">${cMiniCards.join('')}</div>` : ''}
+    ${cUltimosHTML}` : ''
+  const contLiga = hayStatsLiga ? `
+    ${(goleadorHTML || mejorHTML) ? `<div class="hl-fila">${goleadorHTML}${mejorHTML}</div>` : ''}
+    ${miniCards1.length ? `<div class="hl-fila">${miniCards1.join('')}</div>` : ''}
+    ${miniCards2.length ? `<div class="hl-fila">${miniCards2.join('')}</div>` : ''}
+    ${top5HTML}
+    ${ultimosHTML}` : ''
+  const contSuper = (hayStatsSupercopa || hayStatsPromocion) ? `
+    ${scHTML ? `<div class="hl-fila">${scHTML}</div>` : ''}
+    ${pMiniCards.length ? `<div class="hl-fila">${pMiniCards.join('')}</div>` : ''}
+    ${pUltimosHTML}` : ''
+  let contSF = ''
+  try {
+    const { sf: sfE, a: sfA, b: sfB } = sfEstado()
+    if (sfA || sfB) {
+      const c = sfA && sfB ? sfCalculo(sfE) : null
+      const lado = (e, txt) => e ? `<div style="text-align:center;flex:1;min-width:0;"><div style="display:flex;justify-content:center;">${sfEscudo(e, 70)}</div><div style="font-weight:900;color:${colorDe(e.dueno)};margin-top:6px;">${e.nombre}</div><div class="text-gris">${txt}</div></div>`
+        : `<div style="text-align:center;flex:1;opacity:.55;"><div class="logo-init" style="width:70px;height:70px;margin:0 auto;font-size:26px;">?</div><div style="margin-top:6px;">Por definir</div><div class="text-gris">${txt}</div></div>`
+      contSF = `<div class="hl-fila"><div class="card" style="flex:1;display:flex;align-items:center;gap:10px;">${lado(sfA, '🥇 Supercopa')}<div style="font-size:28px;font-weight:900;color:var(--dorado2);">${c && c.jugados ? `${c.ga}-${c.gb}` : 'VS'}</div>${lado(sfB, '🌍 Mundial')}</div></div>`
+    }
+  } catch(e) {}
+  const faseSF = (() => { try { const { sf: x, a, b } = sfEstado(); if (!a || !b) return { label: 'Esperando campeones', sub: '' }; if (a.nombre === b.nombre) return { label: '¡Campeón automático!', sub: a.nombre }; const c = sfCalculo(x); return c.ganador ? { label: '¡Finalizado!', sub: (c.ganador === 'a' ? a : b).nombre } : { label: c.jugados ? 'En juego' : 'Por jugar', sub: c.jugados ? `Global ${c.ga}-${c.gb}` : '' } } catch(e) { return { label: '', sub: '' } } })()
+
+  const hlLogo = (comp, emoji) => comp === 'superfinal' ? `<span class="hl-logo sf">${SF_LOGO}</span>` : (compLogos[comp] ? `<span class="hl-logo"><img src="${compLogos[comp]}" alt=""></span>` : `<span class="hl-logo emoji">${emoji}</span>`)
+  const enJuego = f => f.label && !/Finaliz|pendiente|Esperando|Sin configurar|automático|Resumen|Sin jugar|Por jugar/i.test(f.label)
+  const panel = (key, comp, emoji, titulo, fase, color, contenido) => {
+    const abierto = hlAbiertos().has(key)
+    return `<div class="hl-panel ${abierto ? 'abierto' : ''} ${contenido ? '' : 'vacio'}" data-k="${key}" style="--c:${color}">
+      <button class="hl-head" onclick="toggleHL('${key}')" ${contenido ? '' : 'disabled'}>
+        ${hlLogo(comp, emoji)}
+        <span class="hl-tit"><b>${titulo}</b><small>${enJuego(fase) ? '<span class="hl-vivo"></span>' : ''}${fase.label || ''}${fase.sub ? ` · ${fase.sub}` : ''}</small></span>
+        ${contenido ? `<span class="hl-ver">${abierto ? 'Ocultar' : 'Ver'}</span><span class="hl-chev">⌄</span>` : `<span class="hl-ver" style="opacity:.6">Sin datos aún</span>`}
+      </button>
+      <div class="hl-body"><div class="hl-inner">${contenido}</div></div>
+    </div>`
+  }
+  const faseSuper = { label: estado.supercopa?.ganador ? 'Supercopa finalizada' : hayStatsSupercopa ? 'Supercopa por jugar' : hayStatsPromocion ? 'Resumen de la Promoción' : 'Sin jugar todavía', sub: estado.supercopa?.ganador ? getSupercopaNombre(estado.supercopa.ganador) : '' }
+
   cont.innerHTML = `
     ${vsBannerHTML}
-    <!-- Competencias -->
-    <div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:14px;">
-      ${compCard('🇦🇷','Liga AFA', faseLiga.label, faseLiga.sub, '#4a9eff')}
-      ${compCard('🏆','Copa Argentina', faseCopa.label, faseCopa.sub, '#f5a623')}
-      ${compCard('⚽','Mundial Clubes', faseMundial.label, faseMundial.sub, '#e94560')}
-    </div>
-
-    <!-- ═══ Estadísticas — Mundial de Clubes ═══ -->
-    ${hayStatsMundial ? `
-    <div style="font-size:13px;font-weight:700;color:var(--texto);margin:18px 0 10px;display:flex;align-items:center;gap:6px;">⚽ Estadísticas — Mundial de Clubes</div>
-    ${(mGoleadorHTML || mGoleadoHTML || mMejorPartidoHTML) ? `<div style="display:flex;gap:12px;flex-wrap:wrap;margin-bottom:14px;">${mGoleadorHTML}${mGoleadoHTML}${mMejorPartidoHTML}</div>` : ''}
-    ${mMiniCards.length ? `<div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:14px;">${mMiniCards.join('')}</div>` : ''}
-    ${mUltimosHTML}
-    ` : ''}
-
-    <!-- ═══ Estadísticas — Copa Argentina ═══ -->
-    ${hayStatsCopa ? `
-    <div style="font-size:13px;font-weight:700;color:var(--texto);margin:18px 0 10px;display:flex;align-items:center;gap:6px;">🏆 Estadísticas — Copa Argentina</div>
-    ${(cGoleadorHTML || cGoleadoHTML || cMejorPartidoHTML) ? `<div style="display:flex;gap:12px;flex-wrap:wrap;margin-bottom:14px;">${cGoleadorHTML}${cGoleadoHTML}${cMejorPartidoHTML}</div>` : ''}
-    ${cMiniCards.length ? `<div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:14px;">${cMiniCards.join('')}</div>` : ''}
-    ${cUltimosHTML}
-    ` : ''}
-
-    <!-- ═══ Estadísticas — Liga AFA ═══ -->
-    ${hayStatsLiga ? `
-    <div style="font-size:13px;font-weight:700;color:var(--texto);margin:18px 0 10px;display:flex;align-items:center;gap:6px;">🇦🇷 Estadísticas — Liga AFA</div>
-    ${(goleadorHTML || mejorHTML) ? `<div style="display:flex;gap:12px;flex-wrap:wrap;margin-bottom:14px;">${goleadorHTML}${mejorHTML}</div>` : ''}
-    ${miniCards1.length ? `<div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:14px;">${miniCards1.join('')}</div>` : ''}
-    ${miniCards2.length ? `<div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:14px;">${miniCards2.join('')}</div>` : ''}
-    ${top5HTML}
-    ${ultimosHTML}
-    ` : ''}
-
-    <!-- ═══ Supercopa + Promoción ═══ -->
-    ${(hayStatsSupercopa || hayStatsPromocion) ? `
-    <div style="font-size:13px;font-weight:700;color:var(--texto);margin:18px 0 10px;display:flex;align-items:center;gap:6px;">🥇 Supercopa y Promoción</div>
-    ${scHTML ? `<div style="display:flex;gap:12px;flex-wrap:wrap;margin-bottom:14px;">${scHTML}</div>` : ''}
-    ${pMiniCards.length ? `<div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:14px;">${pMiniCards.join('')}</div>` : ''}
-    ${pUltimosHTML}
-    ` : ''}
-
+    <div class="hl-titulo">✨ Destacados del torneo <span>Toca una competencia para ver su resumen</span></div>
+    ${panel('mundial', 'mundial', '⚽', 'Mundial de Clubes', faseMundial, '#e94560', contMundial)}
+    ${panel('liga', 'liga', '🇦🇷', 'Liga AFA', faseLiga, '#4a9eff', contLiga)}
+    ${panel('copa', 'copa', '🏆', 'Copa Argentina', faseCopa, '#f5a623', contCopa)}
+    ${panel('super', 'supercopa', '🥇', 'Supercopa y Promoción', faseSuper, '#2ecc71', contSuper)}
+    ${panel('superfinal', 'superfinal', '👑', 'Súper Final', faseSF, '#f5c542', contSF)}
     <div style="font-size:11px;color:var(--gris);margin-top:8px;">Actualizado: ${ultima}</div>
   `
 }

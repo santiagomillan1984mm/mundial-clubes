@@ -425,6 +425,9 @@
       background: linear-gradient(180deg, #2a2208, #120f04); border: 3px solid #f5c542; box-shadow: 0 0 90px rgba(245,197,66,.55); animation: bp-zoom-in .7s cubic-bezier(.2,1.4,.4,1); }
     .fx-camp .fx-copa { font-size: 54px; animation: fx-copa 1s ease-in-out infinite alternate; }
     @keyframes fx-copa { from { transform: translateY(0) rotate(-6deg); } to { transform: translateY(-8px) rotate(6deg); } }
+    .fx-comp-logo { margin: 0 auto 6px; background: #fff; border-radius: 14px; padding: 8px 12px; display: inline-flex; align-items: center; justify-content: center;
+      box-shadow: 0 0 24px rgba(245,197,66,.5); animation: bp-pop .6s cubic-bezier(.34,1.56,.64,1); }
+    .fx-comp-logo img { height: 70px; max-width: 170px; object-fit: contain; }
     .fx-camp .fx-esc { width: 150px; height: 150px; margin: 6px auto 10px; display: flex; align-items: center; justify-content: center;
       filter: drop-shadow(0 0 22px rgba(245,197,66,.6)) drop-shadow(0 10px 18px rgba(0,0,0,.6)); animation: bp-latido 1s ease-in-out .7s infinite alternate; }
     .fx-camp .fx-esc img { max-width: 100%; max-height: 100%; object-fit: contain; }
@@ -6669,7 +6672,13 @@ function mostrarCampeon(nombre, logoId, dueno, competencia, esGrande = false, op
   cargarLogosIntl([nombre])
   sonarHimno(dueno).then(ok => { if (ok) { if (fxActual) fxActual.dataset.himno = '1' } else sfx.fanfarria() })
   fxMostrar(`<div class="fx-rayos-oro"></div><div class="fx-camp" onclick="event.stopPropagation();this.parentNode.click()">
-    <div class="fx-copa">${opciones.icono || (esGrande ? '🏆🌍🏆' : '🏆')}</div>
+    ${(() => {
+      // logo oficial de la competencia, si lo tenemos
+      const comp = /Súper Final/.test(competencia) ? 'superfinal' : /Supercopa/.test(competencia) ? 'supercopa' : /Mundial/.test(competencia) ? 'mundial' : /Copa Argentina/.test(competencia) ? 'copa' : /Liga AFA/.test(competencia) ? 'liga' : null
+      if (comp === 'superfinal') return `<div class="fx-comp-logo" style="width:96px;height:96px;padding:0;background:none;">${SF_LOGO}</div>`
+      const u = comp && compLogos[comp]
+      return u ? `<div class="fx-comp-logo"><img src="${u}" alt=""></div>` : `<div class="fx-copa">${opciones.icono || (esGrande ? '🏆🌍🏆' : '🏆')}</div>`
+    })()}
     <div class="fx-esc">${escudoFX(nombre, 130, '#f5c542', logoId)}</div>
     <div class="fx-comp">${competencia}</div>
     <div class="fx-cnom">${nombre}</div>

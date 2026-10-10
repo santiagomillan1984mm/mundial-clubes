@@ -3098,6 +3098,16 @@ function renderSorteo() {
 }
 
 let sorteoAnimId = 0
+// Sorteo en dos pasos: primero una liga al azar (todas con la misma chance), después un equipo de esa liga
+function elegirPorLiga(lista) {
+  const porLiga = {}
+  for (const c of lista) (porLiga[c.liga] ||= []).push(c)
+  const ligas = Object.keys(porLiga)
+  if (!ligas.length) return null
+  const liga = ligas[Math.floor(Math.random() * ligas.length)]
+  const eqs = porLiga[liga]
+  return eqs[Math.floor(Math.random() * eqs.length)]
+}
 function hacerSorteo() {
   if (poolClubes.length < 10) { toast('Pool de clubes no cargado', true); return }
 
@@ -3109,9 +3119,14 @@ function hacerSorteo() {
   const totalInt = intSanti + intLuciano
 
   // Mezclar pool y seleccionar
-  // Mezcla justa (Fisher-Yates): todos los clubes del pool tienen la misma probabilidad
-  const mezclado = [...poolClubes]
-  for (let i = mezclado.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [mezclado[i], mezclado[j]] = [mezclado[j], mezclado[i]] }
+  // Cada bolilla: primero sale una liga al azar y luego un equipo de esa liga (sin repetir equipos)
+  const mezclado = []
+  let restantes = [...poolClubes]
+  while (mezclado.length < totalInt && restantes.length) {
+    const c = elegirPorLiga(restantes)
+    mezclado.push(c)
+    restantes = restantes.filter(x => x !== c)
+  }
   const seleccionados = mezclado.slice(0, totalInt)
 
   // Repartir
@@ -3327,7 +3342,7 @@ function girarReemplazo() {
   esfera.style.boxShadow = '0 0 50px rgba(245,166,35,0.7)'
 
   setTimeout(() => {
-    const elegido = disponibles[Math.floor(Math.random() * disponibles.length)]
+    const elegido = elegirPorLiga(disponibles)
     _reemplazoCandidato = elegido
     esfera.style.animation = ''
     esfera.style.boxShadow = '0 0 30px rgba(245,166,35,0.3)'

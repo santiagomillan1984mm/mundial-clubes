@@ -322,6 +322,28 @@
     .bp-revela .bp-card .bp-nom { font-size: 17px; font-weight: 800; text-align: left; line-height: 1.15; }
     .bp-revela .bp-card .bp-liga { font-size: 11px; color: var(--gris); text-align: left; margin-top: 2px; }
     @keyframes bp-pop { from { transform: scale(.5) translateY(-24px); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+    .bp-zoom { position: fixed; inset: 0; z-index: 9998; display: flex; align-items: center; justify-content: center;
+      background: radial-gradient(circle at 50% 45%, rgba(0,0,0,.35), rgba(0,0,0,.78)); animation: bp-fondo .25s ease-out; pointer-events: none; }
+    .bp-zoom.fuera { animation: bp-fondo-out .35s ease-in forwards; }
+    .bp-zoom .bp-zcard { text-align: center; padding: 26px 30px 22px; border-radius: 22px; background: linear-gradient(180deg, #1c2a4a, #0f1830);
+      border: 3px solid var(--c); box-shadow: 0 0 60px color-mix(in srgb, var(--c) 55%, transparent), 0 20px 50px rgba(0,0,0,.6);
+      min-width: 240px; max-width: 86vw; animation: bp-zoom-in .55s cubic-bezier(.2,1.4,.4,1); }
+    .bp-zoom.fuera .bp-zcard { animation: bp-zoom-out .35s ease-in forwards; }
+    .bp-zoom .bp-zesc { width: 130px; height: 130px; margin: 0 auto 12px; display: flex; align-items: center; justify-content: center;
+      filter: drop-shadow(0 8px 18px rgba(0,0,0,.55)); animation: bp-latido 1.2s ease-in-out .5s infinite alternate; }
+    .bp-zoom .bp-zesc img { max-width: 100%; max-height: 100%; object-fit: contain; }
+    .bp-zoom .bp-zesc .bp-zini { width: 120px; height: 120px; border-radius: 50%; background: var(--c); color: #fff; font-size: 44px; font-weight: 900; display: flex; align-items: center; justify-content: center; }
+    .bp-zoom .bp-znom { font-size: 30px; font-weight: 900; line-height: 1.1; color: #fff; letter-spacing: .3px; }
+    .bp-zoom .bp-zliga { font-size: 13px; color: var(--gris); margin-top: 6px; }
+    .bp-zoom .bp-zdueno { display: inline-block; margin-top: 14px; padding: 6px 18px; border-radius: 20px; background: var(--c); color: #fff; font-weight: 800; font-size: 15px; letter-spacing: 1px; text-transform: uppercase; }
+    .bp-zoom .bp-zrayos { position: absolute; width: 520px; height: 520px; border-radius: 50%;
+      background: repeating-conic-gradient(from 0deg, color-mix(in srgb, var(--c) 22%, transparent) 0 8deg, transparent 8deg 22deg);
+      animation: bp-rodar 9s linear infinite; mask: radial-gradient(circle, #000 25%, transparent 68%); -webkit-mask: radial-gradient(circle, #000 25%, transparent 68%); }
+    @keyframes bp-zoom-in { from { transform: scale(.15) translateY(80px); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+    @keyframes bp-zoom-out { to { transform: scale(.4) translateY(120px); opacity: 0; } }
+    @keyframes bp-latido { to { transform: scale(1.07); } }
+    @keyframes bp-fondo { from { opacity: 0; } }
+    @keyframes bp-fondo-out { to { opacity: 0; } }
     .bp-vuela { position: fixed; width: 30px; height: 30px; border-radius: 50%; z-index: 9999; pointer-events: none;
       background: radial-gradient(circle at 32% 28%, #fff 0 10%, var(--c) 48%, rgba(0,0,0,.5) 100%);
       transition: transform .55s cubic-bezier(.5,0,.5,1), opacity .55s; }
@@ -3283,6 +3305,18 @@ function lanzarPapelito(nombre, dueno) {
   }, 950)
 }
 
+function zoomEquipo(club, color, esc, duracion) {
+  const ini = club.nombre.split(' ').map(w => w[0]).filter(Boolean).slice(0, 2).join('').toUpperCase()
+  const z = document.createElement('div')
+  z.className = 'bp-zoom'; z.style.setProperty('--c', color)
+  z.innerHTML = `<div class="bp-zrayos"></div><div class="bp-zcard" style="position:relative">
+    <div class="bp-zesc">${esc ? `<img src="${esc}" alt="">` : `<div class="bp-zini">${ini}</div>`}</div>
+    <div class="bp-znom">${club.nombre}</div><div class="bp-zliga">${club.liga}</div>
+    <div class="bp-zdueno">${club.dueno === 'santi' ? 'Santi' : 'Luciano'}</div></div>`
+  document.body.appendChild(z)
+  setTimeout(() => { z.classList.add('fuera'); setTimeout(() => z.remove(), 380) }, duracion)
+}
+
 function animarBolillero(bolillas, idx, animId = sorteoAnimId) {
   // Si se inició otro sorteo, esta animación vieja se detiene (evita equipos duplicados en las columnas)
   if (animId !== sorteoAnimId) return
@@ -3348,6 +3382,9 @@ function animarBolillero(bolillas, idx, animId = sorteoAnimId) {
     if (revela) revela.innerHTML = `<div class="bp-card" style="--c:${colorD}">${esc ? `<img src="${esc}" alt="">` : ''}<div><div class="bp-nom" style="color:${colorD}">${club.nombre}</div><div class="bp-liga">${club.liga}</div></div></div><div class="bolillero-texto" id="bol-texto" style="display:none">${club.nombre}</div>`
     duenoEl.innerHTML = `<span class="badge-${club.dueno}" style="font-size:13px;">${club.dueno === 'santi' ? 'Santi' : 'Luciano'}</span>`
 
+    // zoom: el equipo aparece en grande con su escudo
+    setTimeout(() => { if (animId === sorteoAnimId) zoomEquipo(club, colorD, esc, 1300) }, 450)
+
     // la bolilla vuela a la columna del dueño
     setTimeout(() => {
       if (animId !== sorteoAnimId || !tomada) return
@@ -3362,21 +3399,25 @@ function animarBolillero(bolillas, idx, animId = sorteoAnimId) {
       requestAnimationFrame(() => requestAnimationFrame(() => { v.style.transform = `translate(${dx}px, ${dy}px) scale(.5)`; v.style.opacity = '.2' }))
       setTimeout(() => v.remove(), 600)
       tomada.classList.remove('si')
-    }, 800)
+    }, 2050)
 
-    const col   = document.getElementById(`col-${club.dueno}`)
-    const cntEl = document.getElementById(`cnt-${club.dueno}`)
-    const div   = document.createElement('div')
-    div.className = 'equipo-row bolilla-item'
-    div.innerHTML = `<span style="display:flex;align-items:center;gap:8px;min-width:0;">${escudoNombre(club.nombre, 20)}<span class="equipo-nombre">${club.nombre}</span></span><span class="equipo-liga">${club.liga}</span>`
-    col.appendChild(div)
-    cntEl.textContent = col.children.length
-    div.scrollIntoView({ behavior: 'smooth', block: 'nearest' })
+    // el equipo entra a la columna del dueño cuando termina el zoom
+    setTimeout(() => {
+      if (animId !== sorteoAnimId) return
+      const col   = document.getElementById(`col-${club.dueno}`)
+      const cntEl = document.getElementById(`cnt-${club.dueno}`)
+      const div   = document.createElement('div')
+      div.className = 'equipo-row bolilla-item'
+      div.innerHTML = `<span style="display:flex;align-items:center;gap:8px;min-width:0;">${escudoNombre(club.nombre, 20)}<span class="equipo-nombre">${club.nombre}</span></span><span class="equipo-liga">${club.liga}</span>`
+      col.appendChild(div)
+      cntEl.textContent = col.children.length
+      div.scrollIntoView({ behavior: 'smooth', block: 'nearest' })
+    }, 2150)
 
     setTimeout(() => {
       esfera.classList.remove('saliendo')
       setTimeout(() => animarBolillero(bolillas, idx + 1, animId), 300)
-    }, 1000)
+    }, 2250)
   }, 750)
 }
 

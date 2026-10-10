@@ -881,6 +881,8 @@
   <div style="display:flex;align-items:center;gap:10px;">
     <button id="btn-tema" onclick="toggleTema()" title="Cambiar tema"
       style="background:none;border:none;font-size:18px;cursor:pointer;color:var(--gris);padding:4px;">🌙</button>
+    <button id="btn-sonido" onclick="toggleSonido()" title="Sonido"
+      style="background:none;border:none;font-size:18px;cursor:pointer;color:var(--gris);padding:4px;">🔊</button>
     <button id="btn-notif" onclick="solicitarNotificaciones()" title="Activar notificaciones"
       style="background:none;border:none;font-size:18px;cursor:pointer;color:var(--gris);padding:4px;">🔕</button>
     <div id="admin-status" style="font-size:12px; color: var(--gris);">Solo lectura</div>
@@ -995,6 +997,11 @@
         <button class="btn btn-secondary" onclick="desactivarAdmin()">Cerrar sesión</button>
       </div>
       <div id="admin-msg" style="margin-top:10px; font-size:13px;"></div>
+    </div>
+    <div class="card">
+      <div class="card-titulo">🎵 Himnos del campeón</div>
+      <p class="text-gris" style="margin-bottom:12px;">Sube el audio (mp3) que quieres que suene cuando salga campeón cada uno. Se guarda solo en este celular. Si no hay audio, suena una fanfarria.</p>
+      <div id="himnos-lista"></div>
     </div>
   </div>
 
@@ -3406,6 +3413,148 @@ function lanzarPapelito(nombre, dueno) {
   }, 950)
 }
 
+// ═══════════ SONIDO (Web Audio, sin archivos) ═══════════
+const SONIDO_KEY = 'tdc_sonido_off'
+let sonidoOff = false
+try { sonidoOff = localStorage.getItem(SONIDO_KEY) === '1' } catch(e) {}
+let actx = null
+function audio() {
+  if (sonidoOff) return null
+  try {
+    if (!actx) actx = new (window.AudioContext || window.webkitAudioContext)()
+    if (actx.state === 'suspended') actx.resume()
+  } catch(e) { return null }
+  return actx
+}
+// Los celulares solo permiten audio después de un toque: se "desbloquea" con el primero
+document.addEventListener('pointerdown', () => { if (!sonidoOff) audio() }, { once: true, capture: true })
+function actualizarBtnSonido() { const b = document.getElementById('btn-sonido'); if (b) b.textContent = sonidoOff ? '🔇' : '🔊' }
+function toggleSonido() {
+  sonidoOff = !sonidoOff
+  try { localStorage.setItem(SONIDO_KEY, sonidoOff ? '1' : '0') } catch(e) {}
+  actualizarBtnSonido()
+  if (sonidoOff) detenerHimno(); else { audio(); sfx.pop() }
+  toast(sonidoOff ? '🔇 Sonido apagado' : '🔊 Sonido encendido')
+}
+function ruido(ctx, dur) {
+  const b = ctx.createBuffer(1, Math.max(1, ctx.sampleRate * dur), ctx.sampleRate), d = b.getChannelData(0)
+  for (let i = 0; i < d.length; i++) d[i] = Math.random() * 2 - 1
+  const s = ctx.createBufferSource(); s.buffer = b; return s
+}
+function tono(ctx, { f = 440, f2 = null, tipo = 'sine', t = 0, dur = .2, vol = .2, ataque = .01 }) {
+  const o = ctx.createOscillator(), g = ctx.createGain(), t0 = ctx.currentTime + t
+  o.type = tipo; o.frequency.setValueAtTime(f, t0); if (f2) o.frequency.exponentialRampToValueAtTime(f2, t0 + dur)
+  g.gain.setValueAtTime(0.0001, t0); g.gain.exponentialRampToValueAtTime(vol, t0 + ataque); g.gain.exponentialRampToValueAtTime(0.0001, t0 + dur)
+  o.connect(g).connect(ctx.destination); o.start(t0); o.stop(t0 + dur + .05)
+}
+const sfx = {
+  // bolillas chocando dentro del bolillero
+  rattle(ms = 700) {
+    const ctx = audio(); if (!ctx) return
+    const n = Math.round(ms / 45)
+    for (let i = 0; i < n; i++) {
+      const t0 = ctx.currentTime + i * .045 + Math.random() * .02
+      const s = ruido(ctx, .03), f = ctx.createBiquadFilter(), g = ctx.createGain()
+      f.type = 'bandpass'; f.frequency.value = 2500 + Math.random() * 2500; f.Q.value = 6
+      g.gain.setValueAtTime(.18 * Math.random() + .05, t0); g.gain.exponentialRampToValueAtTime(.0001, t0 + .03)
+      s.connect(f).connect(g).connect(ctx.destination); s.start(t0); s.stop(t0 + .04)
+    }
+  },
+  pop() { const ctx = audio(); if (!ctx) return; tono(ctx, { f: 520, f2: 1100, tipo: 'triangle', dur: .12, vol: .25 }) },
+  whoosh(vol = .25) {
+    const ctx = audio(); if (!ctx) return
+    const s = ruido(ctx, .5), f = ctx.createBiquadFilter(), g = ctx.createGain(), t0 = ctx.currentTime
+    f.type = 'bandpass'; f.Q.value = 1.2; f.frequency.setValueAtTime(400, t0); f.frequency.exponentialRampToValueAtTime(3500, t0 + .35)
+    g.gain.setValueAtTime(.0001, t0); g.gain.exponentialRampToValueAtTime(vol, t0 + .15); g.gain.exponentialRampToValueAtTime(.0001, t0 + .45)
+    s.connect(f).connect(g).connect(ctx.destination); s.start(t0); s.stop(t0 + .5)
+  },
+  revela() { const ctx = audio(); if (!ctx) return; [784, 988, 1319].forEach((f, i) => tono(ctx, { f, tipo: 'triangle', t: i * .07, dur: .35, vol: .14 })) },
+  // golpe del VS
+  impacto() {
+    const ctx = audio(); if (!ctx) return
+    tono(ctx, { f: 140, f2: 40, tipo: 'sine', dur: .6, vol: .7, ataque: .005 })
+    const s = ruido(ctx, .4), f = ctx.createBiquadFilter(), g = ctx.createGain(), t0 = ctx.currentTime
+    f.type = 'lowpass'; f.frequency.value = 900; g.gain.setValueAtTime(.35, t0); g.gain.exponentialRampToValueAtTime(.0001, t0 + .4)
+    s.connect(f).connect(g).connect(ctx.destination); s.start(t0); s.stop(t0 + .45)
+  },
+  silbato(t = 0) {
+    const ctx = audio(); if (!ctx) return
+    const o = ctx.createOscillator(), lfo = ctx.createOscillator(), lg = ctx.createGain(), g = ctx.createGain(), t0 = ctx.currentTime + t
+    o.type = 'sine'; o.frequency.value = 2900; lfo.frequency.value = 38; lg.gain.value = 120
+    lfo.connect(lg).connect(o.frequency)
+    g.gain.setValueAtTime(.0001, t0); g.gain.exponentialRampToValueAtTime(.12, t0 + .02); g.gain.setValueAtTime(.12, t0 + .32); g.gain.exponentialRampToValueAtTime(.0001, t0 + .4)
+    o.connect(g).connect(ctx.destination); o.start(t0); lfo.start(t0); o.stop(t0 + .45); lfo.stop(t0 + .45)
+  },
+  // la tribuna gritando
+  tribuna(dur = 2.2, vol = .35, t = 0) {
+    const ctx = audio(); if (!ctx) return
+    const t0 = ctx.currentTime + t
+    for (let k = 0; k < 3; k++) {
+      const s = ruido(ctx, dur), f = ctx.createBiquadFilter(), g = ctx.createGain()
+      f.type = 'bandpass'; f.frequency.value = [500, 900, 1400][k]; f.Q.value = .9
+      g.gain.setValueAtTime(.0001, t0); g.gain.exponentialRampToValueAtTime(vol / (k + 1), t0 + .35)
+      g.gain.setValueAtTime(vol / (k + 1), t0 + dur * .55); g.gain.exponentialRampToValueAtTime(.0001, t0 + dur)
+      s.connect(f).connect(g).connect(ctx.destination); s.start(t0); s.stop(t0 + dur)
+    }
+  },
+  ooh() { const ctx = audio(); if (!ctx) return; this.tribuna(1.1, .18, .35); tono(ctx, { f: 330, f2: 220, tipo: 'sine', t: .35, dur: .9, vol: .08, ataque: .2 }) },
+  // fanfarria propia para el campeón
+  fanfarria() {
+    const ctx = audio(); if (!ctx) return
+    const notas = [[523, 0, .18], [659, .18, .18], [784, .36, .18], [1047, .54, .5], [784, 1.1, .16], [1047, 1.26, .9]]
+    notas.forEach(([f, t, d]) => {
+      ;[1, 1.005].forEach(det => {
+        const o = ctx.createOscillator(), fl = ctx.createBiquadFilter(), g = ctx.createGain(), t0 = ctx.currentTime + t
+        o.type = 'sawtooth'; o.frequency.value = f * det; fl.type = 'lowpass'; fl.frequency.value = 2400
+        g.gain.setValueAtTime(.0001, t0); g.gain.exponentialRampToValueAtTime(.09, t0 + .03); g.gain.setValueAtTime(.09, t0 + d * .7); g.gain.exponentialRampToValueAtTime(.0001, t0 + d)
+        o.connect(fl).connect(g).connect(ctx.destination); o.start(t0); o.stop(t0 + d + .05)
+      })
+    })
+    this.tribuna(3.2, .25, .5)
+  },
+}
+
+// ── Himnos subidos por el usuario (IndexedDB, solo en este dispositivo)
+function himnosDB() {
+  return new Promise((ok, mal) => {
+    const r = indexedDB.open('tdc_audio', 1)
+    r.onupgradeneeded = () => r.result.createObjectStore('himnos')
+    r.onsuccess = () => ok(r.result); r.onerror = () => mal(r.error)
+  })
+}
+async function himnoGet(d) { try { const db = await himnosDB(); return await new Promise(ok => { const q = db.transaction('himnos').objectStore('himnos').get(d); q.onsuccess = () => ok(q.result || null); q.onerror = () => ok(null) }) } catch(e) { return null } }
+async function himnoSet(d, blob) { const db = await himnosDB(); await new Promise((ok, mal) => { const tx = db.transaction('himnos', 'readwrite'); blob ? tx.objectStore('himnos').put(blob, d) : tx.objectStore('himnos').delete(d); tx.oncomplete = ok; tx.onerror = () => mal(tx.error) }) }
+let himnoAudio = null
+function detenerHimno() { if (himnoAudio) { try { himnoAudio.pause() } catch(e) {} himnoAudio = null } }
+async function sonarHimno(dueno) {
+  if (sonidoOff) return false
+  const blob = (dueno === 'santi' || dueno === 'luciano') ? await himnoGet(dueno) : null
+  if (!blob) return false
+  detenerHimno()
+  himnoAudio = new Audio(URL.createObjectURL(blob))
+  try { await himnoAudio.play(); return true } catch(e) { return false }
+}
+async function renderHimnos() {
+  const cont = document.getElementById('himnos-lista'); if (!cont) return
+  const fila = async d => {
+    const tiene = !!(await himnoGet(d))
+    return `<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;padding:8px 0;border-bottom:1px solid var(--border);">
+      <span class="badge-${d}" style="min-width:76px;text-align:center;">${d === 'santi' ? 'Santi' : 'Luciano'}</span>
+      <span class="text-gris" style="flex:1;">${tiene ? '✅ Audio cargado' : 'Sin audio (suena fanfarria)'}</span>
+      <label class="btn btn-secondary btn-sm" style="cursor:pointer;">📁 Subir<input type="file" accept="audio/*" style="display:none" onchange="subirHimno('${d}',this)"></label>
+      ${tiene ? `<button class="btn btn-secondary btn-sm" onclick="probarHimno('${d}')">▶️</button><button class="btn btn-secondary btn-sm" onclick="detenerHimno()">⏹</button><button class="btn btn-secondary btn-sm" onclick="quitarHimno('${d}')">🗑️</button>` : ''}
+    </div>`
+  }
+  cont.innerHTML = (await fila('santi')) + (await fila('luciano'))
+}
+async function subirHimno(d, inp) {
+  const f = inp.files[0]; if (!f) return
+  if (f.size > 15 * 1024 * 1024) { toast('El audio es muy pesado (máx. 15 MB)', true); return }
+  try { await himnoSet(d, f); toast('🎵 Himno guardado'); renderHimnos() } catch(e) { toast('No se pudo guardar el audio', true) }
+}
+async function probarHimno(d) { const was = sonidoOff; sonidoOff = false; await sonarHimno(d); sonidoOff = was }
+async function quitarHimno(d) { await himnoSet(d, null); detenerHimno(); renderHimnos() }
+
 // ═══════════ EFECTOS ESPECIALES: VS, resultado, campeón ═══════════
 function colorDe(d) { return d === 'santi' ? '#4a9eff' : d === 'luciano' ? '#ff6b6b' : (d ? rlColor(d) : '#f5a623') }
 function etiquetaDueno(d) { return d === 'santi' ? 'Santi' : d === 'luciano' ? 'Luciano' : (d || '') }
@@ -3421,7 +3570,7 @@ function fxMostrar(html, color, dur) {
   const z = document.createElement('div')
   z.className = 'fx-capa'; z.style.setProperty('--c', color)
   z.innerHTML = html + `<div class="fx-cerrar">Toca para cerrar</div>`
-  const cerrar = () => { if (!z.isConnected) return; z.classList.add('fuera'); setTimeout(() => z.remove(), 360); if (fxActual === z) fxActual = null }
+  const cerrar = () => { if (!z.isConnected) return; if (z.dataset.himno) detenerHimno(); z.classList.add('fuera'); setTimeout(() => z.remove(), 360); if (fxActual === z) fxActual = null }
   z.onclick = cerrar
   document.body.appendChild(z); fxActual = z
   if (dur) setTimeout(cerrar, dur)
@@ -3433,6 +3582,7 @@ function mostrarVS(L, V, titulo) {
   cargarLogosIntl([L.nombre, V.nombre])
   const lado = (e, cls) => `<div class="fx-lado ${cls}" style="--c:${colorDe(e.dueno)}"><div class="fx-esc">${escudoFX(e.nombre, 96, colorDe(e.dueno), e.logoId)}</div>
     <div class="fx-nom">${e.nombre}</div>${e.dueno ? `<div class="fx-dueno">${etiquetaDueno(e.dueno)}</div>` : ''}</div>`
+  sfx.whoosh(.2); setTimeout(() => sfx.impacto(), 300)
   fxMostrar(`${titulo ? `<div class="fx-titulo">${titulo}</div>` : ''}<div class="fx-vs">${lado(L, 'izq')}<div class="fx-vs-txt">VS</div>${lado(V, 'der')}</div>`, '#f5a623', 3600)
 }
 // Resultado en grande. extra: { titulo, pasa (texto), mensaje }
@@ -3443,6 +3593,7 @@ function zoomResultado(L, V, gl, gv, extra = {}) {
   const eq = (e, g) => `<div class="fx-res-eq ${gana ? (gana === e ? 'gana' : 'pierde') : ''}"><div class="fx-esc">${escudoFX(e.nombre, 76, colorDe(e.dueno), e.logoId)}</div>
     <div class="fx-nom" style="color:${colorDe(e.dueno)};font-size:${e.nombre.length > 12 ? 11 : 13}px;overflow-wrap:normal">${e.nombre}</div></div>`
   const linea = extra.mensaje || (gana ? `¡Gana ${gana.nombre}!` : '¡Empate!')
+  sfx.silbato(); if (gana) sfx.tribuna(2.2, .3, .35); else sfx.ooh()
   fxMostrar(`<div class="fx-res" style="--c:${color}" onclick="event.stopPropagation();this.parentNode.click()">
     ${extra.titulo ? `<div style="font-size:11px;letter-spacing:2px;text-transform:uppercase;color:var(--gris);margin-bottom:10px;">${extra.titulo}</div>` : ''}
     <div class="fx-res-fila">${eq(L)}<div class="fx-marcador">${gl} - ${gv}</div>${eq(V)}</div>
@@ -3451,6 +3602,7 @@ function zoomResultado(L, V, gl, gv, extra = {}) {
 // Un equipo solo en grande (decisiones de promoción, etc.)
 function zoomEquipoFX(nombre, dueno, titulo, mensaje, logoId) {
   const color = colorDe(dueno)
+  sfx.whoosh(); setTimeout(() => sfx.revela(), 250)
   fxMostrar(`<div class="bp-zrayos" style="--c:${color}"></div><div class="bp-zcard" style="--c:${color};position:relative">
     ${titulo ? `<div style="font-size:11px;letter-spacing:2px;text-transform:uppercase;color:var(--gris);margin-bottom:10px;">${titulo}</div>` : ''}
     <div class="bp-zesc">${escudoFX(nombre, 120, color, logoId)}</div><div class="bp-znom">${nombre}</div>
@@ -3535,6 +3687,7 @@ function animarBolillero(bolillas, idx, animId = sorteoAnimId) {
     esfera.classList.remove('girando')
     document.getElementById('bp-mano')?.classList.remove('baja', 'sube')
     const rv = document.getElementById('bp-revela'); if (rv) rv.innerHTML = `<div class="bolillero-texto" id="bol-texto">¡Listo!</div>`
+    sfx.tribuna(2.5, .25)
     const textoFin = document.getElementById('bol-texto'); if (textoFin) textoFin.textContent = '¡Listo!'
     numEl.textContent = ''
     duenoEl.innerHTML = ''
@@ -3576,6 +3729,7 @@ function animarBolillero(bolillas, idx, animId = sorteoAnimId) {
   if (revela) revela.innerHTML = `<div class="bolillero-texto" id="bol-texto">🎲 Sacando bolilla…</div>`
   if (tomada) tomada.classList.remove('si')
   if (mano) { mano.classList.remove('sube'); mano.classList.add('baja') }   // la mano entra al bolillero
+  sfx.rattle(700)
 
   setTimeout(() => {
     if (animId !== sorteoAnimId) return
@@ -3589,12 +3743,13 @@ function animarBolillero(bolillas, idx, animId = sorteoAnimId) {
       tomada.classList.add('si')
     }
     if (mano) { mano.classList.remove('baja'); mano.classList.add('sube') }
+    sfx.pop()
     numEl.textContent = `${idx + 1} / ${bolillas.length}`
     if (revela) revela.innerHTML = `<div class="bp-card" style="--c:${colorD}">${esc ? `<img src="${esc}" alt="">` : ''}<div><div class="bp-nom" style="color:${colorD}">${club.nombre}</div><div class="bp-liga">${club.liga}</div></div></div><div class="bolillero-texto" id="bol-texto" style="display:none">${club.nombre}</div>`
     duenoEl.innerHTML = `<span class="badge-${club.dueno}" style="font-size:13px;">${club.dueno === 'santi' ? 'Santi' : 'Luciano'}</span>`
 
     // zoom: el equipo aparece en grande con su escudo
-    setTimeout(() => { if (animId === sorteoAnimId) zoomEquipo(club, colorD, esc, 1300) }, 450)
+    setTimeout(() => { if (animId === sorteoAnimId) { sfx.whoosh(.2); sfx.revela(); zoomEquipo(club, colorD, esc, 1300) } }, 450)
 
     // la bolilla vuela a la columna del dueño
     setTimeout(() => {
@@ -3608,6 +3763,7 @@ function animarBolillero(bolillas, idx, animId = sorteoAnimId) {
       const dx = hasta.left + hasta.width / 2 - (desde.left + desde.width / 2)
       const dy = Math.min(hasta.bottom, window.innerHeight - 20) - (desde.top + desde.height / 2)
       requestAnimationFrame(() => requestAnimationFrame(() => { v.style.transform = `translate(${dx}px, ${dy}px) scale(.5)`; v.style.opacity = '.2' }))
+      sfx.whoosh(.12)
       setTimeout(() => v.remove(), 600)
       tomada.classList.remove('si')
     }, 2050)
@@ -3711,6 +3867,7 @@ function girarReemplazo() {
   num.textContent = 'Sorteando...'
   esfera.style.animation = 'girar 0.6s linear infinite'
   esfera.style.boxShadow = '0 0 50px rgba(245,166,35,0.7)'
+  sfx.rattle(1300)
 
   setTimeout(() => {
     const elegido = elegirPorLiga(disponibles)
@@ -3727,7 +3884,7 @@ function girarReemplazo() {
     const duenoR = (estado.sorteo.internacionales || []).find(e => e.id === _reemplazoId)?.dueno || ''
     cargarLogosIntl([elegido.nombre]).finally(() => {
       if (_reemplazoCandidato !== elegido) return
-      zoomEquipo({ ...elegido, dueno: duenoR }, colorDe(duenoR), logoPorNombre(elegido.nombre), 1600)
+      sfx.revela(); zoomEquipo({ ...elegido, dueno: duenoR }, colorDe(duenoR), logoPorNombre(elegido.nombre), 1600)
     })
   }, 1400)
 }
@@ -6292,6 +6449,7 @@ function mostrarCampeon(nombre, logoId, dueno, competencia, esGrande = false) {
   const color = colorDe(dueno)
   const duenoLabel = etiquetaDueno(dueno)
   cargarLogosIntl([nombre])
+  sonarHimno(dueno).then(ok => { if (ok) { if (fxActual) fxActual.dataset.himno = '1' } else sfx.fanfarria() })
   fxMostrar(`<div class="fx-rayos-oro"></div><div class="fx-camp" onclick="event.stopPropagation();this.parentNode.click()">
     <div class="fx-copa">${esGrande ? '🏆🌍🏆' : '🏆'}</div>
     <div class="fx-esc">${escudoFX(nombre, 130, '#f5c542', logoId)}</div>
@@ -6473,6 +6631,8 @@ async function init() {
   renderTodo()
   ocultarSplash()
   cargarCompLogos()
+  actualizarBtnSonido()
+  renderHimnos()
   loadLogos().then(() => renderTodo()).then(() => cargarLogosIntl(nombresMundial())).then(n => { if (n) renderSiQuieto() })
 }
 

@@ -5780,20 +5780,23 @@ function sfEstado() {
   return { sf, a, b }
 }
 function sfCalculo(sf) {
-  let pa = 0, pb = 0, ga = 0, gb = 0, jugados = 0
-  for (const l of sf.legs) {
-    if (l?.ga == null || l?.gb == null) continue
-    jugados++; ga += l.ga; gb += l.gb
-    if (l.ga > l.gb) pa += 3; else if (l.gb > l.ga) pb += 3; else { pa++; pb++ }
-  }
-  let ganador = null
+  // Ida y vuelta: gana el global de goles. Si el global queda empatado, se juega un desempate;
+  // cada desempate se define por sí solo (si también empata, otro desempate).
+  let ga = 0, gb = 0, jugados = 0
+  for (const l of sf.legs) { if (l?.ga == null || l?.gb == null) continue; jugados++ }
   const completos = jugados === sf.legs.length
+  const ida = sf.legs[0], vuelta = sf.legs[1]
+  if (ida) { ga += ida.ga; gb += ida.gb }
+  if (vuelta) { ga += vuelta.ga; gb += vuelta.gb }
+  let ganador = null
   if (jugados >= 2 && completos) {
-    if (pa !== pb) ganador = pa > pb ? 'a' : 'b'
-    else if (ga !== gb) ganador = ga > gb ? 'a' : 'b'
+    if (ga !== gb) ganador = ga > gb ? 'a' : 'b'
+    else {
+      for (const l of sf.legs.slice(2)) { if (l.ga !== l.gb) { ganador = l.ga > l.gb ? 'a' : 'b'; break } }
+    }
   }
   const necesitaDesempate = jugados >= 2 && completos && !ganador
-  return { pa, pb, ga, gb, jugados, ganador, necesitaDesempate }
+  return { ga, gb, jugados, ganador, necesitaDesempate }
 }
 function sfEscudo(e, size) { return `<span style="width:${size}px;height:${size}px;display:inline-flex;align-items:center;justify-content:center;flex-shrink:0;">${escudoFX(e.nombre, size, colorDe(e.dueno), e.logoId)}</span>` }
 function renderSuperFinal() {
@@ -5803,7 +5806,7 @@ function renderSuperFinal() {
   const intro = `<div class="card" style="text-align:center;">
     <div class="sf-logo-xl">${SF_LOGO}</div>
     <div style="font-size:22px;font-weight:900;color:var(--dorado2);letter-spacing:1px;">SÚPER FINAL</div>
-    <div class="text-gris" style="margin-top:4px;">Campeón de la Supercopa vs campeón del Mundial de Clubes · ida y vuelta · gana quien sume más puntos</div>
+    <div class="text-gris" style="margin-top:4px;">Campeón de la Supercopa vs campeón del Mundial de Clubes · ida y vuelta · gana el global de goles</div>
   </div>`
   const slot = (e, txt) => e ? `<div style="display:flex;align-items:center;gap:10px;">${sfEscudo(e, 36)}<div><div style="font-weight:800;color:${colorDe(e.dueno)}">${e.nombre}</div><div class="text-gris">${txt} · ${etiquetaDueno(e.dueno)}</div></div></div>`
     : `<div style="display:flex;align-items:center;gap:10px;opacity:.6;"><div class="logo-init" style="width:36px;height:36px;">?</div><div><div style="font-weight:700;">Por definir</div><div class="text-gris">${txt}</div></div></div>`
@@ -5842,12 +5845,13 @@ function renderSuperFinal() {
       </div></div>`
   }).join('')
   const ganador = calc.ganador ? (calc.ganador === 'a' ? a : b) : null
-  const tabla = `<div class="sf-tabla"><div></div><div class="h">PJ</div><div class="h">Goles</div><div class="h">Pts</div>
-    ${[[a, calc.pa, calc.ga], [b, calc.pb, calc.gb]].map(([e, pts, g]) => `<div style="display:flex;align-items:center;gap:8px;font-weight:800;color:${colorDe(e.dueno)};min-width:0;">${sfEscudo(e, 22)}<span style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${e.nombre}</span></div><div class="n">${calc.jugados}</div><div class="n">${g}</div><div class="n" style="color:var(--dorado2);font-size:18px;">${pts}</div>`).join('')}
+  const fila = (e, l) => (l?.ga == null ? '-' : (e === a ? l.ga : l.gb))
+  const tabla = `<div class="sf-tabla" style="grid-template-columns:1fr auto auto auto;"><div></div><div class="h">Ida</div><div class="h">Vuelta</div><div class="h">Global</div>
+    ${[[a, calc.ga], [b, calc.gb]].map(([e, g]) => `<div style="display:flex;align-items:center;gap:8px;font-weight:800;color:${colorDe(e.dueno)};min-width:0;">${sfEscudo(e, 22)}<span style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${e.nombre}</span></div><div class="n">${fila(e, sf.legs[0])}</div><div class="n">${fila(e, sf.legs[1])}</div><div class="n" style="color:var(--dorado2);font-size:20px;">${g}</div>`).join('')}
   </div>`
   let estadoTxt = ''
   if (ganador) estadoTxt = `<div style="text-align:center;margin-top:12px;font-size:18px;font-weight:900;color:#f5c542;">👑 ¡${ganador.nombre} campeón de la Súper Final!</div>`
-  else if (calc.necesitaDesempate) estadoTxt = `<div style="text-align:center;margin-top:12px;font-weight:800;color:var(--dorado2);">⚖️ Empatados en puntos y goles: se juega partido desempate</div>`
+  else if (calc.necesitaDesempate) estadoTxt = `<div style="text-align:center;margin-top:12px;font-weight:800;color:var(--dorado2);">⚖️ Global empatado: se juega partido desempate</div>`
   cont.innerHTML = intro + `
     <div class="card"><div class="card-titulo">Los finalistas</div>
       <div style="display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:8px;text-align:center;">
@@ -5856,8 +5860,8 @@ function renderSuperFinal() {
         <div>${sfEscudo(b, 64)}<div style="font-weight:900;color:${colorDe(b.dueno)};margin-top:6px;">${b.nombre}</div><div class="text-gris">🌍 Mundial · ${etiquetaDueno(b.dueno)}</div></div>
       </div></div>
     <div class="card"><div class="card-titulo">Partidos</div><div class="sf-legs">${legsHTML}</div></div>
-    <div class="card"><div class="card-titulo">Suma de puntos</div>${tabla}${estadoTxt}
-      <p class="text-gris" style="margin-top:10px;">3 puntos por ganar y 1 por empatar. Si quedan iguales, define la diferencia de gol; si sigue igual, partido desempate.</p></div>`
+    <div class="card"><div class="card-titulo">Marcador global</div>${tabla}${estadoTxt}
+      <p class="text-gris" style="margin-top:10px;">Gana quien haga más goles sumando ida y vuelta. Si el global queda empatado, se juega un tercer partido; si también empata, otro más, hasta que haya ganador.</p></div>`
   if (ganador) sfCelebrar(ganador)
 }
 function sfCelebrar(e) {

@@ -325,18 +325,18 @@
     .bp-zoom { position: fixed; inset: 0; z-index: 9998; display: flex; align-items: center; justify-content: center;
       background: radial-gradient(circle at 50% 45%, rgba(0,0,0,.35), rgba(0,0,0,.78)); animation: bp-fondo .25s ease-out; pointer-events: none; }
     .bp-zoom.fuera { animation: bp-fondo-out .35s ease-in forwards; }
-    .bp-zoom .bp-zcard { text-align: center; padding: 26px 30px 22px; border-radius: 22px; background: linear-gradient(180deg, #1c2a4a, #0f1830);
+    :is(.bp-zoom,.fx-capa) .bp-zcard { text-align: center; padding: 26px 30px 22px; border-radius: 22px; background: linear-gradient(180deg, #1c2a4a, #0f1830);
       border: 3px solid var(--c); box-shadow: 0 0 60px color-mix(in srgb, var(--c) 55%, transparent), 0 20px 50px rgba(0,0,0,.6);
       min-width: 240px; max-width: 86vw; animation: bp-zoom-in .55s cubic-bezier(.2,1.4,.4,1); }
-    .bp-zoom.fuera .bp-zcard { animation: bp-zoom-out .35s ease-in forwards; }
-    .bp-zoom .bp-zesc { width: 130px; height: 130px; margin: 0 auto 12px; display: flex; align-items: center; justify-content: center;
+    :is(.bp-zoom,.fx-capa).fuera .bp-zcard { animation: bp-zoom-out .35s ease-in forwards; }
+    :is(.bp-zoom,.fx-capa) .bp-zesc { width: 130px; height: 130px; margin: 0 auto 12px; display: flex; align-items: center; justify-content: center;
       filter: drop-shadow(0 8px 18px rgba(0,0,0,.55)); animation: bp-latido 1.2s ease-in-out .5s infinite alternate; }
-    .bp-zoom .bp-zesc img { max-width: 100%; max-height: 100%; object-fit: contain; }
-    .bp-zoom .bp-zesc .bp-zini { width: 120px; height: 120px; border-radius: 50%; background: var(--c); color: #fff; font-size: 44px; font-weight: 900; display: flex; align-items: center; justify-content: center; }
-    .bp-zoom .bp-znom { font-size: 30px; font-weight: 900; line-height: 1.1; color: #fff; letter-spacing: .3px; }
-    .bp-zoom .bp-zliga { font-size: 13px; color: var(--gris); margin-top: 6px; }
-    .bp-zoom .bp-zdueno { display: inline-block; margin-top: 14px; padding: 6px 18px; border-radius: 20px; background: var(--c); color: #fff; font-weight: 800; font-size: 15px; letter-spacing: 1px; text-transform: uppercase; }
-    .bp-zoom .bp-zrayos { position: absolute; width: 520px; height: 520px; border-radius: 50%;
+    :is(.bp-zoom,.fx-capa) .bp-zesc img { max-width: 100%; max-height: 100%; object-fit: contain; }
+    :is(.bp-zoom,.fx-capa) .bp-zesc .bp-zini { width: 120px; height: 120px; border-radius: 50%; background: var(--c); color: #fff; font-size: 44px; font-weight: 900; display: flex; align-items: center; justify-content: center; }
+    :is(.bp-zoom,.fx-capa) .bp-znom { font-size: 30px; font-weight: 900; line-height: 1.1; color: #fff; letter-spacing: .3px; }
+    :is(.bp-zoom,.fx-capa) .bp-zliga { font-size: 13px; color: var(--gris); margin-top: 6px; }
+    :is(.bp-zoom,.fx-capa) .bp-zdueno { display: inline-block; margin-top: 14px; padding: 6px 18px; border-radius: 20px; background: var(--c); color: #fff; font-weight: 800; font-size: 15px; letter-spacing: 1px; text-transform: uppercase; }
+    :is(.bp-zoom,.fx-capa) .bp-zrayos { position: absolute; width: 520px; height: 520px; border-radius: 50%;
       background: repeating-conic-gradient(from 0deg, color-mix(in srgb, var(--c) 22%, transparent) 0 8deg, transparent 8deg 22deg);
       animation: bp-rodar 9s linear infinite; mask: radial-gradient(circle, #000 25%, transparent 68%); -webkit-mask: radial-gradient(circle, #000 25%, transparent 68%); }
     @keyframes bp-zoom-in { from { transform: scale(.15) translateY(80px); opacity: 0; } to { transform: scale(1); opacity: 1; } }
@@ -344,6 +344,53 @@
     @keyframes bp-latido { to { transform: scale(1.07); } }
     @keyframes bp-fondo { from { opacity: 0; } }
     @keyframes bp-fondo-out { to { opacity: 0; } }
+    /* ── EFECTOS: VS, resultado, campeón ── */
+    .fx-capa { position: fixed; inset: 0; z-index: 9998; display: flex; align-items: center; justify-content: center; cursor: pointer;
+      background: radial-gradient(circle at 50% 45%, rgba(10,16,32,.9), rgba(3,5,10,.97)); backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px); animation: bp-fondo .25s ease-out; overflow: hidden; }
+    .fx-capa.fuera { animation: bp-fondo-out .35s ease-in forwards; }
+    .fx-capa img { max-width: 100%; max-height: 100%; object-fit: contain; }
+    .fx-titulo { position: absolute; top: 14%; left: 0; right: 0; text-align: center; font-size: 13px; font-weight: 800; letter-spacing: 3px;
+      text-transform: uppercase; color: var(--dorado2); animation: bp-pop .5s ease-out; }
+    .fx-cerrar { position: absolute; bottom: 7%; left: 0; right: 0; text-align: center; font-size: 11px; color: rgba(255,255,255,.45); }
+    .fx-vs { position: relative; width: 100%; max-width: 560px; display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; gap: 4px; padding: 0 10px; }
+    .fx-lado { display: flex; flex-direction: column; align-items: center; text-align: center; gap: 10px; padding: 28px 6px; border-radius: 20px; min-width: 0; }
+    .fx-lado.izq { background: linear-gradient(135deg, color-mix(in srgb, var(--c) 45%, transparent), transparent 75%); animation: fx-izq .55s cubic-bezier(.2,1.2,.4,1); }
+    .fx-lado.der { background: linear-gradient(225deg, color-mix(in srgb, var(--c) 45%, transparent), transparent 75%); animation: fx-der .55s cubic-bezier(.2,1.2,.4,1); }
+    .fx-lado .fx-esc { width: 104px; height: 104px; display: flex; align-items: center; justify-content: center; filter: drop-shadow(0 8px 16px rgba(0,0,0,.6)); }
+    .fx-lado .fx-esc img { max-width: 100%; max-height: 100%; object-fit: contain; }
+    .fx-ini { border-radius: 50%; background: var(--c); color: #fff; font-weight: 900; display: flex; align-items: center; justify-content: center; }
+    .fx-nom { font-size: 19px; font-weight: 900; color: #fff; line-height: 1.15; overflow-wrap: break-word; max-width: 100%; }
+    .fx-dueno { font-size: 11px; font-weight: 800; letter-spacing: 1.5px; text-transform: uppercase; padding: 4px 12px; border-radius: 14px; background: var(--c); color: #fff; }
+    .fx-vs-txt { font-size: 46px; font-weight: 900; color: var(--dorado2); text-shadow: 0 0 24px rgba(245,166,35,.8), 0 4px 0 #7a5208;
+      animation: fx-vs-in .6s cubic-bezier(.2,1.6,.4,1) .25s both, bp-latido .7s ease-in-out .9s infinite alternate; }
+    @keyframes fx-izq { from { transform: translateX(-120%); opacity: 0; } }
+    @keyframes fx-der { from { transform: translateX(120%); opacity: 0; } }
+    @keyframes fx-vs-in { from { transform: scale(4) rotate(-15deg); opacity: 0; } }
+    .fx-res { text-align: center; padding: 22px 18px; border-radius: 22px; background: linear-gradient(180deg, #1c2a4a, #0f1830); border: 3px solid var(--c);
+      box-shadow: 0 0 60px color-mix(in srgb, var(--c) 50%, transparent); width: min(92vw, 420px); animation: bp-zoom-in .5s cubic-bezier(.2,1.4,.4,1); position: relative; }
+    .fx-res-fila { display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; gap: 8px; }
+    .fx-res-eq { display: flex; flex-direction: column; align-items: center; gap: 6px; min-width: 0; transition: .3s; }
+    .fx-res-eq.pierde { opacity: .45; transform: scale(.82); filter: grayscale(.6); }
+    .fx-res-eq.gana .fx-esc { animation: bp-latido .8s ease-in-out .4s infinite alternate; }
+    .fx-res-eq .fx-esc { width: 84px; height: 84px; display: flex; align-items: center; justify-content: center; filter: drop-shadow(0 6px 12px rgba(0,0,0,.55)); }
+    .fx-res-eq .fx-esc img { max-width: 100%; max-height: 100%; object-fit: contain; }
+    .fx-res-eq .fx-nom { font-size: 13px; }
+    .fx-marcador { font-size: 48px; font-weight: 900; color: #fff; letter-spacing: 2px; white-space: nowrap; }
+    .fx-linea { margin-top: 14px; font-size: 18px; font-weight: 900; color: var(--c); }
+    .fx-pasa { margin-top: 8px; display: inline-block; padding: 6px 16px; border-radius: 20px; background: var(--dorado2); color: #1a1a2e; font-weight: 900; font-size: 14px; animation: bp-pop .5s cubic-bezier(.34,1.56,.64,1) .5s both; }
+    .fx-camp { text-align: center; position: relative; padding: 30px 26px 24px; border-radius: 24px; width: min(90vw, 380px);
+      background: linear-gradient(180deg, #2a2208, #120f04); border: 3px solid #f5c542; box-shadow: 0 0 90px rgba(245,197,66,.55); animation: bp-zoom-in .7s cubic-bezier(.2,1.4,.4,1); }
+    .fx-camp .fx-copa { font-size: 54px; animation: fx-copa 1s ease-in-out infinite alternate; }
+    @keyframes fx-copa { from { transform: translateY(0) rotate(-6deg); } to { transform: translateY(-8px) rotate(6deg); } }
+    .fx-camp .fx-esc { width: 150px; height: 150px; margin: 6px auto 10px; display: flex; align-items: center; justify-content: center;
+      filter: drop-shadow(0 0 22px rgba(245,197,66,.6)) drop-shadow(0 10px 18px rgba(0,0,0,.6)); animation: bp-latido 1s ease-in-out .7s infinite alternate; }
+    .fx-camp .fx-esc img { max-width: 100%; max-height: 100%; object-fit: contain; }
+    .fx-camp .fx-comp { font-size: 12px; color: #d9c58a; letter-spacing: 3px; text-transform: uppercase; }
+    .fx-camp .fx-cnom { font-size: 32px; font-weight: 900; color: #f5c542; line-height: 1.1; margin: 4px 0 10px; text-shadow: 0 3px 0 #6b4f06; }
+    .fx-camp .fx-cdueno { font-size: 17px; font-weight: 900; }
+    .fx-rayos-oro { position: absolute; width: 760px; height: 760px; border-radius: 50%; left: 50%; top: 50%; margin: -380px 0 0 -380px;
+      background: repeating-conic-gradient(from 0deg, rgba(245,197,66,.28) 0 7deg, transparent 7deg 18deg);
+      animation: bp-rodar 14s linear infinite; mask: radial-gradient(circle, #000 20%, transparent 65%); -webkit-mask: radial-gradient(circle, #000 20%, transparent 65%); }
     .bp-vuela { position: fixed; width: 30px; height: 30px; border-radius: 50%; z-index: 9999; pointer-events: none;
       background: radial-gradient(circle at 32% 28%, #fff 0 10%, var(--c) 48%, rgba(0,0,0,.5) 100%);
       transition: transform .55s cubic-bezier(.5,0,.5,1), opacity .55s; }
@@ -1153,7 +1200,8 @@ async function cargarLogosIntl(nombres) {
   return nuevos > 0
 }
 function nombresMundial() {
-  return [...(estado?.sorteo?.internacionales || []).map(e => e.nombre), ...(estado?.equiposArgentinos || []).map(e => e.nombre)]
+  return [...(estado?.sorteo?.internacionales || []).map(e => e.nombre), ...(estado?.equiposArgentinos || []).map(e => e.nombre),
+    ...(estado?.torneosRelampago || []).flatMap(t => (t.equipos || []).map(e => e.nombre))]
 }
 function renderSiQuieto() {
   const a = document.activeElement
@@ -1695,7 +1743,8 @@ function renderPromocion() {
               style="width:44px;text-align:center;font-size:16px;font-weight:700;padding:4px;border-radius:6px;border:1px solid var(--border);background:var(--azul);color:var(--texto);">
             <span style="flex:1;font-size:13px;font-weight:600;text-align:right;">${rival.nombre}</span>
           </div>
-          <button class="btn btn-primary btn-sm" onclick="guardarResultadoPromocion('${p.id}')">💾 Guardar resultado</button>`
+          <button class="btn btn-primary btn-sm" onclick="guardarResultadoPromocion('${p.id}')">💾 Guardar resultado</button>
+          <button class="btn btn-secondary btn-sm" onclick="vsPromocion('${p.id}')">⚔️ Ver VS</button>`
       } else if (jugado) {
         const gdColor = descGana ? '#2ecc71' : rivalGana ? '#e74c3c' : 'var(--gris)'
         const grColor = rivalGana ? '#2ecc71' : descGana ? '#e74c3c' : 'var(--gris)'
@@ -1790,6 +1839,8 @@ async function guardarResultadoPromocion(id) {
   await guardarEstado()
   renderPromocion()
   toast('¡Resultado guardado!')
+  zoomResultado({ nombre: getPoolNombre(p.descendidoId), dueno: p.dueno, logoId: p.descendidoId }, { nombre: getPoolNombre(p.rivalId), dueno: '', logoId: p.rivalId }, gd, gr,
+    { titulo: '🔃 Promoción', mensaje: gd > gr ? `¡${getPoolNombre(p.descendidoId)} se salva!` : `¡Ganó ${getPoolNombre(p.rivalId)}! Hay que decidir` })
 }
 
 async function borrarResultadoPromocion(id) {
@@ -1810,6 +1861,8 @@ async function decidirPromocion(id, decision) {
   await guardarEstado()
   renderPromocion()
   toast(decision === 'cambia' ? '¡Cambio confirmado!' : '¡Equipo mantenido!')
+  if (decision === 'cambia') zoomEquipoFX(getPoolNombre(p.rivalId), p.dueno, '🔃 Promoción', '¡Entra a la Liga AFA!', p.rivalId)
+  else zoomEquipoFX(getPoolNombre(p.descendidoId), p.dueno, '🔃 Promoción', '¡Se mantiene en la Liga AFA!', p.descendidoId)
 }
 
 // Descensos/ascensos reales: equipos que salen del pool → equipos que entran
@@ -3305,6 +3358,111 @@ function lanzarPapelito(nombre, dueno) {
   }, 950)
 }
 
+// ═══════════ EFECTOS ESPECIALES: VS, resultado, campeón ═══════════
+function colorDe(d) { return d === 'santi' ? '#4a9eff' : d === 'luciano' ? '#ff6b6b' : (d ? rlColor(d) : '#f5a623') }
+function etiquetaDueno(d) { return d === 'santi' ? 'Santi' : d === 'luciano' ? 'Luciano' : (d || '') }
+function escudoFX(nombre, size, color, logoId) {
+  const u = (logoId && getPoolLogo(logoId)) || logoPorNombre(nombre)
+  if (u) return `<img src="${u}" alt="">`
+  const ini = String(nombre || '?').split(' ').map(w => w[0]).filter(Boolean).slice(0, 2).join('').toUpperCase()
+  return `<div class="fx-ini" style="--c:${color};width:${size}px;height:${size}px;font-size:${Math.round(size * .36)}px">${ini}</div>`
+}
+let fxActual = null
+function fxMostrar(html, color, dur) {
+  if (fxActual) fxActual.remove()
+  const z = document.createElement('div')
+  z.className = 'fx-capa'; z.style.setProperty('--c', color)
+  z.innerHTML = html + `<div class="fx-cerrar">Toca para cerrar</div>`
+  const cerrar = () => { if (!z.isConnected) return; z.classList.add('fuera'); setTimeout(() => z.remove(), 360); if (fxActual === z) fxActual = null }
+  z.onclick = cerrar
+  document.body.appendChild(z); fxActual = z
+  if (dur) setTimeout(cerrar, dur)
+  return z
+}
+// Pantalla VS: L y V = { nombre, dueno, logoId? }
+function mostrarVS(L, V, titulo) {
+  if (!L?.nombre || !V?.nombre) return
+  cargarLogosIntl([L.nombre, V.nombre])
+  const lado = (e, cls) => `<div class="fx-lado ${cls}" style="--c:${colorDe(e.dueno)}"><div class="fx-esc">${escudoFX(e.nombre, 96, colorDe(e.dueno), e.logoId)}</div>
+    <div class="fx-nom">${e.nombre}</div>${e.dueno ? `<div class="fx-dueno">${etiquetaDueno(e.dueno)}</div>` : ''}</div>`
+  fxMostrar(`${titulo ? `<div class="fx-titulo">${titulo}</div>` : ''}<div class="fx-vs">${lado(L, 'izq')}<div class="fx-vs-txt">VS</div>${lado(V, 'der')}</div>`, '#f5a623', 3600)
+}
+// Resultado en grande. extra: { titulo, pasa (texto), mensaje }
+function zoomResultado(L, V, gl, gv, extra = {}) {
+  if (gl == null || gv == null || !L?.nombre || !V?.nombre) return
+  const gana = gl > gv ? L : gv > gl ? V : null
+  const color = gana ? colorDe(gana.dueno) : '#f5a623'
+  const eq = (e, g) => `<div class="fx-res-eq ${gana ? (gana === e ? 'gana' : 'pierde') : ''}"><div class="fx-esc">${escudoFX(e.nombre, 76, colorDe(e.dueno), e.logoId)}</div>
+    <div class="fx-nom" style="color:${colorDe(e.dueno)};font-size:${e.nombre.length > 12 ? 11 : 13}px;overflow-wrap:normal">${e.nombre}</div></div>`
+  const linea = extra.mensaje || (gana ? `¡Gana ${gana.nombre}!` : '¡Empate!')
+  fxMostrar(`<div class="fx-res" style="--c:${color}" onclick="event.stopPropagation();this.parentNode.click()">
+    ${extra.titulo ? `<div style="font-size:11px;letter-spacing:2px;text-transform:uppercase;color:var(--gris);margin-bottom:10px;">${extra.titulo}</div>` : ''}
+    <div class="fx-res-fila">${eq(L)}<div class="fx-marcador">${gl} - ${gv}</div>${eq(V)}</div>
+    <div class="fx-linea">${linea}</div>${extra.pasa ? `<div class="fx-pasa">➡️ ${extra.pasa}</div>` : ''}</div>`, color, extra.pasa ? 3400 : 2800)
+}
+// Un equipo solo en grande (decisiones de promoción, etc.)
+function zoomEquipoFX(nombre, dueno, titulo, mensaje, logoId) {
+  const color = colorDe(dueno)
+  fxMostrar(`<div class="bp-zrayos" style="--c:${color}"></div><div class="bp-zcard" style="--c:${color};position:relative">
+    ${titulo ? `<div style="font-size:11px;letter-spacing:2px;text-transform:uppercase;color:var(--gris);margin-bottom:10px;">${titulo}</div>` : ''}
+    <div class="bp-zesc">${escudoFX(nombre, 120, color, logoId)}</div><div class="bp-znom">${nombre}</div>
+    ${mensaje ? `<div class="bp-zliga" style="font-size:15px;color:#fff;font-weight:700;margin-top:8px;">${mensaje}</div>` : ''}
+    ${dueno ? `<div class="bp-zdueno" style="--c:${color}">${etiquetaDueno(dueno)}</div>` : ''}</div>`, color, 3000)
+}
+const SIG_RONDA_MUNDIAL = { dieciseisavos: 'Pasa a octavos', octavos: 'Pasa a cuartos', cuartos: 'Pasa a semifinales', semis: '¡Pasa a la FINAL!' }
+const SIG_RONDA_COPA = { r1: 'Pasa a la 2ª ronda', r2: 'Pasa a cuartos', cuartos: 'Pasa a semifinales', semis: '¡Pasa a la FINAL!' }
+function eqLiga(id) { return { nombre: getPoolNombre(id), dueno: estado.ligaAfa?.equipos?.find(e => e.id === id)?.dueno || '', logoId: id } }
+function eqMundial(id) { const e = getEquipo(id); return e ? { nombre: e.nombre, dueno: e.dueno, logoId: id && String(id).startsWith('pa') ? id : null } : null }
+function eqCopa(id) { return id ? { nombre: getCopaNombre(id), dueno: getCopaDueno(id), logoId: String(id).startsWith('pa') ? id : null } : null }
+function eqRL(t, id) { return id ? { nombre: rlNombre(t, id), dueno: rlDueno(t, id) } : null }
+function vsLiga(pid) {
+  const p = estado.ligaAfa.partidos.find(x => x.id === pid); if (!p) return
+  mostrarVS(eqLiga(p.local), eqLiga(p.visitante), `🇦🇷 Liga AFA · Jornada ${p.jornada}`)
+}
+function vsRL(tid, l, v) {
+  const t = estado.torneosRelampago.find(x => x.id === tid); if (!t) return
+  mostrarVS(eqRL(t, l), eqRL(t, v), `⚡ ${t.nombre}`)
+}
+function vsSupercopa() {
+  const sc = estado.supercopa
+  const eq = id => ({ nombre: getSupercopaNombre(id), dueno: getSupercopaDueno(id), logoId: id })
+  mostrarVS(eq(sc.localId), eq(sc.visitanteId), '🥇 Supercopa Argentina')
+}
+function vsPromocion(pid) {
+  const p = estado.promocion.partidos.find(x => x.id === pid); if (!p) return
+  mostrarVS({ nombre: getPoolNombre(p.descendidoId), dueno: p.dueno, logoId: p.descendidoId }, { nombre: getPoolNombre(p.rivalId), dueno: '', logoId: p.rivalId }, '🔃 Promoción')
+}
+const btnVS = onclick => `<button onclick="event.stopPropagation();${onclick}" title="Ver VS" style="background:none;border:none;cursor:pointer;font-size:15px;padding:2px 4px;flex-shrink:0;">⚔️</button>`
+
+// Sorteo animado de los torneos relámpago
+async function revelarSorteoRL(t) {
+  const nombres = t.equipos.map(e => e.nombre)
+  await Promise.race([cargarLogosIntl(nombres), new Promise(r => setTimeout(r, 2500))])
+  const pasos = []
+  if (t.formato === 'eliminatorias' && t.rondas) {
+    const r1 = t.rondas.rondas[t.rondas.nombres[0]] || []
+    r1.forEach((c, i) => { if (c.local && c.visitante) pasos.push(() => mostrarVS(eqRL(t, c.local), eqRL(t, c.visitante), `⚡ ${t.nombre} · Cruce ${i + 1}`)) })
+  } else if (t.grupos) {
+    t.grupos.forEach(g => pasos.push(() => {
+      const eqs = g.equiposIds.map(id => eqRL(t, id))
+      fxMostrar(`<div class="bp-zcard" style="--c:#f5a623;position:relative;min-width:260px"><div class="bp-znom" style="margin-bottom:14px">${g.nombre}</div>
+        ${eqs.map((e, i) => `<div style="display:flex;align-items:center;gap:12px;padding:7px 0;animation:bp-pop .4s ease-out ${i * .25}s both">
+          <div style="width:40px;height:40px;display:flex;align-items:center;justify-content:center">${escudoFX(e.nombre, 36, colorDe(e.dueno))}</div>
+          <div style="text-align:left"><div style="font-weight:800;font-size:16px;color:#fff">${e.nombre}</div>${e.dueno ? `<div style="font-size:11px;font-weight:800;color:${colorDe(e.dueno)}">${etiquetaDueno(e.dueno)}</div>` : ''}</div></div>`).join('')}
+      </div>`, '#f5a623', 0)
+    }))
+  }
+  let i = 0
+  const siguiente = () => {
+    if (i >= pasos.length) { if (fxActual) fxActual.click(); return }
+    pasos[i++]()
+    const capa = fxActual
+    const t0 = setTimeout(() => { if (capa === fxActual) siguiente() }, 2600)
+    if (capa) capa.onclick = () => { clearTimeout(t0); siguiente() }
+  }
+  siguiente()
+}
+
 function zoomEquipo(club, color, esc, duracion) {
   const ini = club.nombre.split(' ').map(w => w[0]).filter(Boolean).slice(0, 2).join('').toUpperCase()
   const z = document.createElement('div')
@@ -3512,6 +3670,11 @@ function girarReemplazo() {
     btnConfirmar.style.display = ''
     btnGirar.disabled = false
     btnGirar.textContent = '🔀 Volver a sortear'
+    const duenoR = (estado.sorteo.internacionales || []).find(e => e.id === _reemplazoId)?.dueno || ''
+    cargarLogosIntl([elegido.nombre]).finally(() => {
+      if (_reemplazoCandidato !== elegido) return
+      zoomEquipo({ ...elegido, dueno: duenoR }, colorDe(duenoR), logoPorNombre(elegido.nombre), 1600)
+    })
   }, 1400)
 }
 
@@ -4003,6 +4166,7 @@ function abrirModalResultado(cruceId, ronda) {
   modalCruceId = cruceId
   modalRonda = ronda
   const tituloRonda = { dieciseisavos: 'Dieciseisavos', octavos: 'Octavos', cuartos: 'Cuartos', semis: 'Semifinal', final: 'FINAL' }[ronda] || ronda
+  if (cruce.golesLocal == null && eq1 && eq2) setTimeout(() => mostrarVS(eqMundial(cruce.local), eqMundial(cruce.visitante), `🌍 Mundial de Clubes · ${tituloRonda}`), 50)
   const d1 = eq1?.dueno || '', d2 = eq2?.dueno || ''
   document.getElementById('bracket-modal').innerHTML = `
     <div class="modal-overlay" onclick="if(event.target===this)cerrarModal()">
@@ -4062,6 +4226,11 @@ async function guardarResultado() {
   cerrarModal()
   renderBracket()
   toast('Resultado guardado ✓')
+  if (modalRonda !== 'final' && cruce.golesLocal !== null && cruce.golesVisitante !== null) {
+    const g = cruce.ganador ? eqMundial(cruce.ganador) : null
+    zoomResultado(eqMundial(cruce.local), eqMundial(cruce.visitante), cruce.golesLocal, cruce.golesVisitante,
+      { titulo: '🌍 Mundial de Clubes', mensaje: g ? `¡${g.nombre} clasifica!` : null, pasa: g ? SIG_RONDA_MUNDIAL[modalRonda] : null })
+  }
   verificarCampeon()
 }
 
@@ -4417,7 +4586,7 @@ function renderPartidoLigaHTML(p) {
   const esEmpate = p.golesLocal !== null && p.golesLocal === p.golesVisitante
   const btnWA = p.golesLocal !== null
     ? `<button onclick="event.stopPropagation();compartirResultadoLiga('${p.local}','${p.visitante}',${p.golesLocal},${p.golesVisitante},${p.jornada})" title="Compartir por WhatsApp" style="background:none;border:none;cursor:pointer;font-size:15px;padding:2px 4px;flex-shrink:0;" >📤</button>`
-    : ''
+    : btnVS(`vsLiga('${p.id}')`)
   if (esAdmin) {
     return `<div class="partido-row" data-local="${dLocal}" data-visita="${dVisit}" data-jugado="${p.golesLocal !== null}">
       <div class="partido-equipo" style="display:flex;align-items:center;gap:6px;color:${dLocal==='santi'?'#4a9eff':'#ff6b6b'};font-weight:${esGanL?700:400}">${logoHTML(p.local,20)}<span>${localN}</span></div>
@@ -4691,8 +4860,11 @@ async function guardarPartidoLiga(id) {
   const glEl = document.getElementById(`gl_${id}`)
   const gvEl = document.getElementById(`gv_${id}`)
   if (!glEl || !gvEl) return
+  const antes = `${p.golesLocal}-${p.golesVisitante}`
   p.golesLocal = glEl.value !== '' ? parseInt(glEl.value) : null
   p.golesVisitante = gvEl.value !== '' ? parseInt(gvEl.value) : null
+  if (p.golesLocal !== null && p.golesVisitante !== null && antes !== `${p.golesLocal}-${p.golesVisitante}`)
+    zoomResultado(eqLiga(p.local), eqLiga(p.visitante), p.golesLocal, p.golesVisitante, { titulo: `🇦🇷 Liga AFA · Jornada ${p.jornada}` })
   await guardarEstado()
   // Re-render solo la tabla (sin perder foco en inputs)
   const tabla = calcularTablaLiga()
@@ -5103,6 +5275,7 @@ function abrirModalCopa(cruceId, ronda) {
   const n2 = getCopaNombre(cruce.visitante)
   const d1 = getCopaDueno(cruce.local), d2 = getCopaDueno(cruce.visitante)
   modalCruceId = cruceId; modalRonda = ronda
+  if (cruce.golesLocal == null && cruce.local && cruce.visitante) setTimeout(() => mostrarVS(eqCopa(cruce.local), eqCopa(cruce.visitante), '🏆 Copa Argentina'), 50)
   document.getElementById('copa-modal').innerHTML = `
     <div class="modal-overlay" onclick="if(event.target===this)cerrarModalCopa()">
       <div class="modal">
@@ -5143,6 +5316,11 @@ async function guardarResultadoCopa() {
   cerrarModalCopa()
   renderCopaBracket(document.getElementById('copa-contenido'))
   toast('Resultado guardado ✓')
+  if (modalRonda !== 'final' && cruce.golesLocal !== null && cruce.golesVisitante !== null) {
+    const g = cruce.ganador ? eqCopa(cruce.ganador) : null
+    zoomResultado(eqCopa(cruce.local), eqCopa(cruce.visitante), cruce.golesLocal, cruce.golesVisitante,
+      { titulo: '🏆 Copa Argentina', mensaje: g ? `¡${g.nombre} clasifica!` : null, pasa: g ? SIG_RONDA_COPA[modalRonda] : null })
+  }
   verificarCampeon()
 }
 
@@ -5321,7 +5499,7 @@ function renderSupercopa() {
       </div>`
     } else if (!hayResultado) {
       adminHTML = `<div class="card">
-        <div class="card-titulo">Cargar resultado</div>
+        <div class="card-titulo" style="display:flex;justify-content:space-between;align-items:center;">Cargar resultado <button class="btn btn-secondary btn-sm" onclick="vsSupercopa()">⚔️ Ver VS</button></div>
         <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;">
           <div style="flex:1;min-width:120px;font-size:14px;font-weight:600;text-align:right;">${localN}</div>
           <input type="number" id="sc-gl" min="0" value="0" style="width:54px;text-align:center;font-size:20px;font-weight:700;padding:6px;border-radius:6px;border:1px solid var(--border);background:var(--azul);color:var(--texto);">
@@ -5353,6 +5531,11 @@ function guardarResultadoSupercopa() {
   guardarEstado().then(() => {
     renderSupercopa()
     toast('¡Supercopa guardada!')
+    const key = `supercopa_${sc.ganador}`
+    if (!campeonesYaCelebrados.has(key)) {
+      campeonesYaCelebrados.add(key)
+      mostrarCampeon(getSupercopaNombre(sc.ganador), sc.ganador, getSupercopaDueno(sc.ganador), `🥇 Supercopa Argentina · ${gl} - ${gv}`)
+    }
   }).catch(e => toast('Error al guardar: ' + e.message, true))
 }
 
@@ -5590,6 +5773,7 @@ async function confirmarCrearTorneoRL() {
   delete cont.dataset.creando
   renderRelampago()
   toast('¡Torneo creado!')
+  revelarSorteoRL(torneo)
 }
 
 async function eliminarTorneoRL(id) {
@@ -5695,7 +5879,7 @@ function rlPartidoRowHTML(t, p, onchangeFn, waFn) {
   const lC=rlColor(rlDueno(t,p.local)), vC=rlColor(rlDueno(t,p.visitante))
   const jug=p.golesLocal!==null
   const ganL=jug&&p.golesLocal>p.golesVisitante, ganV=jug&&p.golesVisitante>p.golesLocal
-  const waBtn=jug&&waFn?`<button onclick="event.stopPropagation();${waFn}" style="background:none;border:none;cursor:pointer;font-size:14px;padding:2px 4px;">📤</button>`:''
+  const waBtn=jug&&waFn?`<button onclick="event.stopPropagation();${waFn}" style="background:none;border:none;cursor:pointer;font-size:14px;padding:2px 4px;">📤</button>`:(!jug&&p.local&&p.visitante?btnVS(`vsRL('${t.id}','${p.local}','${p.visitante}')`):'')
   if (esAdmin) {
     return `<div class="partido-row">
       <div class="partido-equipo" style="color:${lC};font-weight:${ganL?700:400};">${lN}</div>
@@ -5785,8 +5969,10 @@ async function guardarPartidoRL(tid,pid) {
   const p=t.partidos.find(x=>x.id===pid); if(!p)return
   const lEl=document.getElementById(`rli_${pid}_l`), vEl=document.getElementById(`rli_${pid}_v`)
   if(!lEl||!vEl)return
+  const antes=`${p.golesLocal}-${p.golesVisitante}`
   p.golesLocal=lEl.value!==''?parseInt(lEl.value):null
   p.golesVisitante=vEl.value!==''?parseInt(vEl.value):null
+  if (p.golesLocal!==null&&p.golesVisitante!==null&&antes!==`${p.golesLocal}-${p.golesVisitante}`) zoomResultado(eqRL(t,p.local),eqRL(t,p.visitante),p.golesLocal,p.golesVisitante,{titulo:`⚡ ${t.nombre}`})
   await guardarEstado()
   renderTorneoRLLiga(document.getElementById('relampago-contenido'),t)
 }
@@ -5838,6 +6024,7 @@ function abrirModalRLElim(tid,cid,ronda) {
   const t=estado.torneosRelampago.find(x=>x.id===tid); if(!t)return
   const c=t.rondas.rondas[ronda]?.find(x=>x.id===cid); if(!c)return
   rlModalTorneoId=tid; rlModalCruceId=cid; rlModalRonda=ronda
+  if (c.golesLocal==null&&c.local&&c.visitante) setTimeout(()=>mostrarVS(eqRL(t,c.local),eqRL(t,c.visitante),`⚡ ${t.nombre}`),50)
   const lN=rlNombre(t,c.local), vN=rlNombre(t,c.visitante)
   const labels={final:'Final',semis:'Semifinal',cuartos:'Cuartos',octavos:'Octavos',dieciseisavos:'1/16'}
   document.getElementById('rl-elim-modal').innerHTML=`
@@ -5887,6 +6074,12 @@ async function guardarResultadoRLElim() {
   cerrarModalRLElim()
   renderTorneoRLElim(document.getElementById('relampago-contenido'),t)
   toast('Resultado guardado ✓')
+  const esFinal = rlModalRonda === t.rondas.nombres[t.rondas.nombres.length-1]
+  if (!esFinal && c.golesLocal!==null && c.golesVisitante!==null) {
+    const i = t.rondas.nombres.indexOf(rlModalRonda), sig = t.rondas.nombres[i+1]
+    const lab = {final:'¡Pasa a la FINAL!',semis:'Pasa a semifinales',cuartos:'Pasa a cuartos',octavos:'Pasa a octavos'}[sig] || 'Pasa de ronda'
+    zoomResultado(eqRL(t,c.local),eqRL(t,c.visitante),c.golesLocal,c.golesVisitante,{titulo:`⚡ ${t.nombre}`,mensaje:c.ganador?`¡${rlNombre(t,c.ganador)} clasifica!`:null,pasa:c.ganador?lab:null})
+  }
 }
 
 // ─── Grupos + Eliminatorias ───────────────────────
@@ -5972,8 +6165,10 @@ async function guardarPartidoRLGrupo(tid,gid,pid) {
   const p=g.partidos.find(x=>x.id===pid); if(!p)return
   const lEl=document.getElementById(`rli_${pid}_l`), vEl=document.getElementById(`rli_${pid}_v`)
   if(!lEl||!vEl)return
+  const antes=`${p.golesLocal}-${p.golesVisitante}`
   p.golesLocal=lEl.value!==''?parseInt(lEl.value):null
   p.golesVisitante=vEl.value!==''?parseInt(vEl.value):null
+  if (p.golesLocal!==null&&p.golesVisitante!==null&&antes!==`${p.golesLocal}-${p.golesVisitante}`) zoomResultado(eqRL(t,p.local),eqRL(t,p.visitante),p.golesLocal,p.golesVisitante,{titulo:`⚡ ${t.nombre} · ${g.nombre}`})
   await guardarEstado()
   renderTorneoRLGrupos(document.getElementById('relampago-contenido'),t)
 }
@@ -6038,29 +6233,18 @@ function lanzarConfeti() {
 
 function mostrarCampeon(nombre, logoId, dueno, competencia, esGrande = false) {
   lanzarConfeti()
-  if (esGrande) {
-    setTimeout(() => lanzarConfeti(), 450)
-    setTimeout(() => lanzarConfeti(), 900)
-  }
-  const overlay = document.createElement('div')
-  overlay.style.cssText = 'position:fixed;top:0;left:0;width:100%;height:100%;z-index:9998;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,0.75);'
-  overlay.onclick = () => overlay.remove()
-  const color = dueno === 'santi' ? '#4a9eff' : dueno === 'luciano' ? '#ff6b6b' : '#f5a623'
-  const duenoLabel = dueno === 'santi' ? 'Santi' : dueno === 'luciano' ? 'Luciano' : ''
-  const card = document.createElement('div')
-  card.style.cssText = `background:var(--card);border:2px solid ${color};border-radius:20px;padding:${esGrande ? '44px 36px' : '36px 32px'};text-align:center;max-width:${esGrande ? 340 : 300}px;width:88%;animation:campeon-appear 0.55s cubic-bezier(0.34,1.56,0.64,1);box-shadow:0 0 ${esGrande ? 90 : 60}px ${color}55;`
-  card.onclick = e => e.stopPropagation()
-  card.innerHTML = `
-    <div style="font-size:${esGrande ? 68 : 52}px;margin-bottom:10px;">${esGrande ? '🏆🌍🏆' : '🏆'}</div>
-    ${logoId ? `<div style="margin-bottom:10px;display:flex;justify-content:center;">${logoHTML(logoId, esGrande ? 76 : 64)}</div>` : ''}
-    <div style="font-size:${esGrande ? 13 : 11}px;color:var(--gris);text-transform:uppercase;letter-spacing:2px;margin-bottom:6px;">${competencia}</div>
-    <div style="font-size:${esGrande ? 26 : 22}px;font-weight:900;color:var(--dorado2);margin-bottom:10px;line-height:1.2;">${nombre}</div>
-    ${duenoLabel ? `<div style="font-size:${esGrande ? 18 : 15}px;font-weight:700;color:${color};">${esGrande ? `🎉 ¡${duenoLabel} SE CONSAGRÓ CAMPEÓN DEL MUNDO! 🎉` : `🎉 ¡Campeón de ${duenoLabel}!`}</div>` : ''}
-    <div style="font-size:11px;color:var(--gris);margin-top:20px;">Toca para cerrar</div>
-  `
-  overlay.appendChild(card)
-  document.body.appendChild(overlay)
-  setTimeout(() => overlay.remove(), esGrande ? 16000 : 12000)
+  setTimeout(() => lanzarConfeti(), 700)
+  if (esGrande) { setTimeout(() => lanzarConfeti(), 1400); setTimeout(() => lanzarConfeti(), 2100) }
+  const color = colorDe(dueno)
+  const duenoLabel = etiquetaDueno(dueno)
+  cargarLogosIntl([nombre])
+  fxMostrar(`<div class="fx-rayos-oro"></div><div class="fx-camp" onclick="event.stopPropagation();this.parentNode.click()">
+    <div class="fx-copa">${esGrande ? '🏆🌍🏆' : '🏆'}</div>
+    <div class="fx-esc">${escudoFX(nombre, 130, '#f5c542', logoId)}</div>
+    <div class="fx-comp">${competencia}</div>
+    <div class="fx-cnom">${nombre}</div>
+    ${duenoLabel ? `<div class="fx-cdueno" style="color:${color}">${esGrande ? `🎉 ¡${duenoLabel.toUpperCase()} SE CONSAGRÓ CAMPEÓN DEL MUNDO! 🎉` : `🎉 ¡Campeón de ${duenoLabel}!`}</div>` : ''}
+  </div>`, '#f5c542', esGrande ? 16000 : 12000)
 }
 
 function getMundialNombre(id) {

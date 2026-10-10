@@ -3097,6 +3097,7 @@ function renderSorteo() {
   `
 }
 
+let sorteoAnimId = 0
 function hacerSorteo() {
   if (poolClubes.length < 10) { toast('Pool de clubes no cargado', true); return }
 
@@ -3108,7 +3109,9 @@ function hacerSorteo() {
   const totalInt = intSanti + intLuciano
 
   // Mezclar pool y seleccionar
-  const mezclado = [...poolClubes].sort(() => Math.random() - 0.5)
+  // Mezcla justa (Fisher-Yates): todos los clubes del pool tienen la misma probabilidad
+  const mezclado = [...poolClubes]
+  for (let i = mezclado.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [mezclado[i], mezclado[j]] = [mezclado[j], mezclado[i]] }
   const seleccionados = mezclado.slice(0, totalInt)
 
   // Repartir
@@ -3140,7 +3143,9 @@ function hacerSorteo() {
   document.getElementById('cnt-santi').textContent = '0'
   document.getElementById('cnt-luciano').textContent = '0'
 
-  animarBolillero(bolillas, 0)
+  const miAnim = ++sorteoAnimId
+  document.querySelectorAll('[onclick="hacerSorteo()"]').forEach(b => b.disabled = true)
+  animarBolillero(bolillas, 0, miAnim)
 }
 
 function lanzarPapelito(nombre, dueno) {
@@ -3174,7 +3179,9 @@ function lanzarPapelito(nombre, dueno) {
   }, 950)
 }
 
-function animarBolillero(bolillas, idx) {
+function animarBolillero(bolillas, idx, animId = sorteoAnimId) {
+  // Si se inició otro sorteo, esta animación vieja se detiene (evita equipos duplicados en las columnas)
+  if (animId !== sorteoAnimId) return
   const esfera  = document.getElementById('bolillero-esfera')
   const textoEl = document.getElementById('bol-texto')
   const numEl   = document.getElementById('bol-numero')
@@ -3186,6 +3193,7 @@ function animarBolillero(bolillas, idx) {
     numEl.textContent = ''
     duenoEl.innerHTML = ''
     document.getElementById('bol-botones').style.display = 'flex'
+    document.querySelectorAll('[onclick="hacerSorteo()"]').forEach(b => b.disabled = false)
     // Confeti rápido al terminar
     for (let i = 0; i < 18; i++) {
       setTimeout(() => {
@@ -3214,6 +3222,7 @@ function animarBolillero(bolillas, idx) {
   duenoEl.innerHTML = ''
 
   setTimeout(() => {
+    if (animId !== sorteoAnimId) return
     esfera.classList.remove('girando')
     esfera.classList.add('saliendo')
     textoEl.textContent = club.nombre
@@ -3233,7 +3242,7 @@ function animarBolillero(bolillas, idx) {
 
     setTimeout(() => {
       esfera.classList.remove('saliendo')
-      setTimeout(() => animarBolillero(bolillas, idx + 1), 300)
+      setTimeout(() => animarBolillero(bolillas, idx + 1, animId), 300)
     }, 900)
   }, 600)
 }

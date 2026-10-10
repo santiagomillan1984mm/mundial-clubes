@@ -459,6 +459,9 @@
     .hl-panel.abierto .hl-body { grid-template-rows: 1fr; }
     .hl-inner { overflow: hidden; padding: 0 12px; }
     .hl-panel.abierto .hl-inner { padding: 6px 12px 12px; }
+    .hist-temp summary::-webkit-details-marker { display: none; }
+    .escw { display: inline-flex; align-items: center; justify-content: center; flex-shrink: 0; }
+    .escw img { max-width: 100%; max-height: 100%; object-fit: contain; }
     .hl-fila { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 10px; }
     .hl-panel.abierto .hl-inner > * { animation: hl-entra .5s cubic-bezier(.2,.9,.3,1.1) both; }
     .hl-panel.abierto .hl-inner > *:nth-child(2) { animation-delay: .08s; } .hl-panel.abierto .hl-inner > *:nth-child(3) { animation-delay: .16s; }
@@ -1400,7 +1403,8 @@ async function cargarCompLogos() {
 
 function nombresMundial() {
   return [...(estado?.sorteo?.internacionales || []).map(e => e.nombre), ...(estado?.equiposArgentinos || []).map(e => e.nombre),
-    ...(estado?.torneosRelampago || []).flatMap(t => (t.equipos || []).map(e => e.nombre))]
+    ...(estado?.torneosRelampago || []).flatMap(t => (t.equipos || []).map(e => e.nombre)),
+    ...(estado?.archivo || []).flatMap(a => (a.partidos || []).flatMap(m => [m.l?.nombre, m.v?.nombre]))]
 }
 function renderSiQuieto() {
   const a = document.activeElement
@@ -2662,6 +2666,77 @@ function getContadorGeneral() {
 const otroJugador = d => d === 'santi' ? 'luciano' : d === 'luciano' ? 'santi' : ''
 function jugadoresPromo(p) { return { desc: p.jugadorDescendido || p.dueno, rival: p.jugadorRival || otroJugador(p.jugadorDescendido || p.dueno) } }
 
+// ═══════════ HISTÓRICO: todos los partidos de todas las temporadas ═══════════
+function todosLosPartidos() {
+  const out = []
+  const push = (comp, ln, ld, vn, vd, gl, gv) => { if (gl == null || gv == null) return; out.push({ comp, l: { nombre: ln, dueno: ld }, v: { nombre: vn, dueno: vd }, gl, gv }) }
+  for (const r of RONDAS_MUNDIAL_ORDEN) for (const c of estado.bracket?.[r] || []) { const L = getEquipo(c.local), V = getEquipo(c.visitante); push('Mundial de Clubes', L?.nombre, L?.dueno, V?.nombre, V?.dueno, c.golesLocal, c.golesVisitante) }
+  const eqL = estado.ligaAfa?.equipos || []
+  for (const p of estado.ligaAfa?.partidos || []) push('Liga AFA', getPoolNombre(p.local), eqL.find(e => e.id === p.local)?.dueno, getPoolNombre(p.visitante), eqL.find(e => e.id === p.visitante)?.dueno, p.golesLocal, p.golesVisitante)
+  for (const r of RONDAS_COPA_ORDEN) for (const c of estado.copaArgentina?.bracket?.[r] || []) push('Copa Argentina', getCopaNombre(c.local), getCopaDueno(c.local), getCopaNombre(c.visitante), getCopaDueno(c.visitante), c.golesLocal, c.golesVisitante)
+  for (const p of estado.promocion?.partidos || []) { const j = jugadoresPromo(p); push('Promoción', getPoolNombre(p.descendidoId), j.desc, getPoolNombre(p.rivalId), j.rival, p.golesDescendido, p.golesRival) }
+  const sc = estado.supercopa
+  if (sc?.localId) push('Supercopa', getSupercopaNombre(sc.localId), getSupercopaDueno(sc.localId), getSupercopaNombre(sc.visitanteId), getSupercopaDueno(sc.visitanteId), sc.golesLocal, sc.golesVisitante)
+  try { const { sf, a, b } = sfEstado(); if (a && b) sf.legs.forEach((l, i) => { if (!l) return; const loc = i % 2 === 0 ? a : b, vis = i % 2 === 0 ? b : a; push('Súper Final', loc.nombre, loc.dueno, vis.nombre, vis.dueno, i % 2 === 0 ? l.ga : l.gb, i % 2 === 0 ? l.gb : l.ga) }) } catch(e) {}
+  for (const a of estado.archivo || []) for (const m of a.partidos || []) push(a.nombre, m.l?.nombre, m.l?.dueno, m.v?.nombre, m.v?.dueno, m.gl, m.gv)
+  return out.filter(m => m.l.nombre && m.v.nombre)
+}
+function recordsHistoricos() {
+  const ps = todosLosPartidos()
+  if (!ps.length) return null
+  const eq = {}
+  for (const m of ps) for (const [e, gf, gc] of [[m.l, m.gl, m.gv], [m.v, m.gv, m.gl]]) {
+    const t = eq[e.nombre] ||= { nombre: e.nombre, dueno: e.dueno, gf: 0, gc: 0, pj: 0, pg: 0 }
+    t.pj++; t.gf += gf; t.gc += gc; if (gf > gc) t.pg++; t.dueno = e.dueno || t.dueno
+  }
+  const lista = Object.values(eq)
+  const max = (arr, f) => arr.reduce((a, b) => f(b) > f(a) ? b : a)
+  return {
+    total: ps.length,
+    goles: ps.reduce((n, m) => n + m.gl + m.gv, 0),
+    goleador: max(lista, t => t.gf),
+    goleado: max(lista, t => t.gc),
+    ganador: max(lista, t => t.pg),
+    mejorPartido: max(ps, m => m.gl + m.gv),
+    goleada: max(ps, m => Math.abs(m.gl - m.gv)),
+  }
+}
+const escW = (nombre, size, color) => `<span class="escw" style="width:${size}px;height:${size}px;">${escudoFX(nombre, size, color)}</span>`
+function histPanelHTML() {
+  const r = recordsHistoricos()
+  if (!r) return ''
+  const eqCard = (emoji, titulo, t, valor, sub) => `<div class="card" style="flex:1 1 100%;display:flex;align-items:center;gap:14px;">
+      ${escW(t.nombre, 62, colorDe(t.dueno))}
+      <div style="min-width:0;"><div style="font-size:10px;color:var(--gris);text-transform:uppercase;letter-spacing:1px;">${emoji} ${titulo}</div>
+        <div style="font-weight:900;font-size:15px;color:${colorDe(t.dueno)};white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${t.nombre}</div>
+        <div style="font-size:22px;font-weight:900;color:var(--dorado2);line-height:1.1;white-space:nowrap;">${valor}</div><div class="text-gris" style="font-size:11px;">${sub}</div></div></div>`
+  const partCard = (emoji, titulo, m) => `<div class="card" style="flex:1 1 100%;">
+      <div style="font-size:10px;color:var(--gris);text-transform:uppercase;letter-spacing:1px;">${emoji} ${titulo}</div><div class="text-gris" style="font-size:11px;margin-bottom:8px;">${m.comp}</div>
+      <div style="display:flex;align-items:center;justify-content:space-between;gap:6px;">
+        <div style="text-align:center;flex:1;min-width:0;"><div style="display:flex;justify-content:center;">${escW(m.l.nombre, 48, colorDe(m.l.dueno))}</div><div style="font-size:13px;font-weight:700;color:${colorDe(m.l.dueno)};white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${m.l.nombre}</div></div>
+        <div style="font-size:24px;font-weight:900;">${m.gl} - ${m.gv}</div>
+        <div style="text-align:center;flex:1;min-width:0;"><div style="display:flex;justify-content:center;">${escW(m.v.nombre, 48, colorDe(m.v.dueno))}</div><div style="font-size:13px;font-weight:700;color:${colorDe(m.v.dueno)};white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${m.v.nombre}</div></div>
+      </div></div>`
+  const temporadas = (estado.archivo || []).map(a => {
+    const pj = (a.partidos || []).length, gol = (a.partidos || []).reduce((n, m) => n + m.gl + m.gv, 0)
+    return `<details class="card hist-temp"><summary style="display:flex;align-items:center;gap:12px;cursor:pointer;list-style:none;">
+        ${a.campeon ? escW(a.campeon, 48, colorDe(a.dueno)) : ''}
+        <div style="flex:1;min-width:0;"><div style="font-weight:900;">${a.nombre}</div>
+          <div class="text-gris" style="font-size:12px;">${a.campeon ? `🏆 <b style="color:${colorDe(a.dueno)}">${a.campeon}</b> · ` : ''}${pj} partidos · ${gol} goles</div></div>
+        <span class="text-gris">Ver ›</span></summary>
+      <div style="margin-top:10px;">${(a.partidos || []).map(m => `<div style="display:flex;align-items:center;gap:6px;padding:6px 0;border-top:1px solid var(--border);font-size:12.5px;">
+          <span style="flex:1;text-align:right;color:${colorDe(m.l.dueno)};font-weight:${m.gl > m.gv ? 800 : 500};white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${m.l.nombre}</span>
+          ${escW(m.l.nombre, 18, colorDe(m.l.dueno))}<b style="min-width:42px;text-align:center;">${m.gl} - ${m.gv}</b>${escW(m.v.nombre, 18, colorDe(m.v.dueno))}
+          <span style="flex:1;color:${colorDe(m.v.dueno)};font-weight:${m.gv > m.gl ? 800 : 500};white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${m.v.nombre}</span></div>`).join('')}</div>
+    </details>`
+  }).join('')
+  return `<div class="text-gris" style="font-size:11px;margin:2px 0 10px;">Todas las competencias y temporadas juntas: ${r.total} partidos · ${r.goles} goles</div>
+    <div class="hl-fila">${eqCard('⚽', 'Más goleador', r.goleador, `${r.goleador.gf} goles`, `${r.goleador.pj} partidos`)}${eqCard('🥅', 'Más goleado', r.goleado, `${r.goleado.gc} en contra`, `${r.goleado.pj} partidos`)}</div>
+    <div class="hl-fila">${eqCard('🏅', 'Más victorias', r.ganador, `${r.ganador.pg} ganados`, `de ${r.ganador.pj} partidos`)}</div>
+    <div class="hl-fila">${partCard('🔥', 'Partido con más goles', r.mejorPartido)}${partCard('💥', 'Mayor goleada', r.goleada)}</div>
+    ${temporadas ? `<div style="font-size:11px;color:var(--gris);text-transform:uppercase;letter-spacing:2px;margin:6px 0 8px;">📦 Temporadas anteriores</div>${temporadas}` : ''}`
+}
+
 // ═══════════ MARCADOR GENERAL EN VIVO ═══════════
 function getContadorPorComp() {
   const comps = {}
@@ -3368,7 +3443,7 @@ function renderEstadoInicio() {
   const faseSF = (() => { try { const { sf: x, a, b } = sfEstado(); if (!a || !b) return { label: 'Esperando campeones', sub: '' }; if (a.nombre === b.nombre) return { label: '¡Campeón automático!', sub: a.nombre }; const c = sfCalculo(x); return c.ganador ? { label: '¡Finalizado!', sub: (c.ganador === 'a' ? a : b).nombre } : { label: c.jugados ? 'En juego' : 'Por jugar', sub: c.jugados ? `Global ${c.ga}-${c.gb}` : '' } } catch(e) { return { label: '', sub: '' } } })()
 
   const hlLogo = (comp, emoji) => comp === 'superfinal' ? `<span class="hl-logo sf">${SF_LOGO}</span>` : (compLogos[comp] ? `<span class="hl-logo"><img src="${compLogos[comp]}" alt=""></span>` : `<span class="hl-logo emoji">${emoji}</span>`)
-  const enJuego = f => f.label && !/Finaliz|pendiente|Esperando|Sin configurar|automático|Resumen|Sin jugar|Por jugar/i.test(f.label)
+  const enJuego = f => f.label && !/Finaliz|pendiente|Esperando|Sin configurar|automático|Resumen|Sin jugar|Por jugar|Todas las temporadas/i.test(f.label)
   const panel = (key, comp, emoji, titulo, fase, color, contenido) => {
     const abierto = hlAbiertos().has(key)
     return `<div class="hl-panel ${abierto ? 'abierto' : ''} ${contenido ? '' : 'vacio'}" data-k="${key}" style="--c:${color}">
@@ -3393,6 +3468,7 @@ function renderEstadoInicio() {
     ${panel('promo', 'promocion', '🔃', 'Promoción', fasePromo, '#a855f7', contPromo)}
     ${panel('super', 'supercopa', '🥇', 'Supercopa Argentina', faseSuper, '#2ecc71', contSuper)}
     ${panel('superfinal', 'superfinal', '👑', 'Súper Final', faseSF, '#f5c542', contSF)}
+    ${panel('hist', 'historico', '📜', 'Récords históricos', { label: 'Todas las temporadas', sub: `${(estado.archivo || []).length} archivada${(estado.archivo || []).length === 1 ? '' : 's'}` }, '#94a3b8', histPanelHTML())}
     <div style="font-size:11px;color:var(--gris);margin-top:8px;">Actualizado: ${ultima}</div>
   `
   setTimeout(animarMarcador, 30)
@@ -6153,7 +6229,7 @@ function sfCalculo(sf) {
   const necesitaDesempate = jugados >= 2 && completos && !ganador
   return { ga, gb, jugados, ganador, necesitaDesempate }
 }
-function sfEscudo(e, size) { return `<span style="width:${size}px;height:${size}px;display:inline-flex;align-items:center;justify-content:center;flex-shrink:0;">${escudoFX(e.nombre, size, colorDe(e.dueno), e.logoId)}</span>` }
+function sfEscudo(e, size) { return `<span class="escw" style="width:${size}px;height:${size}px;">${escudoFX(e.nombre, size, colorDe(e.dueno), e.logoId)}</span>` }
 function renderSuperFinal() {
   const cont = document.getElementById('superfinal-contenido')
   if (!cont || !estado) return

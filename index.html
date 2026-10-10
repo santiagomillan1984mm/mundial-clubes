@@ -944,8 +944,57 @@ const LOGO_OVERRIDES = {
 }
 
 // Cache de logos resueltos vía Wikipedia API
-const LOGO_CACHE_KEY = 'tdc_logos_v6'
+const LOGO_CACHE_KEY = 'tdc_logos_v7'
 let resolvedLogos = {}
+
+// Escudos que vienen con fondo blanco: se lo quitamos en el navegador
+const LOGOS_SIN_FONDO = new Set(['pa12'])
+
+function quitarFondoBlanco(url) {
+  return new Promise(resolve => {
+    const img = new Image()
+    img.crossOrigin = 'anonymous'
+    img.onload = () => {
+      try {
+        const w = img.naturalWidth, h = img.naturalHeight
+        const c = document.createElement('canvas'); c.width = w; c.height = h
+        const ctx = c.getContext('2d'); ctx.drawImage(img, 0, 0)
+        const d = ctx.getImageData(0, 0, w, h); const px = d.data
+        const esBlanco = i => px[i+3] > 0 && px[i] > 225 && px[i+1] > 225 && px[i+2] > 225
+        // Relleno desde los bordes: solo se borra el blanco conectado al borde
+        const visto = new Uint8Array(w * h); const pila = []
+        for (let x = 0; x < w; x++) { pila.push(x, (h-1)*w + x) }
+        for (let y = 0; y < h; y++) { pila.push(y*w, y*w + w - 1) }
+        while (pila.length) {
+          const k = pila.pop()
+          if (visto[k]) continue
+          visto[k] = 1
+          const i = k * 4
+          if (px[i+3] !== 0 && !esBlanco(i)) continue
+          px[i+3] = 0
+          const x = k % w, y = (k - x) / w
+          if (x > 0) pila.push(k-1); if (x < w-1) pila.push(k+1)
+          if (y > 0) pila.push(k-w); if (y < h-1) pila.push(k+w)
+        }
+        // Suavizar el borde: píxeles claros pegados a lo transparente
+        for (let k = 0; k < w*h; k++) {
+          const i = k*4
+          if (px[i+3] === 0) continue
+          const x = k % w, y = (k - x) / w
+          const vecinoT = (x>0 && px[i-1]===0) || (x<w-1 && px[i+7]===0) || (y>0 && px[i-w*4+3]===0) || (y<h-1 && px[i+w*4+3]===0)
+          if (vecinoT) {
+            const luz = Math.min(px[i], px[i+1], px[i+2])
+            if (luz > 180) px[i+3] = Math.round(px[i+3] * (255 - luz) / 75)
+          }
+        }
+        ctx.putImageData(d, 0, 0)
+        resolve(c.toDataURL('image/png'))
+      } catch(e) { resolve(null) }
+    }
+    img.onerror = () => resolve(null)
+    img.src = url
+  })
+}
 
 async function loadLogos() {
   // Aplicar overrides primero
@@ -970,7 +1019,7 @@ async function loadLogos() {
       if (!res.ok) return
       const data = await res.json()
       const url = data.thumbnail?.source || data.originalimage?.source
-      if (url) resolvedLogos[eq.id] = url
+      if (url) resolvedLogos[eq.id] = LOGOS_SIN_FONDO.has(eq.id) ? (await quitarFondoBlanco(url) || url) : url
     } catch(e) {}
   }))
 

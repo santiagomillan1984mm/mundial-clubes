@@ -1210,12 +1210,12 @@ async function cargarLogosIntl(nombres) {
   return nuevos > 0
 }
 // Logos oficiales de las competencias (Wikipedia), con caché local
-const COMP_LOGO_KEY = 'tdc_comp_logos_v3'
+const COMP_LOGO_KEY = 'tdc_comp_logos_v4'
 const COMP_CANDIDATOS = {
   liga: [['es', 'Liga Profesional de Fútbol (Argentina)'], ['en', 'Argentine Primera División'], ['es', 'Primera División de Argentina']],
   copa: [['es', 'Copa Argentina'], ['en', 'Copa Argentina']],
   supercopa: [['es', 'Supercopa Argentina'], ['en', 'Supercopa Argentina']],
-  mundial: [['en', 'FIFA Club World Cup'], ['en', '2025 FIFA Club World Cup'], ['es', 'Copa Mundial de Clubes de la FIFA']],
+  mundial: [['en', '2025 FIFA Club World Cup'], ['es', 'Copa Mundial de Clubes de la FIFA 2025'], ['en', 'FIFA Club World Cup']],
 }
 let compLogos = {}
 try { compLogos = JSON.parse(localStorage.getItem(COMP_LOGO_KEY) || '{}') || {} } catch(e) { compLogos = {} }

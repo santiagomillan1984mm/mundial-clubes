@@ -1680,7 +1680,7 @@ function tablaHistoricaHTML(historial) {
     </div>
     ${filaDuelo('🏆 Títulos', S.total, L.total)}
     ${COMPS_HIST.map(c => filaDuelo(`${c.icono} ${COMPETENCIAS_LABEL[c.id]}`, S[c.id], L[c.id])).join('')}
-    <div style="font-size:11px;color:var(--gris);margin-top:10px;text-align:center;">Puntos por título: Mundial 5 · Liga 4 · Copa 3 · Supercopa 2</div>
+    <div style="font-size:11px;color:var(--gris);margin-top:10px;text-align:center;">Puntos por título: Súper Final 6 · Mundial 5 · Liga 4 · Copa 3 · Supercopa 2</div>
   </div>`
 
   const lista = Object.values(clubes).sort((a, b) => b.pts - a.pts || b.total - a.total || a.nombre.localeCompare(b.nombre))

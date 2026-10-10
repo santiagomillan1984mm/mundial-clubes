@@ -899,10 +899,10 @@ const WIKI_ARTICLES = {
   pa24: 'Club_Atlético_Aldosivi',
   pa25: 'Gimnasia_y_Esgrima_La_Plata',
   pa26: 'Club_Atlético_Sarmiento_(Junín)',
-  pa27: 'Godoy_Cruz_Antonio_Tomba',
+  pa31: 'Gimnasia_y_Esgrima_de_Mendoza',
   pa28: 'Central_Córdoba_de_Santiago_del_Estero',
   pa29: 'Deportivo_Riestra',
-  pa30: 'Club_Atlético_San_Martín_(San_Juan)',
+  pa32: 'Estudiantes_de_Río_Cuarto',
 }
 
 const POOL_ARG = [
@@ -932,10 +932,10 @@ const POOL_ARG = [
   { id:'pa24', nombre:'Aldosivi' },
   { id:'pa25', nombre:'Gimnasia LP' },
   { id:'pa26', nombre:'Sarmiento' },
-  { id:'pa27', nombre:'Godoy Cruz' },
+  { id:'pa31', nombre:'Gimnasia (Mendoza)' },
   { id:'pa28', nombre:'Central Córdoba' },
   { id:'pa29', nombre:'Dep. Riestra' },
-  { id:'pa30', nombre:'San Martín SJ' },
+  { id:'pa32', nombre:'Estudiantes (Río Cuarto)' },
 ]
 
 // URLs directas para clubs donde la API de Wikipedia no devuelve thumbnail
@@ -944,7 +944,7 @@ const LOGO_OVERRIDES = {
 }
 
 // Cache de logos resueltos vía Wikipedia API
-const LOGO_CACHE_KEY = 'tdc_logos_v5'
+const LOGO_CACHE_KEY = 'tdc_logos_v6'
 let resolvedLogos = {}
 
 async function loadLogos() {
@@ -1515,8 +1515,15 @@ async function decidirPromocion(id, decision) {
   toast(decision === 'cambia' ? '¡Cambio confirmado!' : '¡Equipo mantenido!')
 }
 
+// Descensos/ascensos reales: equipos que salen del pool → equipos que entran
+const CAMBIOS_POOL = { pa27: 'pa31', pa30: 'pa32' }
+
 function renderTodo() {
   if (!estado.poolArgentino) estado.poolArgentino = POOL_ARG.map(e => ({...e}))
+  estado.poolArgentino = estado.poolArgentino.map(e => {
+    const nuevo = CAMBIOS_POOL[e.id] && POOL_ARG.find(x => x.id === CAMBIOS_POOL[e.id])
+    return nuevo ? {...nuevo} : e
+  })
   if (!estado.ligaAfa) estado.ligaAfa = { configurado: false, equipos: [], partidos: [] }
   if (!estado.copaArgentina) estado.copaArgentina = { configurado: false, equipos: [], bracket: { r1: [], r2: [], cuartos: [], semis: [], final: [] } }
   if (!estado.historial) estado.historial = []

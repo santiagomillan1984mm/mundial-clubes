@@ -1022,8 +1022,11 @@
     #splash-screen .sp-brillo { position: absolute; width: 60vmin; height: 60vmin; left: 50%; top: 45%; margin: -30vmin 0 0 -30vmin; border-radius: 50%;
       background: radial-gradient(circle, rgba(245,197,66,.45), transparent 65%); opacity: 0; animation: sp-brillo 1.6s ease .7s forwards; }
     #splash-screen img { position: relative; width: min(92vw, 92vh, 620px); height: auto; transform: scale(.12); opacity: 0;
-      filter: drop-shadow(0 0 30px rgba(116,172,223,.5)) drop-shadow(0 20px 40px rgba(0,0,0,.6));
-      animation: sp-crece 1.7s cubic-bezier(.55,0,.25,1) .1s forwards, sp-flota 3s ease-in-out 1.8s infinite alternate; }
+      filter: drop-shadow(0 0 30px rgba(116,172,223,.5)) drop-shadow(0 20px 40px rgba(0,0,0,.6)); }
+    #splash-screen.listo img { animation: sp-crece 1.7s cubic-bezier(.55,0,.25,1) .1s forwards, sp-flota 3s ease-in-out 1.8s infinite alternate; }
+    #splash-screen .sp-rayos, #splash-screen .sp-brillo, #splash-screen .splash-sub { animation-play-state: paused; }
+    #splash-screen:not(.listo) .splash-sub { opacity: 0; }
+    #splash-screen.listo .sp-rayos, #splash-screen.listo .sp-brillo, #splash-screen.listo .splash-sub { animation-play-state: running; }
     #splash-screen .splash-sub { position: relative; opacity: 0; animation: sp-sub .6s ease 1.3s forwards; letter-spacing: 4px; font-weight: 800; color: #74acdf; }
     #splash-screen .sp-chispa { position: absolute; width: 6px; height: 6px; border-radius: 50%; background: #f5c542; box-shadow: 0 0 10px #f5c542; opacity: 0; animation: sp-chispa 1.8s ease-out forwards; }
     @keyframes sp-crece { 0% { transform: scale(.12) rotate(-12deg); opacity: 0; } 55% { opacity: 1; } 80% { transform: scale(1.04) rotate(1deg); } 100% { transform: scale(1) rotate(0); opacity: 1; } }
@@ -1058,13 +1061,20 @@
 <div id="splash-screen">
   <div class="sp-rayos"></div>
   <div class="sp-brillo"></div>
-  <img src="logo-transparente.png" alt="Torneo de Campeones" />
+  <img src="logo-transparente.png" alt="Torneo de Campeones" onload="splashListo()" onerror="splashListo()" />
   <div class="splash-sub">Cargando…</div>
 </div>
 <script>
-  // Intro: chispas doradas cuando el logo termina de crecer
+  // Intro: arranca recién cuando el logo está descargado, así se ve crecer desde chico
   window._splashInicio = Date.now()
-  setTimeout(() => {
+  function splashListo() {
+    const sp = document.getElementById('splash-screen'); if (!sp || sp.classList.contains('listo')) return
+    window._splashInicio = Date.now()
+    sp.classList.add('listo')
+    setTimeout(splashChispas, 1450)
+  }
+  setTimeout(splashListo, 2500)   // por si la imagen tarda demasiado
+  function splashChispas() {
     const sp = document.getElementById('splash-screen'); if (!sp) return
     for (let i = 0; i < 28; i++) {
       const c = document.createElement('div'); c.className = 'sp-chispa'
@@ -1075,7 +1085,8 @@
       if (i % 3 === 0) { c.style.background = '#74acdf'; c.style.boxShadow = '0 0 10px #74acdf' }
       sp.appendChild(c)
     }
-  }, 1450)
+  }
+  const imgSp = document.querySelector('#splash-screen img'); if (imgSp && imgSp.complete && imgSp.naturalWidth) splashListo()
 </script>
 
 <header>
@@ -7296,7 +7307,8 @@ async function verificarVersionApp() {
 function ocultarSplash() {
   const el = document.getElementById('splash-screen')
   if (!el) return
-  // dejar que la animación del logo se vea completa (mínimo ~2.4 s)
+  // esperar a que el logo haya cargado y se vea crecer completo (~2.4 s desde que arranca)
+  if (!el.classList.contains('listo')) { setTimeout(ocultarSplash, 100); return }
   const espera = Math.max(0, 2400 - (Date.now() - (window._splashInicio || 0)))
   setTimeout(() => { el.classList.add('oculto'); setTimeout(() => el.remove(), 550) }, espera)
 }

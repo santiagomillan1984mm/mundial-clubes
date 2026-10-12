@@ -272,6 +272,16 @@
     :is(#bolillero-container,#copa-bol).bp-full .equipo-row img { width: 18px !important; height: 18px !important; }
     :is(#bolillero-container,#copa-bol).bp-full .sorteo-col-titulo { font-size: 12px; position: sticky; top: 0; z-index: 1; }
     :is(#bolillero-container,#copa-bol).bp-full :is(#bol-botones,#copa-bol-botones) { position: sticky; bottom: 0; padding: 12px 0 6px; background: linear-gradient(transparent, #060a17 35%); justify-content: center; }
+    /* Paneles desplegables dentro de cada competencia */
+    .sec-panel { border-radius: 14px; margin-bottom: 10px; }
+    .sec-panel .hl-head { padding: 11px 12px; gap: 10px; }
+    .sec-panel .hl-head::after { display: none; }
+    .sec-panel .hl-logo { width: 38px; height: 38px; border-radius: 10px; font-size: 20px; padding: 0; }
+    .sec-panel .hl-tit b { font-size: 15px; }
+    .sec-panel .hl-inner > .card { background: transparent; border: none; box-shadow: none; padding: 0; margin: 0 0 4px; }
+    .sec-panel .hl-inner > .card > .card-titulo:first-child { display: none; }
+    .sec-panel .clasif-titulo { display: none; }
+    .sec-panel .clasif-widget { margin: 0; border: none; background: transparent; padding: 0; }
     /* Predicciones */
     .pred-card .pred-sub { font-size: 11px; font-weight: 900; letter-spacing: 1.5px; text-transform: uppercase; color: var(--dorado2); margin: 16px 0 8px; }
     .pred-tabla { margin-top: 10px; }
@@ -2131,12 +2141,9 @@ function renderPromocion() {
   const lucianoPartidos = partidos.filter(p => p.dueno === 'luciano')
 
   cont.innerHTML = `
-    <div class="card" style="margin-bottom:16px;">
-      <div class="card-titulo">¿Cómo funciona?</div>
-      <p class="text-gris" style="font-size:13px;line-height:1.6;">
+    ${secPanel('promo_como', 'ℹ️', '¿Cómo funciona?', 'Reglas de la promoción', `<p class="text-gris" style="font-size:13px;line-height:1.6;">
         Cada uno elige un equipo rival para enfrentar a su descendido. Si gana el rival, asciende y el dueño decide si el descendido baja definitivamente o se mantiene.
-      </p>
-    </div>
+      </p>`, false, '#a855f7')}
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">
       <div>
         <div style="font-weight:700;margin-bottom:10px;" class="badge-santi">SANTI</div>
@@ -4849,8 +4856,7 @@ function renderBracket() {
     ${finalCard}
   </div>`
 
-  cont.innerHTML = `
-    ${leyenda}
+  const cuadroM = `${leyenda}
     <div class="bracket-scroll">
       <div style="display:flex;align-items:stretch;min-width:1240px;min-height:660px;gap:0;padding:4px 0;">
         ${roundColHTML(dL, 'dieciseisavos', 'Dieciseisavos')}
@@ -4871,7 +4877,13 @@ function renderBracket() {
         ${connectorHTML(4, 'left')}
         ${roundColHTML(dR, 'dieciseisavos', 'Dieciseisavos')}
       </div>
-    </div>
+    </div>`
+  const fm = getFaseMundial()
+  let favM = ''
+  try { const pm = predMundial(); if (pm && pm.equipos[0]) favM = `Favorito: ${pm.equipos[0].nombre} (${Math.round(pm.equipos[0].llega[pm.rondas])}%)` } catch (e) {}
+  cont.innerHTML = `
+    ${secPanel('mundial_cuadro', '🏆', 'Cuadro', `${fm.label || ''}${fm.sub ? ' · ' + fm.sub : ''}`, cuadroM, true, '#e94560')}
+    ${secPanel('mundial_pred', '🔮', 'Predicciones', favM, predMundialHTML(), false, '#a855f7')}
     <div id="bracket-modal"></div>
   `
 }
@@ -5474,6 +5486,52 @@ function generarFixturesLiga() {
   return partidos
 }
 
+// ── Paneles desplegables (Liga, Copa, Mundial, Promoción): se recuerda cuáles dejaste abiertos
+const SEC_KEY = 'tdc_sec_abiertos_v1'
+function secEstado() { try { return JSON.parse(localStorage.getItem(SEC_KEY)) || {} } catch (e) { return {} } }
+function secPanel(key, emoji, titulo, resumen, contenido, defAbierto = false, color = 'var(--dorado2)') {
+  if (!contenido) return ''
+  const st = secEstado(), ab = key in st ? st[key] : defAbierto
+  return `<div class="hl-panel sec-panel ${ab ? 'abierto' : ''}" data-sk="${key}" style="--c:${color}">
+    <button class="hl-head" onclick="toggleSec('${key}')">
+      <span class="hl-logo emoji">${emoji}</span>
+      <span class="hl-tit"><b>${titulo}</b>${resumen ? `<small>${resumen}</small>` : ''}</span>
+      <span class="hl-chev">⌄</span>
+    </button>
+    <div class="hl-body"><div class="hl-inner">${contenido}</div></div>
+  </div>`
+}
+function toggleSec(k) {
+  const el = document.querySelector(`.sec-panel[data-sk="${k}"]`); if (!el) return
+  const ab = !el.classList.contains('abierto')
+  el.classList.toggle('abierto', ab)
+  const st = secEstado(); st[k] = ab
+  try { localStorage.setItem(SEC_KEY, JSON.stringify(st)) } catch (e) {}
+  if (ab) { sfx.whoosh(.1); setTimeout(() => el.scrollIntoView({ behavior: 'smooth', block: 'nearest' }), 300) }
+}
+function ligaPanelesHTML(S, tabla, totalJugados) {
+  const liga = estado.ligaAfa
+  const lider = tabla[0] && tabla[0].pj > 0 ? tabla[0] : null
+  const posp = (liga.partidos || []).filter(p => p.pospuesto && p.golesLocal === null).length
+  let fav = ''
+  try { const pr = predLiga(); const f = pr && [...pr.equipos].sort((a, b) => b.campeon - a.campeon)[0]; if (f) fav = `Favorito: ${getPoolNombre(f.id)} (${Math.round(f.campeon)}%)` } catch (e) {}
+  let ws = 0, wl = 0, em = 0
+  for (const p of (liga.partidos || []).filter(p => p.golesLocal !== null)) {
+    const dL = liga.equipos.find(e => e.id === p.local)?.dueno, dV = liga.equipos.find(e => e.id === p.visitante)?.dueno
+    const g = p.golesLocal > p.golesVisitante ? dL : p.golesVisitante > p.golesLocal ? dV : null
+    if (!g) em++; else if (g === 'santi') ws++; else wl++
+  }
+  return [
+    secPanel('liga_tabla', '📊', 'Tabla de posiciones', lider ? `Líder: ${getPoolNombre(lider.id)} · ${lider.pts} pts` : 'Todavía sin partidos', S.tabla, true, '#4a9eff'),
+    secPanel('liga_partidos', '📅', 'Partidos', `Jornada ${getLigaJornadaActual()} · ${totalJugados}/${(liga.partidos || []).length} jugados${posp ? ` · ⏸ ${posp} pospuesto${posp === 1 ? '' : 's'}` : ''}`, S.partidos, true, '#4a9eff'),
+    secPanel('liga_pred', '🔮', 'Predicciones', fav, S.pred, false, '#a855f7'),
+    secPanel('liga_clasif', '🏅', 'Clasificados al Mundial', 'Los 8 que hoy entran', S.clasif, false, '#2ecc71'),
+    secPanel('liga_grafico', '📈', 'Evolución de puntos', 'Cómo va sumando cada equipo', S.grafico, false, '#f5a623'),
+    secPanel('liga_duelo', '⚔️', 'Santi vs Luciano', `Santi ${ws} · ${em} empates · Luciano ${wl}`, S.duelo, false, '#e94560'),
+    secPanel('liga_h2h', '🤝', 'Head to Head', 'Historial entre dos equipos', S.h2h, false, '#94a3b8'),
+  ].join('')
+}
+
 function renderLiga() {
   const cont = document.getElementById('liga-contenido')
   if (!cont || !estado) return
@@ -5491,13 +5549,14 @@ function renderLiga() {
   const totalJugados = (liga.partidos || []).filter(p => p.golesLocal !== null).length
 
   let html = ''
+  const S = { clasif: '', pred: '', tabla: '', grafico: '', duelo: '', h2h: '', partidos: '' }
 
   // Widget clasificación tentativa
-  html += renderClasifTentativa(tabla, 8, 'Clasificados tentantivos al Mundial de Clubes', true)
-  html += predLigaHTML()
+  S.clasif = renderClasifTentativa(tabla, 8, 'Clasificados tentativos al Mundial de Clubes', true)
+  S.pred = predLigaHTML()
 
   // Tabla de posiciones
-  html += `<div class="card">
+  S.tabla = `<div class="card">
     <div class="card-titulo">📊 Tabla de posiciones — ${totalJugados}/100 partidos jugados</div>
     <div class="tabla-pos-wrap"><table class="tabla-pos">
       <thead><tr>
@@ -5526,7 +5585,7 @@ function renderLiga() {
     </table></div>
   </div>`
 
-  html += renderGraficoPuntos()
+  S.grafico = renderGraficoPuntos()
 
   // Stats Santi vs Luciano
   const jugados = liga.partidos.filter(p => p.golesLocal !== null)
@@ -5545,7 +5604,7 @@ function renderLiga() {
   const pctL = total ? Math.round(wLuciano/total*100) : 0
 
   if (jugados.length > 0) {
-    html += `<div class="card" style="margin-bottom:14px;">
+    S.duelo = `<div class="card" style="margin-bottom:14px;">
       <div class="card-titulo">⚔️ Santi vs Luciano — ${total} partidos jugados</div>
       <div style="display:flex;gap:8px;align-items:center;margin-bottom:12px;flex-wrap:wrap;">
         <div style="flex:1;text-align:center;min-width:80px;">
@@ -5580,7 +5639,7 @@ function renderLiga() {
     const d = eq.dueno
     return `<option value="${eq.id}">${getPoolNombre(eq.id)} (${d==='santi'?'Santi':'Luciano'})</option>`
   }).join('')
-  html += `<div class="card" style="margin-bottom:14px;">
+  S.h2h = `<div class="card" style="margin-bottom:14px;">
     <div class="card-titulo">🤝 Head to Head</div>
     <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-bottom:14px;">
       <select id="h2h-eq1" onchange="renderHeadToHead()" style="flex:1;min-width:140px;padding:8px;border-radius:6px;border:1px solid var(--border);background:var(--azul2);color:var(--texto);">
@@ -5595,7 +5654,7 @@ function renderLiga() {
   </div>`
 
   // Filtros de jornada
-  html += `<div class="card" style="padding:14px 16px;">
+  S.partidos = `<div class="card" style="padding:14px 16px;">
     <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-bottom:14px;">
       <span style="font-size:12px;color:var(--gris);font-weight:600;">FILTRAR:</span>
       <button class="btn-filtro-liga activo" onclick="filtrarLiga('todos',this)">Todos</button>
@@ -5613,7 +5672,7 @@ function renderLiga() {
     const completa = jugadosJ === 10
     const esActual = j === jornadaActual
 
-    html += `<div class="jornada-bloque" data-jornada="${j}">
+    S.partidos += `<div class="jornada-bloque" data-jornada="${j}">
       <div class="jornada-header" onclick="toggleJornada(${j})" style="cursor:pointer;user-select:none;">
         <span>Jornada ${j}${esActual && !completa ? ' <span style="font-size:10px;background:#1e3a8a;color:#4a9eff;border-radius:4px;padding:1px 6px;margin-left:4px;">EN CURSO</span>' : ''}</span>
         <div style="display:flex;align-items:center;gap:8px;">
@@ -5627,7 +5686,8 @@ function renderLiga() {
     </div>`
   }
 
-  html += `</div></div>`
+  S.partidos += `</div></div>`
+  html += ligaPanelesHTML(S, tabla, totalJugados)
 
   if (esAdmin) {
     html += `<div class="flex-gap mt"><button class="btn btn-danger btn-sm" onclick="resetLiga()">↺ Reconfigurar liga</button></div>`
@@ -6698,8 +6758,7 @@ function renderCopaBracket(cont) {
     ${fin ? copaCruceCard(fin, 'final') : '<div style="font-size:11px;color:var(--gris);text-align:center;">Final pendiente</div>'}
   </div>`
 
-  cont.innerHTML = `
-    ${leyenda}
+  const cuadroCopa = `${leyenda}
     <div class="bracket-scroll">
       <div style="display:flex;align-items:stretch;min-width:1200px;height:660px;gap:0;padding:4px 0;">
         ${copaColHTML(r1L,'r1','Ronda 1')}
@@ -6720,9 +6779,15 @@ function renderCopaBracket(cont) {
         ${connectorHTML(4,'left')}
         ${copaColHTML(r1R,'r1','Ronda 1')}
       </div>
-    </div>
-    ${esAdmin ? `<div class="mt flex-gap"><button class="btn btn-secondary btn-sm" onclick="toggleEditarCopa()">${copaEditando ? '✅ Listo' : '✏️ Editar cruces'}</button><button class="btn btn-danger btn-sm" onclick="resetCopa()">↺ Reconfigurar copa</button></div>` : ''}
-    ${esAdmin && copaEditando ? `<div class="card mt">${editorCrucesHTML()}</div>` : ''}
+    </div>`
+  const fc = getFaseCopa()
+  let favC = ''
+  try { const pc = predCopa(); if (pc && pc.equipos[0]) favC = `Favorito: ${pc.equipos[0].nombre} (${Math.round(pc.equipos[0].llega[pc.rondas])}%)` } catch (e) {}
+  cont.innerHTML = `
+    ${secPanel('copa_cuadro', '🏆', 'Cuadro', `${fc.label}${fc.sub ? ' · ' + fc.sub : ''}`, cuadroCopa, true, '#f5a623')}
+    ${secPanel('copa_pred', '🔮', 'Predicciones', favC, predCopaHTML(), false, '#a855f7')}
+    ${esAdmin ? secPanel('copa_edit', '✏️', 'Editar cruces', 'Intercambiar equipos de la Ronda 1', `<div>${editorCrucesHTML()}</div>`, false, '#94a3b8') : ''}
+    ${esAdmin ? `<div class="mt flex-gap"><button class="btn btn-danger btn-sm" onclick="resetCopa()">↺ Reconfigurar copa</button></div>` : ''}
     <div id="copa-modal"></div>
   `
 }

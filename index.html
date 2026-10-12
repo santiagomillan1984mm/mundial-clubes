@@ -272,6 +272,34 @@
     :is(#bolillero-container,#copa-bol).bp-full .equipo-row img { width: 18px !important; height: 18px !important; }
     :is(#bolillero-container,#copa-bol).bp-full .sorteo-col-titulo { font-size: 12px; position: sticky; top: 0; z-index: 1; }
     :is(#bolillero-container,#copa-bol).bp-full :is(#bol-botones,#copa-bol-botones) { position: sticky; bottom: 0; padding: 12px 0 6px; background: linear-gradient(transparent, #060a17 35%); justify-content: center; }
+    /* Predicciones */
+    .pred-card .pred-sub { font-size: 11px; font-weight: 900; letter-spacing: 1.5px; text-transform: uppercase; color: var(--dorado2); margin: 16px 0 8px; }
+    .pred-tabla { margin-top: 10px; }
+    .pred-fila { display: flex; align-items: center; gap: 8px; padding: 6px 2px; border-bottom: 1px solid var(--border); font-size: 13px; }
+    .pred-fila > img, .pred-fila > .logo-init { flex-shrink: 0; }
+    .pred-nom { flex: 1; min-width: 0; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .pred-num { width: 54px; flex-shrink: 0; text-align: right; font-variant-numeric: tabular-nums; font-weight: 700; }
+    .pred-num.baja { color: #e57373; }
+    .pred-num.fuerte { color: var(--dorado2); }
+    .pred-ko .pred-num { width: 52px; }
+    .pred-cab { font-size: 10px; color: var(--gris); text-transform: uppercase; letter-spacing: .5px; border-bottom: 2px solid var(--border); }
+    .pred-cab .pred-num, .pred-cab .pred-nom { font-weight: 700; color: var(--gris); }
+    .pred-cab .pred-num.fuerte { color: var(--dorado2); }
+    .pred-mas summary { cursor: pointer; color: var(--gris); font-size: 12px; padding: 8px 2px; list-style: none; }
+    .pred-mas summary::before { content: '▸ '; } .pred-mas[open] summary::before { content: '▾ '; }
+    .pred-duelo { background: var(--azul3); border-radius: 10px; padding: 12px; }
+    .pred-duelo-tit { font-size: 11px; color: var(--gris); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 6px; }
+    .pred-duelo-fila { display: flex; justify-content: space-between; }
+    .pred-duelo-fila b { font-size: 26px; font-weight: 900; display: block; line-height: 1.1; }
+    .pred-duelo-fila small { font-size: 11px; font-weight: 700; }
+    .pred-duelo-barra { display: flex; height: 8px; border-radius: 4px; overflow: hidden; gap: 2px; margin-top: 8px; }
+    .pred-duelo-extra { font-size: 12px; color: var(--gris); margin-top: 8px; text-align: center; }
+    .pred-clave { background: rgba(245,197,66,.06); border: 1px solid rgba(245,197,66,.25); border-radius: 10px; padding: 10px 12px; margin-top: 14px; }
+    .pred-clave .pred-sub { margin-top: 0; }
+    .pred-clave-vs { display: flex; align-items: center; justify-content: center; gap: 14px; margin-bottom: 8px; }
+    .pred-clave-vs > div { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 4px; font-weight: 800; font-size: 13px; text-align: center; min-width: 0; }
+    .pred-clave-vs > b { color: var(--dorado2); }
+    .pred-frases { margin: 0; padding-left: 18px; display: flex; flex-direction: column; gap: 6px; font-size: 13px; line-height: 1.4; }
     body.bp-bloqueo { overflow: hidden; }
     /* Sorteo Copa Argentina */
     .cb-cruce { display: grid; grid-template-columns: 22px minmax(0,1fr) 22px minmax(0,1fr); align-items: center; gap: 6px; padding: 6px 4px; border-bottom: 1px solid var(--border); font-size: 12.5px; }
@@ -3499,15 +3527,16 @@ function renderEstadoInicio() {
   const hayStatsLiga = goleadorHTML || mejorHTML || miniCards1.length || top5HTML || ultimosHTML
 
   // ── Destacados en paneles desplegables, uno por competencia ──
-  const contMundial = hayStatsMundial ? `
+  const predM = predMundialHTML(), predC = predCopaHTML(), predL = predLigaHTML()
+  const contMundial = (hayStatsMundial || predM) ? `${predM}
     ${(mGoleadorHTML || mGoleadoHTML || mMejorPartidoHTML) ? `<div class="hl-fila">${mGoleadorHTML}${mGoleadoHTML}${mMejorPartidoHTML}</div>` : ''}
     ${mMiniCards.length ? `<div class="hl-fila">${mMiniCards.join('')}</div>` : ''}
     ${mUltimosHTML}` : ''
-  const contCopa = hayStatsCopa ? `
+  const contCopa = (hayStatsCopa || predC) ? `${predC}
     ${(cGoleadorHTML || cGoleadoHTML || cMejorPartidoHTML) ? `<div class="hl-fila">${cGoleadorHTML}${cGoleadoHTML}${cMejorPartidoHTML}</div>` : ''}
     ${cMiniCards.length ? `<div class="hl-fila">${cMiniCards.join('')}</div>` : ''}
     ${cUltimosHTML}` : ''
-  const contLiga = hayStatsLiga ? `
+  const contLiga = (hayStatsLiga || predL) ? `${predL}
     ${(goleadorHTML || mejorHTML) ? `<div class="hl-fila">${goleadorHTML}${mejorHTML}</div>` : ''}
     ${miniCards1.length ? `<div class="hl-fila">${miniCards1.join('')}</div>` : ''}
     ${miniCards2.length ? `<div class="hl-fila">${miniCards2.join('')}</div>` : ''}
@@ -5125,6 +5154,300 @@ function calcularTablaLiga() {
   return Object.values(tabla).sort((a,b) => b.pts-a.pts || (b.gf-b.gc)-(a.gf-a.gc) || b.gf-a.gf)
 }
 
+// ══════════════════════════════════════════════
+// PREDICCIONES — simulador (miles de torneos con los resultados cargados)
+// ══════════════════════════════════════════════
+const PRED_SIMS = 5000
+let predCache = { key: null, liga: null, copa: null, mundial: null }
+
+function predKey() {
+  const n = o => JSON.stringify(o || null).length
+  return [estado?.ultimaActualizacion, n(estado?.ligaAfa?.partidos), n(estado?.copaArgentina?.bracket), n(estado?.bracket),
+    (estado?.ligaAfa?.partidos || []).filter(p => p.golesLocal !== null).length].join('|')
+}
+function predCacheOk() { const k = predKey(); if (predCache.key !== k) predCache = { key: k, liga: null, copa: null, mundial: null } }
+
+// Todos los partidos jugados, con nombre y dueño de cada lado
+function predPartidosJugados() {
+  const out = []
+  const push = (a, da, b, db, ga, gb, w = 1) => { if (a && b && ga != null && gb != null && ga !== '' && gb !== '') out.push({ a, da, b, db, ga: +ga, gb: +gb, w }) }
+  const liga = estado.ligaAfa
+  if (liga?.configurado) for (const p of liga.partidos || []) {
+    const dl = liga.equipos.find(e => e.id === p.local)?.dueno, dv = liga.equipos.find(e => e.id === p.visitante)?.dueno
+    push(getPoolNombre(p.local), dl, getPoolNombre(p.visitante), dv, p.golesLocal, p.golesVisitante)
+  }
+  for (const r of RONDAS_COPA_ORDEN) for (const c of estado.copaArgentina?.bracket?.[r] || [])
+    if (c.local && c.visitante) push(getCopaNombre(c.local), getCopaDueno(c.local), getCopaNombre(c.visitante), getCopaDueno(c.visitante), c.golesLocal, c.golesVisitante)
+  for (const r of RONDAS_MUNDIAL_ORDEN) for (const c of estado.bracket?.[r] || []) {
+    const L = getEquipo(c.local), V = getEquipo(c.visitante)
+    if (L && V) push(L.nombre, L.dueno, V.nombre, V.dueno, c.golesLocal, c.golesVisitante)
+  }
+  for (const p of estado.promocion?.partidos || []) {
+    if (!p.descendidoId || !p.rivalId) continue
+    const j = jugadoresPromo(p)
+    push(getPoolNombre(p.descendidoId), j.desc, getPoolNombre(p.rivalId), j.rival, p.golesDescendido, p.golesRival)
+  }
+  for (const a of estado.archivo || []) for (const m of a.partidos || []) push(m.l?.nombre, m.l?.dueno, m.v?.nombre, m.v?.dueno, m.gl, m.gv, .5)  // temporadas viejas pesan la mitad
+  return out
+}
+
+// Fuerza de cada equipo: sus goles, "tirados" hacia el promedio de su dueño (y el del dueño hacia el general)
+function predModelo() {
+  const ps = predPartidosJugados()
+  let goles = 0, apar = 0
+  const T = {}, O = {}
+  const add = (M, k, gf, gc, w) => { if (!k) return; const x = M[k] ||= { gf: 0, gc: 0, n: 0 }; x.gf += gf * w; x.gc += gc * w; x.n += w }
+  for (const p of ps) {
+    goles += (p.ga + p.gb) * p.w; apar += 2 * p.w
+    add(T, p.a, p.ga, p.gb, p.w); add(T, p.b, p.gb, p.ga, p.w)
+    // el nivel de cada jugador se mide en los partidos Santi vs Luciano
+    if (p.da && p.db && p.da !== p.db) { add(O, p.da, p.ga, p.gb, p.w); add(O, p.db, p.gb, p.ga, p.w) }
+  }
+  const avg = apar ? Math.max(.6, goles / apar) : 1.5
+  const KO = 20, KT = 4
+  // Nivel del jugador (Santi / Luciano): se suaviza a la mitad para que no se coma a los equipos
+  const suave = x => 1 + (x - 1) * .5
+  const dueno = d => { const o = O[d] || { gf: 0, gc: 0, n: 0 }; return { att: suave((o.gf + KO * avg) / (o.n + KO) / avg), def: suave((o.gc + KO * avg) / (o.n + KO) / avg) } }
+  const fuerza = (nombre, d) => {
+    const od = dueno(d), t = T[nombre] || { gf: 0, gc: 0, n: 0 }
+    return { att: (t.gf + KT * avg * od.att) / (t.n + KT) / avg, def: (t.gc + KT * avg * od.def) / (t.n + KT) / avg }
+  }
+  return { avg, fuerza, jugados: ps.length }
+}
+function predPoisson(l) { const L = Math.exp(-l); let k = 0, p = 1; do { k++; p *= Math.random() } while (p > L); return k - 1 }
+function predGoles(m, A, B) {
+  const la = Math.min(5, Math.max(.15, m.avg * A.att * B.def)), lb = Math.min(5, Math.max(.15, m.avg * B.att * A.def))
+  return [predPoisson(la), predPoisson(lb)]
+}
+
+// ── Liga AFA
+function predLiga() {
+  predCacheOk()
+  if (predCache.liga) return predCache.liga
+  const liga = estado.ligaAfa
+  if (!liga?.configurado || !(liga.equipos || []).length) return null
+  const m = predModelo()
+  const ids = liga.equipos.map(e => e.id)
+  const F = {}; for (const e of liga.equipos) F[e.id] = m.fuerza(getPoolNombre(e.id), e.dueno)
+  const base = {}; for (const id of ids) base[id] = { pts: 0, gf: 0, gc: 0 }
+  const pend = []
+  for (const p of liga.partidos || []) {
+    if (!base[p.local] || !base[p.visitante]) continue
+    if (p.golesLocal === null || p.golesVisitante === null) { pend.push(p); continue }
+    const a = base[p.local], b = base[p.visitante], gl = p.golesLocal, gv = p.golesVisitante
+    a.gf += gl; a.gc += gv; b.gf += gv; b.gc += gl
+    if (gl > gv) a.pts += 3; else if (gv > gl) b.pts += 3; else { a.pts++; b.pts++ }
+  }
+  const n = ids.length, campeon = {}, top8 = {}, baja = {}, posSum = {}
+  for (const id of ids) { campeon[id] = 0; top8[id] = 0; baja[id] = 0; posSum[id] = 0 }
+  const jActual = getLigaJornadaActual()
+  const clave = pend.filter(p => p.jornada === jActual).map(p => ({ p, r: { L: [0, 0, 0, 0, 0], E: [0, 0, 0, 0, 0], V: [0, 0, 0, 0, 0] } }))
+  let santiCamp = 0, santiTop8 = 0, lucTop8 = 0
+  const dueno = Object.fromEntries(liga.equipos.map(e => [e.id, e.dueno]))
+  for (let s = 0; s < PRED_SIMS; s++) {
+    const t = {}; for (const id of ids) t[id] = { id, pts: base[id].pts, gf: base[id].gf, gc: base[id].gc, r: Math.random() }
+    const res = new Map()
+    for (const p of pend) {
+      const [gl, gv] = predGoles(m, F[p.local], F[p.visitante])
+      const a = t[p.local], b = t[p.visitante]
+      a.gf += gl; a.gc += gv; b.gf += gv; b.gc += gl
+      if (gl > gv) { a.pts += 3; res.set(p, 'L') } else if (gv > gl) { b.pts += 3; res.set(p, 'V') } else { a.pts++; b.pts++; res.set(p, 'E') }
+    }
+    const orden = Object.values(t).sort((a, b) => b.pts - a.pts || (b.gf - b.gc) - (a.gf - a.gc) || b.gf - a.gf || a.r - b.r)
+    orden.forEach((x, i) => { posSum[x.id] += i + 1; if (i < 8) top8[x.id]++; if (i >= n - 4) baja[x.id]++ })
+    campeon[orden[0].id]++
+    if (dueno[orden[0].id] === 'santi') santiCamp++
+    for (let i = 0; i < 8; i++) dueno[orden[i].id] === 'santi' ? santiTop8++ : lucTop8++
+    for (const c of clave) {
+      const r = c.r[res.get(c.p)]
+      r[0]++
+      if (top8[c.p.local] !== undefined) { const pl = orden.findIndex(x => x.id === c.p.local), pv = orden.findIndex(x => x.id === c.p.visitante)
+        if (pl < 8) r[1]++; if (pv < 8) r[2]++; if (pl === 0) r[3]++; if (pv === 0) r[4]++ }
+    }
+  }
+  const pct = x => x / PRED_SIMS * 100
+  const equipos = ids.map(id => ({ id, dueno: dueno[id], campeon: pct(campeon[id]), top8: pct(top8[id]), baja: pct(baja[id]), pos: posSum[id] / PRED_SIMS }))
+    .sort((a, b) => a.pos - b.pos)
+  // Partido clave: el que más mueve las chances de clasificar (y de salir campeón) de los dos equipos
+  let partidoClave = null
+  for (const c of clave) {
+    const q = (k, i) => c.r[k][0] ? c.r[k][i] / c.r[k][0] * 100 : null
+    const mov = (i, ganaK, pierdeK) => { const a = q(ganaK, i), b = q(pierdeK, i); return a == null || b == null ? 0 : Math.abs(a - b) }
+    const movL = mov(1, 'L', 'V'), movV = mov(2, 'V', 'L')
+    const total = movL + movV + .5 * (mov(3, 'L', 'V') + mov(4, 'V', 'L'))
+    if (!partidoClave || total > partidoClave.total) partidoClave = { p: c.p, total, movL, movV }
+  }
+  return predCache.liga = {
+    equipos, partidoClave, jugados: (liga.partidos || []).length - pend.length, total: (liga.partidos || []).length, modeloJugados: m.jugados,
+    santiCamp: pct(santiCamp), santiTop8: santiTop8 / PRED_SIMS, lucTop8: lucTop8 / PRED_SIMS
+  }
+}
+
+// ── Eliminatorias (Copa y Mundial): % de llegar a cada ronda
+function predKO(rondas, nombreDe, duenoDe) {
+  const R = rondas.length
+  if (!rondas[0].some(c => c && c.local && c.visitante)) return null
+  const m = predModelo()
+  const F = {}
+  const fuerza = id => F[id] ||= m.fuerza(nombreDe(id), duenoDe(id))
+  const llega = {}
+  let santiCamp = 0, lucCamp = 0
+  const sumar = (id, r) => { if (!id) return; (llega[id] ||= new Array(R + 1).fill(0))[r]++ }
+  for (let s = 0; s < PRED_SIMS; s++) {
+    let prev = null
+    for (let r = 0; r < R; r++) {
+      const sig = []
+      for (let i = 0; i < rondas[r].length; i++) {
+        const c = rondas[r][i]
+        const [a, b] = r === 0 ? [c?.local, c?.visitante] : [prev[2 * i], prev[2 * i + 1]]
+        sumar(a, r); sumar(b, r)
+        let g = null
+        if (c?.ganador && (c.ganador === a || c.ganador === b)) g = c.ganador
+        else if (!a || !b) g = a || b || null
+        else if (c && c.local === a && c.visitante === b && c.golesLocal != null && c.golesVisitante != null && c.golesLocal !== c.golesVisitante) g = c.golesLocal > c.golesVisitante ? a : b
+        else { const [ga, gb] = predGoles(m, fuerza(a), fuerza(b)); g = ga > gb ? a : gb > ga ? b : (Math.random() < .5 ? a : b) }
+        sig.push(g)
+      }
+      prev = sig
+    }
+    const camp = prev[0]
+    sumar(camp, R)
+    if (duenoDe(camp) === 'santi') santiCamp++; else if (duenoDe(camp) === 'luciano') lucCamp++
+  }
+  const equipos = Object.entries(llega).map(([id, v]) => ({ id, dueno: duenoDe(id), nombre: nombreDe(id), llega: v.map(x => x / PRED_SIMS * 100) }))
+    .sort((a, b) => b.llega[R] - a.llega[R] || b.llega[R - 1] - a.llega[R - 1])
+  return { equipos, santiCamp: santiCamp / PRED_SIMS * 100, lucCamp: lucCamp / PRED_SIMS * 100, rondas: R }
+}
+function predSlots(arr, prefijo, n) { return Array.from({ length: n }, (_, i) => (arr || []).find(c => c.id === `${prefijo}${i + 1}`) || null) }
+function predCopa() {
+  predCacheOk()
+  if (predCache.copa !== null) return predCache.copa
+  const c = estado.copaArgentina
+  if (!c?.configurado) return predCache.copa = false
+  const b = c.bracket
+  const rondas = [b.r1 || [], predSlots(b.r2, 'cr2_', 8), predSlots(b.cuartos, 'cc_', 4), predSlots(b.semis, 'cs_', 2), predSlots(b.final, 'cf_', 1)]
+  return predCache.copa = predKO(rondas, getCopaNombre, getCopaDueno) || false
+}
+function predMundial() {
+  predCacheOk()
+  if (predCache.mundial !== null) return predCache.mundial
+  if (!estado.sorteo?.confirmado || !(estado.bracket?.dieciseisavos || []).length) return predCache.mundial = false
+  const rondas = RONDAS_MUNDIAL_ORDEN.map(r => predSlots(estado.bracket[r], RONDA_PREFIJO[r], RONDA_TAMANO[r]))
+  return predCache.mundial = predKO(rondas, id => getEquipo(id)?.nombre || id, id => getEquipo(id)?.dueno || '') || false
+}
+
+// ── Frases de comentarista (armadas con los números)
+function predFrasesLiga(pr) {
+  const fr = []
+  const nom = id => getPoolNombre(id)
+  const fav = [...pr.equipos].sort((a, b) => b.campeon - a.campeon)[0]
+  if (pr.jugados < 15) fr.push(`Con ${pr.jugados} de ${pr.total} partidos jugados, todo está muy abierto: los porcentajes se van afinando fecha a fecha.`)
+  if (fav) fr.push(`<b style="color:${colorDe(fav.dueno)}">${nom(fav.id)}</b> es el gran candidato: sale campeón en el ${Math.round(fav.campeon)}% de las simulaciones.`)
+  // Racha: partidos seguidos sin perder (los más recientes)
+  const partidos = (estado.ligaAfa.partidos || []).filter(p => p.golesLocal !== null).sort((a, b) => (a.jornada || 0) - (b.jornada || 0))
+  let mejorRacha = null
+  for (const e of pr.equipos) {
+    const suyos = partidos.filter(p => p.local === e.id || p.visitante === e.id).reverse()
+    let n = 0
+    for (const p of suyos) { const mio = p.local === e.id ? p.golesLocal : p.golesVisitante, otro = p.local === e.id ? p.golesVisitante : p.golesLocal; if (mio >= otro) n++; else break }
+    if (n >= 3 && (!mejorRacha || n > mejorRacha.n)) mejorRacha = { e, n }
+  }
+  if (mejorRacha) fr.push(`<b style="color:${colorDe(mejorRacha.e.dueno)}">${nom(mejorRacha.e.id)}</b> viene de ${mejorRacha.n} partidos sin perder: es el equipo más en forma.`)
+  const tabla = calcularTablaLiga().filter(t => t.pj >= 2)
+  const ataque = [...tabla].sort((a, b) => b.gf / b.pj - a.gf / a.pj)[0]
+  if (ataque) fr.push(`El ataque más filoso es el de <b style="color:${colorDe(ataque.dueno)}">${nom(ataque.id)}</b>: ${(ataque.gf / ataque.pj).toFixed(1)} goles por partido.`)
+  const muro = [...tabla].sort((a, b) => a.gc / a.pj - b.gc / b.pj)[0]
+  if (muro && muro.id !== ataque?.id) fr.push(`<b style="color:${colorDe(muro.dueno)}">${nom(muro.id)}</b> es un muro: recibe ${(muro.gc / muro.pj).toFixed(1)} goles por partido.`)
+  const s = Math.round(pr.santiCamp), l = 100 - s
+  fr.push(s === l ? 'Por ahora, el título está 50 y 50 entre Santi y Luciano.' : `${s > l ? '<b style="color:#4a9eff">Santi</b>' : '<b style="color:#ff6b6b">Luciano</b>'} tiene la ventaja: el campeón es suyo en el ${Math.max(s, l)}% de los casos.`)
+  const peligro = [...pr.equipos].filter(e => e.baja >= 40 && e.top8 < 10).sort((a, b) => b.baja - a.baja)[0]
+  if (peligro) fr.push(`Alerta en el fondo: <b style="color:${colorDe(peligro.dueno)}">${nom(peligro.id)}</b> termina entre los 4 últimos en el ${Math.round(peligro.baja)}% de los casos.`)
+  return fr
+}
+
+// ── HTML
+function predPct(x) { return x >= 99.5 ? '99%+' : x > 0 && x < 1 ? '<1%' : Math.round(x) + '%' }
+function predBarra(x, color) { return `<div class="pred-barra"><div style="width:${Math.max(0, Math.min(100, x))}%;background:${color};"></div></div>` }
+function predDueloHTML(sCamp, lCamp, extra = '') {
+  const s = Math.round(sCamp), l = Math.abs(sCamp + lCamp - 100) < .01 ? 100 - s : Math.round(lCamp)
+  return `<div class="pred-duelo">
+    <div class="pred-duelo-tit">⚔️ ¿De quién es el campeón?</div>
+    <div class="pred-duelo-fila"><div style="color:#4a9eff"><b>${s}%</b><small>Santi</small></div><div style="color:#ff6b6b;text-align:right;"><b>${l}%</b><small>Luciano</small></div></div>
+    <div class="pred-duelo-barra"><div style="flex:${s || .1};background:#4a9eff;"></div><div style="flex:${l || .1};background:#ff6b6b;"></div></div>
+    ${extra}
+  </div>`
+}
+function predLigaHTML() {
+  let pr
+  try { pr = predLiga() } catch (e) { console.error(e); return '' }
+  if (!pr) return ''
+  const fila = e => `<div class="pred-fila">
+      ${logoHTML(e.id, 22)}
+      <span class="pred-nom" style="color:${colorDe(e.dueno)}">${getPoolNombre(e.id)}</span>
+      <span class="pred-num" title="Campeón">${predPct(e.campeon)}</span>
+      <span class="pred-num" title="Top 8">${predPct(e.top8)}</span>
+      <span class="pred-num baja" title="4 últimos">${predPct(e.baja)}</span>
+    </div>`
+  const cab = `<div class="pred-fila pred-cab"><span style="width:22px"></span><span class="pred-nom">Equipo</span><span class="pred-num">Campeón</span><span class="pred-num">Top 8</span><span class="pred-num baja">Abajo</span></div>`
+  const ord = [...pr.equipos].sort((a, b) => b.campeon - a.campeon || a.pos - b.pos)
+  let claveHTML = ''
+  const pc = pr.partidoClave
+  if (pc && pc.total > 1) {
+    const l = pc.p.local, v = pc.p.visitante
+    const eq = id => pr.equipos.find(e => e.id === id)
+    claveHTML = `<div class="pred-clave">
+      <div class="pred-sub">🎯 Partido clave de la fecha</div>
+      <div class="pred-clave-vs">
+        <div>${logoHTML(l, 40)}<span style="color:${colorDe(eq(l)?.dueno)}">${getPoolNombre(l)}</span></div>
+        <b>VS</b>
+        <div>${logoHTML(v, 40)}<span style="color:${colorDe(eq(v)?.dueno)}">${getPoolNombre(v)}</span></div>
+      </div>
+      <div class="text-gris" style="text-align:center;">Ganar o perder este partido le mueve <b style="color:var(--dorado2)">${Math.round(Math.max(pc.movL, pc.movV))} puntos</b> de chances de clasificar al Mundial a ${pc.movL >= pc.movV ? getPoolNombre(l) : getPoolNombre(v)}.</div>
+    </div>`
+  }
+  const frases = predFrasesLiga(pr)
+  return `<div class="card pred-card">
+    <div class="card-titulo">🔮 Predicciones — Liga AFA</div>
+    <div class="text-gris" style="margin:-4px 0 10px;">Simulamos ${PRED_SIMS.toLocaleString('es-AR')} veces lo que falta de la liga con los goles de cada equipo y de cada jugador. <b>Top 8</b> = clasifica al Mundial · <b>Abajo</b> = termina entre los 4 últimos.</div>
+    ${predDueloHTML(pr.santiCamp, 100 - pr.santiCamp, `<div class="pred-duelo-extra">Clasificados al Mundial esperados: <b style="color:#4a9eff">${pr.santiTop8.toFixed(1)}</b> Santi · <b style="color:#ff6b6b">${pr.lucTop8.toFixed(1)}</b> Luciano</div>`)}
+    <div class="pred-tabla">${cab}${ord.slice(0, 8).map(fila).join('')}
+      <details class="pred-mas"><summary>Ver los ${ord.length - 8} restantes</summary>${ord.slice(8).map(fila).join('')}</details>
+    </div>
+    ${claveHTML}
+    <div class="pred-sub">🎙️ El comentarista</div>
+    <ul class="pred-frases">${frases.map(f => `<li>${f}</li>`).join('')}</ul>
+  </div>`
+}
+function predKOHTML(pr, titulo, etiquetas, logoDe) {
+  if (!pr) return ''
+  const R = pr.rondas
+  // En el celular entran 3 columnas: semis, final y campeón
+  const desde = R - 2
+  const cols = etiquetas.slice(desde)
+  const fila = e => `<div class="pred-fila">
+      ${logoDe(e.id)}
+      <span class="pred-nom" style="color:${colorDe(e.dueno)}">${e.nombre}</span>
+      ${cols.map((_, i) => `<span class="pred-num${i === cols.length - 1 ? ' fuerte' : ''}">${predPct(e.llega[desde + i])}</span>`).join('')}
+    </div>`
+  const cab = `<div class="pred-fila pred-cab"><span style="width:22px"></span><span class="pred-nom">Equipo</span>${cols.map((c, i) => `<span class="pred-num${i === cols.length - 1 ? ' fuerte' : ''}">${c}</span>`).join('')}</div>`
+  const vivos = pr.equipos.filter(e => e.llega[R] > 0 || e.llega[R - 1] > 0)
+  const lista = vivos.length ? vivos : pr.equipos
+  return `<div class="card pred-card">
+    <div class="card-titulo">🔮 Predicciones — ${titulo}</div>
+    <div class="text-gris" style="margin:-4px 0 10px;">% de llegar a cada ronda, simulando ${PRED_SIMS.toLocaleString('es-AR')} veces lo que falta. En los empates se tiran penales 50 y 50.</div>
+    ${predDueloHTML(pr.santiCamp, pr.lucCamp)}
+    <div class="pred-tabla pred-ko">${cab}${lista.slice(0, 8).map(fila).join('')}
+      ${lista.length > 8 ? `<details class="pred-mas"><summary>Ver los ${lista.length - 8} restantes</summary>${lista.slice(8).map(fila).join('')}</details>` : ''}
+    </div>
+  </div>`
+}
+function predCopaHTML() {
+  try { return predKOHTML(predCopa(), 'Copa Argentina', ['R1', '8vos', '4tos', 'Semis', 'Final', 'Campeón'], id => logoHTML(id, 22)) } catch (e) { console.error(e); return '' }
+}
+function predMundialHTML() {
+  try { return predKOHTML(predMundial(), 'Mundial de Clubes', ['16avos', '8vos', '4tos', 'Semis', 'Final', 'Campeón'], id => { const e = getEquipo(id); return (e && (escudoNombre(e.nombre, 22))) || logoHTML(id, 22) }) } catch (e) { console.error(e); return '' }
+}
+
 function generarFixturesLiga() {
   const s = estado.ligaAfa.equipos.filter(e => e.dueno === 'santi')
   const l = estado.ligaAfa.equipos.filter(e => e.dueno === 'luciano')
@@ -5166,6 +5489,7 @@ function renderLiga() {
 
   // Widget clasificación tentativa
   html += renderClasifTentativa(tabla, 8, 'Clasificados tentantivos al Mundial de Clubes', true)
+  html += predLigaHTML()
 
   // Tabla de posiciones
   html += `<div class="card">

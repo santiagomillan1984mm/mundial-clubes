@@ -882,6 +882,9 @@
       flex-wrap: wrap;
     }
     .partido-row:last-child { border-bottom: none; }
+    .partido-row.pospuesto { opacity: .75; }
+    .posp-tag { flex-basis: 100%; text-align: center; font-size: 11px; font-weight: 800; letter-spacing: 1px; color: #f5a623; margin-top: -2px; }
+    .btn-posp { background: none; border: 1px solid var(--border); border-radius: 6px; cursor: pointer; font-size: 12px; padding: 2px 6px; color: var(--gris); flex-shrink: 0; }
     .partido-equipo {
       flex: 1;
       font-size: 13px;
@@ -2345,7 +2348,9 @@ function getMejorPromedio() {
 function getProximoPartido() {
   if (!estado?.ligaAfa?.configurado) return null
   const jornada = getLigaJornadaActual()
-  const pendientes = (estado.ligaAfa.partidos || []).filter(p => p.jornada === jornada && p.golesLocal === null)
+  let pendientes = (estado.ligaAfa.partidos || []).filter(p => p.jornada === jornada && p.golesLocal === null && !p.pospuesto)
+  // Si solo quedan pospuestos, el próximo es el pospuesto más viejo
+  if (!pendientes.length) pendientes = (estado.ligaAfa.partidos || []).filter(p => p.golesLocal === null).sort((a, b) => a.jornada - b.jornada).slice(0, 1)
   if (!pendientes.length) return null
   // El más interesante: el que enfrenta a los equipos con más puntos
   const tabla = calcularTablaLiga()
@@ -5598,6 +5603,7 @@ function renderLiga() {
       <button class="btn-filtro-liga" onclick="filtrarLiga('luciano',this)" style="color:#ff6b6b;">Luciano</button>
       <button class="btn-filtro-liga" onclick="filtrarLiga('pendientes',this)">Pendientes</button>
       <button class="btn-filtro-liga" onclick="filtrarLiga('jugados',this)">Jugados</button>
+      ${liga.partidos.some(p => p.pospuesto && p.golesLocal === null) ? `<button class="btn-filtro-liga" onclick="filtrarLiga('pospuestos',this)" style="color:#f5a623;">⏸ Pospuestos (${liga.partidos.filter(p => p.pospuesto && p.golesLocal === null).length})</button>` : ''}
     </div>
     <div id="liga-jornadas">`
 
@@ -5611,7 +5617,7 @@ function renderLiga() {
       <div class="jornada-header" onclick="toggleJornada(${j})" style="cursor:pointer;user-select:none;">
         <span>Jornada ${j}${esActual && !completa ? ' <span style="font-size:10px;background:#1e3a8a;color:#4a9eff;border-radius:4px;padding:1px 6px;margin-left:4px;">EN CURSO</span>' : ''}</span>
         <div style="display:flex;align-items:center;gap:8px;">
-          <span class="jornada-completada">${completa ? '✓ Completa' : `${jugadosJ}/10`}</span>
+          <span class="jornada-completada">${completa ? '✓ Completa' : `${jugadosJ}/10`}${partidos.some(p => p.pospuesto && p.golesLocal === null) ? ` <span style="color:#f5a623;">· ⏸ ${partidos.filter(p => p.pospuesto && p.golesLocal === null).length}</span>` : ''}</span>
           <span id="chevron-j${j}" style="color:var(--gris);transition:transform 0.2s;">${esActual ? '▲' : '▼'}</span>
         </div>
       </div>
@@ -5662,11 +5668,14 @@ function renderPartidoLigaHTML(p) {
   const esGanL = p.golesLocal !== null && p.golesLocal > p.golesVisitante
   const esGanV = p.golesVisitante !== null && p.golesVisitante > p.golesLocal
   const esEmpate = p.golesLocal !== null && p.golesLocal === p.golesVisitante
+  const posp = p.pospuesto && p.golesLocal === null
+  const btnPosp = esAdmin && p.golesLocal === null ? `<button class="btn-posp" onclick="event.stopPropagation();togglePosponerLiga('${p.id}')" title="${posp ? 'Reprogramar' : 'Posponer'}">${posp ? '▶️' : '⏸'}</button>` : ''
+  const tagPosp = posp ? `<div class="posp-tag">⏸ POSPUESTO</div>` : ''
   const btnWA = p.golesLocal !== null
     ? `<button onclick="event.stopPropagation();compartirResultadoLiga('${p.local}','${p.visitante}',${p.golesLocal},${p.golesVisitante},${p.jornada})" title="Compartir por WhatsApp" style="background:none;border:none;cursor:pointer;font-size:15px;padding:2px 4px;flex-shrink:0;" >📤</button>`
     : btnVS(`vsLiga('${p.id}')`)
   if (esAdmin) {
-    return `<div class="partido-row" data-local="${dLocal}" data-visita="${dVisit}" data-jugado="${p.golesLocal !== null}">
+    return `<div class="partido-row${posp ? ' pospuesto' : ''}" data-local="${dLocal}" data-visita="${dVisit}" data-jugado="${p.golesLocal !== null}" data-pospuesto="${posp}">
       <div class="partido-equipo" style="display:flex;align-items:center;gap:6px;color:${dLocal==='santi'?'#4a9eff':'#ff6b6b'};font-weight:${esGanL?700:400}">${logoHTML(p.local,20)}<span>${localN}</span></div>
       <div class="partido-score">
         <input class="input score-input" type="number" min="0" max="99" value="${gl}" placeholder="-" id="gl_${p.id}" onchange="guardarPartidoLiga('${p.id}')">
@@ -5674,17 +5683,26 @@ function renderPartidoLigaHTML(p) {
         <input class="input score-input" type="number" min="0" max="99" value="${gv}" placeholder="-" id="gv_${p.id}" onchange="guardarPartidoLiga('${p.id}')">
       </div>
       <div class="partido-equipo derecha" style="display:flex;align-items:center;justify-content:flex-end;gap:6px;color:${dVisit==='santi'?'#4a9eff':'#ff6b6b'};font-weight:${esGanV?700:400}"><span>${visitN}</span>${logoHTML(p.visitante,20)}</div>
-      ${btnWA}
+      ${btnWA}${btnPosp}${tagPosp}
     </div>`
   } else {
     const sc = p.golesLocal !== null ? `<span style="font-size:15px;font-weight:800;color:${esEmpate?'var(--gris)':'var(--dorado2)'};">${p.golesLocal} - ${p.golesVisitante}</span>` : `<span style="color:var(--gris);font-size:13px;">vs</span>`
-    return `<div class="partido-row" data-local="${dLocal}" data-visita="${dVisit}" data-jugado="${p.golesLocal !== null}">
+    return `<div class="partido-row${posp ? ' pospuesto' : ''}" data-local="${dLocal}" data-visita="${dVisit}" data-jugado="${p.golesLocal !== null}" data-pospuesto="${posp}">
       <div class="partido-equipo" style="display:flex;align-items:center;gap:6px;color:${dLocal==='santi'?'#4a9eff':'#ff6b6b'};font-weight:${esGanL?700:400}">${logoHTML(p.local,20)}<span>${localN}</span></div>
       <div style="flex-shrink:0;padding:0 10px;">${sc}</div>
       <div class="partido-equipo derecha" style="display:flex;align-items:center;justify-content:flex-end;gap:6px;color:${dVisit==='santi'?'#4a9eff':'#ff6b6b'};font-weight:${esGanV?700:400}"><span>${visitN}</span>${logoHTML(p.visitante,20)}</div>
-      ${btnWA}
+      ${btnWA}${tagPosp}
     </div>`
   }
+}
+
+async function togglePosponerLiga(id) {
+  const p = estado.ligaAfa.partidos.find(x => x.id === id)
+  if (!p || p.golesLocal !== null) return
+  p.pospuesto = !p.pospuesto
+  toast(p.pospuesto ? `⏸ ${getPoolNombre(p.local)} vs ${getPoolNombre(p.visitante)} pospuesto` : '▶️ Partido reprogramado')
+  await guardarEstado()
+  renderTodo()
 }
 
 function toggleJornada(j) {
@@ -5781,6 +5799,7 @@ function filtrarLiga(filtro, btn) {
     if (filtro === 'santi') visible = local === 'santi' || visita === 'santi'
     else if (filtro === 'luciano') visible = local === 'luciano' || visita === 'luciano'
     else if (filtro === 'pendientes') visible = !jugado
+    else if (filtro === 'pospuestos') visible = row.dataset.pospuesto === 'true'
     else if (filtro === 'jugados') visible = jugado
     row.style.display = visible ? '' : 'none'
   })
@@ -5941,6 +5960,7 @@ async function guardarPartidoLiga(id) {
   const antes = `${p.golesLocal}-${p.golesVisitante}`
   p.golesLocal = glEl.value !== '' ? parseInt(glEl.value) : null
   p.golesVisitante = gvEl.value !== '' ? parseInt(gvEl.value) : null
+  if (p.golesLocal !== null && p.golesVisitante !== null) delete p.pospuesto
   if (p.golesLocal !== null && p.golesVisitante !== null && antes !== `${p.golesLocal}-${p.golesVisitante}`)
     zoomResultado(eqLiga(p.local), eqLiga(p.visitante), p.golesLocal, p.golesVisitante, { titulo: `🇦🇷 Liga AFA · Jornada ${p.jornada}` })
   await guardarEstado()
@@ -5984,7 +6004,7 @@ function getLigaJornadaActual() {
   const partidos = estado.ligaAfa.partidos || []
   for (let j = 1; j <= 10; j++) {
     const jornadaPartidos = partidos.filter(p => p.jornada === j)
-    if (jornadaPartidos.some(p => p.golesLocal === null)) return j
+    if (jornadaPartidos.some(p => p.golesLocal === null && !p.pospuesto)) return j
   }
   return 10
 }

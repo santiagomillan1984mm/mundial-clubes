@@ -254,25 +254,38 @@
 
 
     /* ── BOLILLERO A PANTALLA COMPLETA ── */
-    #bolillero-container.bp-full { position: fixed; inset: 0; z-index: 9000; overflow-y: auto; -webkit-overflow-scrolling: touch;
+    :is(#bolillero-container,#copa-bol).bp-full { position: fixed; inset: 0; z-index: 9000; overflow-y: auto; -webkit-overflow-scrolling: touch;
       background: radial-gradient(ellipse at 50% 0%, #22346a 0%, #0d1530 55%, #060a17 100%); padding: env(safe-area-inset-top) 0 env(safe-area-inset-bottom); animation: bp-fondo .3s ease-out; }
-    #bolillero-container.bp-full > .card { background: transparent; border: none; box-shadow: none; max-width: 640px; margin: 0 auto; padding: 8px 14px 20px; }
-    #bolillero-container.bp-full .bp-full-top { display: flex; }
+    :is(#bolillero-container,#copa-bol).bp-full > .card { background: transparent; border: none; box-shadow: none; max-width: 640px; margin: 0 auto; padding: 8px 14px 20px; }
+    :is(#bolillero-container,#copa-bol).bp-full .bp-full-top { display: flex; }
     .bp-full-top { display: none; align-items: center; justify-content: space-between; padding: 10px 2px 0; }
     .bp-full-top .bp-full-tit { font-size: 15px; font-weight: 900; letter-spacing: 2px; text-transform: uppercase; color: var(--dorado2); display: flex; align-items: center; gap: 8px; }
     .bp-full-top button { background: rgba(255,255,255,.08); border: 1px solid rgba(255,255,255,.15); color: #fff; border-radius: 10px; width: 36px; height: 36px; font-size: 16px; cursor: pointer; }
-    #bolillero-container.bp-full .bp-stage { transform: scale(.86); transform-origin: top center; margin-bottom: -50px; }
-    #bolillero-container.bp-full .sorteo-grid { grid-template-columns: minmax(0,1fr) minmax(0,1fr) !important; gap: 10px; }
-    #bolillero-container.bp-full .sorteo-grid > div { min-width: 0; }
-    #bolillero-container.bp-full .equipo-row > span:first-child { min-width: 0; flex: 1; overflow: hidden; }
-    #bolillero-container.bp-full .lapiz-reemplazo { flex-shrink: 0; padding: 2px !important; }
-    #bolillero-container.bp-full .equipo-row { padding: 5px 0; font-size: 12px; flex-wrap: nowrap; }
-    #bolillero-container.bp-full .equipo-row .equipo-nombre { font-size: 12.5px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-    #bolillero-container.bp-full .equipo-row .equipo-liga { display: none; }
-    #bolillero-container.bp-full .equipo-row img { width: 18px !important; height: 18px !important; }
-    #bolillero-container.bp-full .sorteo-col-titulo { font-size: 12px; position: sticky; top: 0; z-index: 1; }
-    #bolillero-container.bp-full #bol-botones { position: sticky; bottom: 0; padding: 12px 0 6px; background: linear-gradient(transparent, #060a17 35%); justify-content: center; }
+    :is(#bolillero-container,#copa-bol).bp-full .bp-stage { transform: scale(.86); transform-origin: top center; margin-bottom: -50px; }
+    :is(#bolillero-container,#copa-bol).bp-full .sorteo-grid { grid-template-columns: minmax(0,1fr) minmax(0,1fr) !important; gap: 10px; }
+    :is(#bolillero-container,#copa-bol).bp-full .sorteo-grid > div { min-width: 0; }
+    :is(#bolillero-container,#copa-bol).bp-full .equipo-row > span:first-child { min-width: 0; flex: 1; overflow: hidden; }
+    :is(#bolillero-container,#copa-bol).bp-full .lapiz-reemplazo { flex-shrink: 0; padding: 2px !important; }
+    :is(#bolillero-container,#copa-bol).bp-full .equipo-row { padding: 5px 0; font-size: 12px; flex-wrap: nowrap; }
+    :is(#bolillero-container,#copa-bol).bp-full .equipo-row .equipo-nombre { font-size: 12.5px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    :is(#bolillero-container,#copa-bol).bp-full .equipo-row .equipo-liga { display: none; }
+    :is(#bolillero-container,#copa-bol).bp-full .equipo-row img { width: 18px !important; height: 18px !important; }
+    :is(#bolillero-container,#copa-bol).bp-full .sorteo-col-titulo { font-size: 12px; position: sticky; top: 0; z-index: 1; }
+    :is(#bolillero-container,#copa-bol).bp-full :is(#bol-botones,#copa-bol-botones) { position: sticky; bottom: 0; padding: 12px 0 6px; background: linear-gradient(transparent, #060a17 35%); justify-content: center; }
     body.bp-bloqueo { overflow: hidden; }
+    /* Sorteo Copa Argentina */
+    .cb-cruce { display: grid; grid-template-columns: 22px minmax(0,1fr) 22px minmax(0,1fr); align-items: center; gap: 6px; padding: 6px 4px; border-bottom: 1px solid var(--border); font-size: 12.5px; }
+    .cb-cruce .cb-n { color: var(--gris); font-size: 11px; font-weight: 700; text-align: center; }
+    .cb-cruce .cb-vs { color: var(--dorado2); font-size: 10px; font-weight: 900; text-align: center; }
+    .cb-eq { font-size: 12.5px; display: flex; align-items: center; gap: 6px; min-width: 0; padding: 3px 6px; border-radius: 6px; border-left: 3px solid var(--c, transparent); background: rgba(255,255,255,.03); }
+    .sorteo-grid > * { min-width: 0; }
+    .cb-eq span { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .cb-eq.vacio { opacity: .35; border-left-color: var(--border); }
+    .cb-eq.nuevo { animation: cb-entra .45s ease-out; }
+    @keyframes cb-entra { from { transform: scale(1.25); background: rgba(245,197,66,.35); } to { transform: scale(1); } }
+    .cb-inv { display: flex; align-items: center; gap: 10px; padding: 10px; border-radius: 10px; border: 2px dashed var(--border); min-height: 54px; }
+    .cb-inv.lleno { border-style: solid; border-color: var(--c); background: rgba(255,255,255,.04); }
+    .cb-fase { text-align: center; font-size: 12px; font-weight: 900; letter-spacing: 2px; text-transform: uppercase; color: var(--dorado2); margin: 14px 0 8px; }
     /* ── EL PRESIDENTE (personaje que saca las bolillas) ── */
     .bp-presi { position: absolute; left: calc(50% - 166px); top: 40px; width: 110px; z-index: 3; transform-origin: 50% 100%; animation: bp-respira 3.2s ease-in-out infinite; }
     .bp-presi svg { width: 110px; height: 230px; display: block; filter: drop-shadow(0 6px 10px rgba(0,0,0,.45)); }
@@ -1482,6 +1495,7 @@ function renderSiQuieto() {
   const a = document.activeElement
   if (a && (a.tagName === 'INPUT' || a.tagName === 'SELECT' || a.tagName === 'TEXTAREA')) return
   if (document.getElementById('bolillero-container')?.style.display === 'block') return
+  if (copaSorteoCorriendo || document.getElementById('copa-bol')?.classList.contains('bp-full')) return
   renderTodo()
 }
 
@@ -2157,6 +2171,7 @@ function renderTodo() {
   })
   if (!estado.ligaAfa) estado.ligaAfa = { configurado: false, equipos: [], partidos: [] }
   if (!estado.copaArgentina) estado.copaArgentina = { configurado: false, equipos: [], bracket: { r1: [], r2: [], cuartos: [], semis: [], final: [] } }
+  migrarCopa32()
   if (!estado.historial) estado.historial = []
   if (!estado.torneosRelampago) estado.torneosRelampago = []
   if (!estado.supercopa) estado.supercopa = { localId: null, visitanteId: null, golesLocal: null, golesVisitante: null, ganador: null }
@@ -4160,7 +4175,7 @@ function verEquipoGrande(club) {
 }
 
 function zoomEquipo(club, color, esc, duracion) {
-  const ini = club.nombre.split(' ').map(w => w[0]).filter(Boolean).slice(0, 2).join('').toUpperCase()
+  const ini = club.nombre.replace(/\s*\(.*?\)\s*/g, ' ').trim().split(' ').map(w => w[0]).filter(Boolean).slice(0, 2).join('').toUpperCase()
   const z = document.createElement('div')
   z.className = 'bp-zoom'; z.style.setProperty('--c', color)
   z.innerHTML = `<div class="bp-zrayos"></div><div class="bp-zcard" style="position:relative">
@@ -4977,7 +4992,9 @@ async function guardarResultado() {
 
 function getPoolNombre(id) {
   const p = (estado.poolArgentino || POOL_ARG).find(e => e.id === id)
-  return p ? p.nombre : id
+  if (p) return p.nombre
+  const inv = (estado.copaArgentina?.equipos || []).find(e => e.id === id && e.nombre)
+  return inv ? inv.nombre : id
 }
 
 function getPoolLogo(id) {
@@ -5741,8 +5758,28 @@ function renderCopaConfig(cont) {
     }).join('')
   }
 
+  const sorteoListo = copa.sorteo?.realizado && (copa.bracket?.r1 || []).length === 16
+  if (sorteoListo) { renderCopaSorteoPendiente(cont); return }
+  const restoArg = poolResto
+
   let html = `
-  <!-- Equipos base de la liga -->
+  <div class="card" style="margin-bottom:12px;">
+    <div class="card-titulo">🏆 Cómo se arma la Copa (32 equipos)</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
+      <div style="background:var(--azul3);border-radius:8px;padding:10px;text-align:center;">
+        <div class="badge-santi" style="display:inline-block;margin-bottom:6px;">SANTI</div>
+        <div style="font-size:16px;font-weight:700;">${ligaS.length} liga + 5 🇦🇷 + 1 🇲🇽</div>
+        <div class="text-gris">= 16 equipos</div>
+      </div>
+      <div style="background:var(--azul3);border-radius:8px;padding:10px;text-align:center;">
+        <div class="badge-luciano" style="display:inline-block;margin-bottom:6px;">LUCIANO</div>
+        <div style="font-size:16px;font-weight:700;">${ligaL.length} liga + 5 🇦🇷 + 1 🇲🇽</div>
+        <div class="text-gris">= 16 equipos</div>
+      </div>
+    </div>
+    <p class="text-gris" style="margin-top:10px;">El bolillero reparte al azar los ${restoArg.length} argentinos que no están en la liga (5 y 5), después sale un invitado de la Liga MX para cada uno y al final arma los 16 cruces. Regla de oro: en la Ronda 1 siempre es Santi vs Luciano.</p>
+  </div>
+
   <div class="card" style="margin-bottom:12px;">
     <div class="card-titulo">✅ Equipos de la Liga AFA — incluidos automáticamente (20)</div>
     <div style="display:flex;gap:16px;flex-wrap:wrap;">
@@ -5757,50 +5794,23 @@ function renderCopaConfig(cont) {
     </div>
   </div>
 
-  <!-- Selección extras -->
-  <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:14px;">
-    <div class="card" style="border-top:3px solid #4a9eff;">
-      <div style="font-weight:700;color:#4a9eff;margin-bottom:10px;font-size:13px;">Santi — extras ${extS.length}/5</div>
-      ${seleccionadosHTML(extS, 'santi')}
-    </div>
-    <div class="card" style="border-top:3px solid #ff6b6b;">
-      <div style="font-weight:700;color:#ff6b6b;margin-bottom:10px;font-size:13px;">Luciano — extras ${extL.length}/5</div>
-      ${seleccionadosHTML(extL, 'luciano')}
-    </div>
+  <div class="card" style="margin-bottom:12px;">
+    <div class="card-titulo">🎲 Al bolillero</div>
+    <div style="font-weight:700;font-size:12px;margin-bottom:6px;">🇦🇷 Argentinos fuera de la liga (${restoArg.length})</div>
+    <div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:12px;">${restoArg.map(e => `<div class="cb-eq" style="--c:var(--border);">${logoHTML(e.id,18)}<span>${e.nombre}</span></div>`).join('')}</div>
+    <div style="font-weight:700;font-size:12px;margin-bottom:6px;">🇲🇽 Liga MX (${ligaMXNombres().length})</div>
+    <div style="display:flex;flex-wrap:wrap;gap:6px;">${ligaMXNombres().map(n => `<div class="cb-eq" style="--c:var(--border);">${escudoNombre(n, 18)}<span>${n}</span></div>`).join('')}</div>
   </div>`
 
   if (esAdmin) {
-    html += `<div class="card">
-      <div class="card-titulo">Equipos disponibles para elegir (${disponibles.length})</div>
-      ${disponibles.length === 0 ? '<p class="text-gris">Todos los equipos del pool ya fueron asignados.</p>' : ''}
-      ${disponibles.map(eq => `
-        <div style="display:flex;align-items:center;gap:8px;padding:8px 0;border-bottom:1px solid var(--border);">
-          ${logoHTML(eq.id, 26)}
-          <span style="flex:1;font-size:13px;font-weight:600;">${eq.nombre}</span>
-          <button onclick="agregarExtraCopa('${eq.id}','santi')"
-            ${extS.length >= 5 ? 'disabled' : ''}
-            style="padding:5px 10px;border:none;border-radius:6px;background:${extS.length>=5?'#333':'#1a4fa3'};color:${extS.length>=5?'#666':'#fff'};font-size:12px;font-weight:700;cursor:${extS.length>=5?'default':'pointer'};">
-            + Santi
-          </button>
-          <button onclick="agregarExtraCopa('${eq.id}','luciano')"
-            ${extL.length >= 5 ? 'disabled' : ''}
-            style="padding:5px 10px;border:none;border-radius:6px;background:${extL.length>=5?'#333':'#8b1a1a'};color:${extL.length>=5?'#666':'#fff'};font-size:12px;font-weight:700;cursor:${extL.length>=5?'default':'pointer'};">
-            + Luciano
-          </button>
-        </div>`).join('')}
-    </div>
-    <div class="flex-gap mt">
-      <button class="btn btn-primary" onclick="confirmarCopa()"
-        ${extS.length === 5 && extL.length === 5 ? '' : 'disabled style="opacity:0.5;cursor:default;"'}>
-        🏆 Confirmar y generar bracket
-      </button>
-      <span class="text-gris" style="font-size:12px;">
-        ${extS.length === 5 && extL.length === 5 ? '¡Listo para confirmar!' : `Faltan: Santi ${5-extS.length}, Luciano ${5-extL.length}`}
-      </span>
+    html += `<div class="flex-gap mt">
+      <button class="btn btn-primary" onclick="hacerSorteoCopa()" ${restoArg.length >= 10 ? '' : 'disabled style="opacity:0.5;cursor:default;"'}>🎲 Iniciar bolillero</button>
     </div>`
   } else {
-    html += `<div class="card"><p class="text-gris">Esperando que Santi complete la selección de extras.</p></div>`
+    html += `<div class="card"><p class="text-gris">Esperando que Santi haga el sorteo.</p></div>`
   }
+  html += copaBolilleroHTML()
+  if (!copaPreLogosMX) { copaPreLogosMX = true; cargarLogosMX(ligaMXNombres()).then(() => { if (!estado.copaArgentina.configurado && !copaSorteoCorriendo && !estado.copaArgentina.sorteo?.realizado) renderCopa() }) }
 
   cont.innerHTML = html
 }
@@ -5823,52 +5833,420 @@ function quitarExtraCopa(id) {
 }
 
 async function confirmarCopa() {
-  const liga = estado.ligaAfa
   const copa = estado.copaArgentina
-  const extras = (copa.equipos || []).filter(e => e.origen === 'extra')
-  const extS = extras.filter(e => e.dueno === 'santi').length
-  const extL = extras.filter(e => e.dueno === 'luciano').length
-  if (extS !== 5 || extL !== 5) { toast(`Necesitás 5 extras cada uno. Santi: ${extS}, Luciano: ${extL}`, true); return }
-
-  // Armar lista completa de 30: 20 liga + 10 extras
-  const equiposLiga = liga.equipos.map(e => ({ id: e.id, dueno: e.dueno, origen: 'liga' }))
-  const equiposExtras = extras
-  copa.equipos = [...equiposLiga, ...equiposExtras]
-
-  // Generar bracket con 30 equipos (32 slots, 2 byes)
-  copa.bracket = generarBracketCopa(copa.equipos)
+  if (!copa.sorteo?.realizado || (copa.bracket?.r1 || []).length !== 16) { toast('Primero hacé el sorteo', true); return }
+  salirCopaBolFull()
+  copa.sorteo.confirmado = true
   copa.configurado = true
   await guardarEstado()
   renderCopa()
-  toast('¡Copa Argentina generada!')
+  toast('¡Copa Argentina confirmada!')
 }
 
-function generarBracketCopa(equipos) {
-  // 30 equipos → bracket de 32 con 2 byes (los 2 últimos slots son null)
-  const mezclados = [...equipos].sort(() => Math.random() - 0.5)
-  while (mezclados.length < 32) mezclados.push(null) // 2 byes
+// ══════════════════════════════════════════════
+// COPA ARGENTINA — SORTEO (invitados Liga MX + cruces con bolillero)
+// ══════════════════════════════════════════════
+const COPA_STAGE_HTML = `<div class="bp-stage">
+            <div class="bp-eje izq"></div><div class="bp-eje der"></div>
+            <div class="bp-pata izq"></div><div class="bp-pata der"></div><div class="bp-base"></div>
+            <div class="bp-drum" id="cb-esfera"><div class="bp-mix"><div class="bp-b" style="--c:#4a9eff;left:94px;top:89px;--x:10px;--y:-29px;--d:0.84s"></div><div class="bp-b" style="--c:#ff6b6b;left:36px;top:116px;--x:34px;--y:-67px;--d:1.53s"></div><div class="bp-b" style="--c:#f5a623;left:66px;top:74px;--x:-29px;--y:-43px;--d:1.13s"></div><div class="bp-b" style="--c:#ffffff;left:73px;top:81px;--x:30px;--y:-43px;--d:0.85s"></div><div class="bp-b" style="--c:#2ecc71;left:43px;top:98px;--x:40px;--y:-30px;--d:1.27s"></div><div class="bp-b" style="--c:#4a9eff;left:27px;top:143px;--x:34px;--y:-45px;--d:0.84s"></div><div class="bp-b" style="--c:#ff6b6b;left:68px;top:75px;--x:31px;--y:-62px;--d:1.03s"></div><div class="bp-b" style="--c:#f5a623;left:48px;top:139px;--x:-25px;--y:-34px;--d:1.05s"></div><div class="bp-b" style="--c:#ffffff;left:58px;top:83px;--x:34px;--y:-34px;--d:1.31s"></div><div class="bp-b" style="--c:#4a9eff;left:107px;top:82px;--x:30px;--y:-25px;--d:0.85s"></div><div class="bp-b" style="--c:#ff6b6b;left:27px;top:96px;--x:23px;--y:-27px;--d:1.23s"></div><div class="bp-b" style="--c:#f5a623;left:92px;top:129px;--x:34px;--y:-41px;--d:1.09s"></div><div class="bp-b" style="--c:#2ecc71;left:75px;top:93px;--x:-9px;--y:-65px;--d:1.26s"></div><div class="bp-b" style="--c:#ffffff;left:138px;top:113px;--x:17px;--y:-52px;--d:1.29s"></div><div class="bp-b" style="--c:#4a9eff;left:30px;top:85px;--x:25px;--y:-44px;--d:0.93s"></div><div class="bp-b" style="--c:#ff6b6b;left:99px;top:89px;--x:22px;--y:-44px;--d:0.83s"></div></div></div>
+            <div class="bp-manivela"></div>
+            <div class="bp-boca"></div>
+            <div class="bp-presi" id="cb-presi">
+              <svg viewBox="0 0 110 230" aria-hidden="true">
+                <g class="bp-cuerpo">
+                  <path d="M18 96 C6 124 6 164 12 192 L28 192 C28 160 28 126 32 104Z" fill="#232a3d"/>
+                  <circle cx="20" cy="200" r="9" fill="#a8744c"/>
+                  <path d="M14 100 Q60 70 106 100 Q114 150 106 230 L14 230 Q6 150 14 100 Z" fill="#2b3245"/>
+                  <path d="M14 100 Q60 70 106 100 Q114 150 106 230 L14 230 Q6 150 14 100 Z" fill="url(#cbTraje)"/>
+                  <ellipse cx="60" cy="160" rx="34" ry="40" fill="#323a50"/>
+                  <path d="M50 86 L60 118 L70 86 Z" fill="#f4f4f4"/>
+                  <path d="M58 92 L62 92 L64 100 L61 122 L59 122 L56 100Z" fill="#1d2233"/>
+                  <path d="M34 88 Q60 104 86 88 L90 98 Q60 116 30 98 Z" fill="#7cc4ec"/>
+                  <path d="M40 92 L44 104 M52 96 L54 108 M66 96 L64 108 M78 92 L75 104" stroke="#fff" stroke-width="4"/>
+                  <path d="M76 98 L84 140 L74 140 L68 104 Z" fill="#7cc4ec"/>
+                  <path d="M73 112 L79 112 M75 124 L81 124" stroke="#fff" stroke-width="4"/>
+                  <path d="M74 140 h10 v6 h-10z" fill="#fff"/>
+                  <circle cx="60" cy="150" r="2" fill="#141927"/><circle cx="60" cy="170" r="2" fill="#141927"/><circle cx="60" cy="190" r="2" fill="#141927"/>
+                </g>
+                <g class="bp-cabeza">
+                  <rect x="50" y="74" width="20" height="12" fill="#9a6a44"/>
+                  <ellipse cx="31" cy="54" rx="5" ry="8" fill="#9a6a44"/><ellipse cx="89" cy="54" rx="5" ry="8" fill="#9a6a44"/>
+                  <ellipse cx="60" cy="54" rx="29" ry="30" fill="#a8744c"/>
+                  <path d="M31 50 C26 18 48 8 62 9 C80 9 96 20 89 50 C88 36 80 26 70 25 C60 23 52 24 44 28 C38 32 34 40 31 50 Z" fill="#f2f2f2"/>
+                  <path d="M38 24 C48 15 70 13 84 22" stroke="#ffffff" stroke-width="4" fill="none" stroke-linecap="round"/>
+                  <path d="M31 50 C30 58 31 64 33 68 L36 52 Z" fill="#e6e6e6"/><path d="M89 50 C90 58 89 64 87 68 L84 52 Z" fill="#e6e6e6"/>
+                  <path d="M41 42 q8-5 15 0" stroke="#e8e8e8" stroke-width="4" fill="none" stroke-linecap="round"/>
+                  <path d="M64 42 q8-5 15 0" stroke="#e8e8e8" stroke-width="4" fill="none" stroke-linecap="round"/>
+                  <g class="bp-ojos"><ellipse cx="49" cy="51" rx="2.6" ry="3.2" fill="#1d140e"/><ellipse cx="71" cy="51" rx="2.6" ry="3.2" fill="#1d140e"/></g>
+                  <ellipse cx="60" cy="61" rx="5.5" ry="6" fill="#8e5f3c"/>
+                  <circle cx="40" cy="65" r="5.5" fill="#c97a6a" opacity=".35"/><circle cx="80" cy="65" r="5.5" fill="#c97a6a" opacity=".35"/>
+                  <path d="M36 70 Q60 92 84 70 Q80 84 60 86 Q40 84 36 70Z" fill="#9a6a44"/>
+                  <ellipse class="bp-boca-presi" cx="60" cy="75" rx="7" ry="2.6" fill="#5a1f1f"/>
+                </g>
+                <defs><linearGradient id="cbTraje" x1="0" x2="1"><stop offset="0" stop-color="#000" stop-opacity=".28"/><stop offset=".5" stop-color="#fff" stop-opacity=".05"/><stop offset="1" stop-color="#000" stop-opacity=".28"/></linearGradient></defs>
+              </svg>
+              <div class="bp-cartel">EL DELEGADO</div>
+            </div>
+            <div class="bp-burbuja" id="cb-burbuja"></div>
+            <div class="bp-mano bp-brazo" id="cb-mano">
+              <svg viewBox="0 0 96 28" aria-hidden="true">
+                <rect x="0" y="3" width="66" height="22" rx="10" fill="#1f2b52"/>
+                <rect x="0" y="3" width="66" height="9" rx="4" fill="#fff" opacity=".06"/>
+                <rect x="60" y="2" width="10" height="24" rx="3" fill="#f2f2f2"/>
+                <circle cx="65" cy="8" r="1.8" fill="#f5c542"/>
+                <ellipse cx="80" cy="14" rx="13" ry="11" fill="#f1c7a1"/>
+                <path d="M83 3 q11 2 12 11 q-1 9 -12 11" fill="#e9b48e"/>
+                <ellipse cx="76" cy="4" rx="5.5" ry="3.3" fill="#e9b48e"/>
+              </svg>
+              <div class="bp-tomada" id="cb-tomada"><div class="bp-esc" id="cb-tomada-esc"></div></div>
+            </div>
+          </div>`
+const LIGA_MX_FALLBACK = ['Club América', 'Atlas', 'Atlético San Luis', 'Cruz Azul', 'Guadalajara', 'FC Juárez', 'León', 'Atlante', 'Monterrey', 'Necaxa', 'Pachuca', 'Puebla', 'Querétaro', 'Santos Laguna', 'Club Tijuana', 'Toluca', 'Tigres UANL', 'Pumas UNAM']
+const LIGA_MX_LABEL = 'México - Liga MX'
+// Títulos exactos en Wikipedia (en) para que el escudo salga bien
+const WIKI_MX = {
+  'Club América': 'Club América', 'Atlas': 'Atlas F.C.', 'Atlético San Luis': 'Atlético San Luis', 'Cruz Azul': 'Cruz Azul',
+  'Guadalajara': 'C.D. Guadalajara', 'FC Juárez': 'FC Juárez', 'León': 'Club León', 'Atlante': 'Atlante F.C.', 'Monterrey': 'C.F. Monterrey',
+  'Necaxa': 'Club Necaxa', 'Pachuca': 'C.F. Pachuca', 'Puebla': 'Club Puebla', 'Querétaro': 'Querétaro F.C.', 'Santos Laguna': 'Santos Laguna',
+  'Club Tijuana': 'Club Tijuana', 'Toluca': 'Deportivo Toluca F.C.', 'Tigres UANL': 'Tigres UANL', 'Pumas UNAM': 'Club Universidad Nacional'
+}
+let copaSorteoCorriendo = false
+let copaPreLogosMX = false
+let copaAnimId = 0
+let copaPasos = []
 
+function ligaMXNombres() {
+  const l = (poolClubes || []).filter(c => c.liga === LIGA_MX_LABEL).map(c => c.nombre)
+  return l.length ? l : LIGA_MX_FALLBACK
+}
+async function cargarLogosMX(nombres) {
+  const pend = nombres.filter(n => !logoPorNombre(n))
+  await Promise.all(pend.map(async n => {
+    try {
+      const t = WIKI_MX[n]
+      if (t) {
+        const r = await fetch(`https://en.wikipedia.org/w/api.php?action=query&format=json&origin=*&redirects=1&prop=pageimages&piprop=thumbnail&pithumbsize=200&pilicense=any&titles=${encodeURIComponent(t)}`)
+        const d = await r.json()
+        const url = Object.values(d.query?.pages || {})[0]?.thumbnail?.source
+        if (url) { logosIntl[n] = await limpiarFondoSiHace(url); return }
+      }
+    } catch(e) {}
+  }))
+  try { localStorage.setItem(INTL_LOGO_KEY, JSON.stringify(logosIntl)) } catch(e) {}
+  await cargarLogosIntl(nombres.filter(n => !logoPorNombre(n)))
+}
+function migrarCopa32() {
+  const c = estado.copaArgentina
+  if (!c?.configurado) return
+  const tieneInvitados = (c.equipos || []).some(e => e.origen === 'invitado')
+  if (tieneInvitados) return
+  const jugado = Object.values(c.bracket || {}).some(r => (r || []).some(x => x.golesLocal !== null && x.golesLocal !== undefined && x.local && x.visitante))
+  if (jugado) return
+  c.configurado = false
+  c.equipos = (c.equipos || []).filter(e => e.origen === 'extra')
+  c.bracket = { r1: [], r2: [], cuartos: [], semis: [], final: [] }
+  delete c.sorteo
+}
+function copaEq(id) {
+  const e = (estado.copaArgentina.equipos || []).find(x => x.id === id)
+  if (!e) return null
+  return { id, nombre: getCopaNombre(id), dueno: e.dueno, liga: e.origen === 'invitado' ? LIGA_MX_LABEL : (e.origen === 'liga' ? 'Liga AFA' : 'Extra argentino'), origen: e.origen }
+}
+function cbEscudo(id, size) {
+  const e = copaEq(id)
+  if (!e) return ''
+  return e.origen === 'invitado' ? (escudoNombre(e.nombre, size) || logoHTML(id, size)) : logoHTML(id, size)
+}
+function copaBolilleroHTML() {
+  return `<div id="copa-bol" style="display:none;">
+    <div class="card">
+      <div class="bp-full-top"><div class="bp-full-tit"><span class="comp-ic" data-comp="copa"></span>Sorteo Copa Argentina</div><button onclick="salirCopaBolFull()" title="Salir de pantalla completa">✕</button></div>
+      <div class="bolillero-wrap">
+        ${COPA_STAGE_HTML}
+        <div class="bolillero-numero" id="cb-numero"></div>
+        <div class="bp-revela" id="cb-revela">${compLogos.copa ? `<img src="${compLogos.copa}" alt="Copa Argentina" style="height:70px;object-fit:contain;">` : '<div class="bolillero-texto">Listo</div>'}</div>
+        <div id="cb-dueno" style="font-size:13px; min-height:24px;"></div>
+      </div>
+      <div class="cb-fase">🇦🇷 Extras argentinos</div>
+      <div class="sorteo-grid" style="grid-template-columns:1fr 1fr;">
+        <div><div class="sorteo-col-titulo badge-santi">SANTI — <span id="cb-cnt-santi">0</span>/5</div><div id="cb-ext-santi"></div></div>
+        <div><div class="sorteo-col-titulo badge-luciano">LUCIANO — <span id="cb-cnt-luciano">0</span>/5</div><div id="cb-ext-luciano"></div></div>
+      </div>
+      <div class="cb-fase">🇲🇽 Invitados Liga MX</div>
+      <div class="sorteo-grid" style="grid-template-columns:1fr 1fr;">
+        <div class="cb-inv" id="cb-inv-santi" style="--c:#4a9eff"><span class="badge-santi" style="font-size:11px;">SANTI</span><span class="text-gris">Por sortear</span></div>
+        <div class="cb-inv" id="cb-inv-luciano" style="--c:#ff6b6b"><span class="badge-luciano" style="font-size:11px;">LUCIANO</span><span class="text-gris">Por sortear</span></div>
+      </div>
+      <div class="cb-fase">⚔️ Cruces — Ronda 1</div>
+      <div id="cb-cruces"></div>
+      <div id="copa-bol-botones" class="flex-gap mt" style="display:none;"></div>
+      <div id="cb-saltar" class="flex-gap mt" style="justify-content:center;"><button class="btn btn-secondary btn-sm" onclick="saltarSorteoCopa()">⏩ Saltar animación</button></div>
+    </div>
+  </div>`
+}
+// ── Editor de cruces (Ronda 1): intercambiar equipos del mismo dueño y cambiar el invitado de la Liga MX
+let copaEditSel = null
+let copaEditando = false
+function cruceJugado(c) { return c && c.golesLocal !== null && c.golesLocal !== undefined }
+function extrasResumenHTML() {
+  const ex = d => (estado.copaArgentina.equipos || []).filter(e => e.origen === 'extra' && e.dueno === d)
+  const col = d => `<div><div class="badge-${d}" style="font-size:11px;margin-bottom:6px;display:inline-block;">${d === 'santi' ? 'SANTI' : 'LUCIANO'}</div>
+    ${ex(d).map(e => `<div class="cb-eq" style="--c:${colorDe(d)};margin-bottom:4px;">${cbEscudo(e.id, 18)}<span>${getCopaNombre(e.id)}</span></div>`).join('')}</div>`
+  return `<div class="cb-fase">🇦🇷 Extras argentinos</div><div class="sorteo-grid" style="grid-template-columns:1fr 1fr;">${col('santi')}${col('luciano')}</div>`
+}
+function editorCrucesHTML() {
+  const copa = estado.copaArgentina, r1 = copa.bracket?.r1 || []
+  const usados = (copa.equipos || []).filter(e => e.origen === 'invitado').map(e => e.nombre)
+  const invSel = d => {
+    const e = (copa.equipos || []).find(x => x.origen === 'invitado' && x.dueno === d); if (!e) return ''
+    const jugado = r1.some(c => (c.local === e.id || c.visitante === e.id) && cruceJugado(c))
+    const opts = ligaMXNombres().filter(n => n === e.nombre || !usados.includes(n)).map(n => `<option ${n === e.nombre ? 'selected' : ''}>${n}</option>`).join('')
+    return `<div class="cb-inv lleno" style="--c:${colorDe(d)};flex-wrap:wrap;"><span class="badge-${d}" style="font-size:11px;">${d === 'santi' ? 'SANTI' : 'LUCIANO'}</span>${cbEscudo(e.id, 28)}
+      ${jugado ? `<b>${e.nombre}</b>` : `<select onchange="cambiarInvitadoCopa('${d}', this.value)" style="flex:1;min-width:120px;background:var(--azul3);color:#fff;border:1px solid var(--border);border-radius:6px;padding:5px;font-weight:700;">${opts}</select>`}</div>`
+  }
+  const eqBtn = (c, id) => {
+    const e = copaEq(id); if (!e) return `<div class="cb-eq vacio"><span>—</span></div>`
+    const bloqueado = cruceJugado(c)
+    const sel = copaEditSel === id
+    return `<div class="cb-eq" style="--c:${colorDe(e.dueno)};${bloqueado ? 'opacity:.5;' : 'cursor:pointer;'}${sel ? 'outline:2px solid var(--dorado2);background:rgba(245,197,66,.18);' : ''}"
+      ${bloqueado ? '' : `onclick="copaEditClick('${id}')"`}>${cbEscudo(id, 18)}<span>${e.nombre}</span></div>`
+  }
+  return `${extrasResumenHTML()}<div class="cb-fase">🇲🇽 Invitados Liga MX</div>
+    <div class="sorteo-grid" style="grid-template-columns:1fr 1fr;">${invSel('santi')}${invSel('luciano')}</div>
+    <div class="cb-fase">⚔️ Cruces — Ronda 1</div>
+    <p class="text-gris" style="text-align:center;margin:-2px 0 8px;">✏️ Tocá un equipo y después otro <b>del mismo dueño</b> para intercambiarlos. Así siempre queda Santi vs Luciano.</p>
+    ${r1.map((c, i) => `<div class="cb-cruce"><div class="cb-n">${i + 1}</div>${eqBtn(c, c.local)}<div class="cb-vs">VS</div>${eqBtn(c, c.visitante)}</div>`).join('')}`
+}
+function refrescarCopaEditor() {
+  const cont = document.getElementById('copa-contenido'); if (!cont) return
+  if (estado.copaArgentina.configurado) renderCopa(); else renderCopaSorteoPendiente(cont)
+}
+async function copaEditClick(id) {
+  if (!esAdmin) return
+  if (!copaEditSel || copaEditSel === id) { copaEditSel = copaEditSel === id ? null : id; refrescarCopaEditor(); return }
+  const a = copaEq(copaEditSel), b = copaEq(id)
+  if (!a || !b || a.dueno !== b.dueno) { toast('Solo se cambian equipos del mismo dueño (regla de oro)', true); copaEditSel = id; refrescarCopaEditor(); return }
+  const r1 = estado.copaArgentina.bracket.r1
+  const pos = x => { for (const c of r1) { if (c.local === x) return [c, 'local']; if (c.visitante === x) return [c, 'visitante'] } return [null] }
+  const [ca, la] = pos(copaEditSel), [cb, lb] = pos(id)
+  if (!ca || !cb || cruceJugado(ca) || cruceJugado(cb)) { toast('Ese cruce ya se jugó', true); return }
+  ca[la] = id; cb[lb] = a.id
+  copaEditSel = null
+  if (estado.copaArgentina.configurado) await guardarEstado()
+  refrescarCopaEditor()
+}
+async function cambiarInvitadoCopa(dueno, nombre) {
+  const e = (estado.copaArgentina.equipos || []).find(x => x.origen === 'invitado' && x.dueno === dueno)
+  if (!e) return
+  e.nombre = nombre
+  await cargarLogosMX([nombre])
+  if (estado.copaArgentina.configurado) await guardarEstado()
+  refrescarCopaEditor()
+}
+function toggleEditarCopa() { copaEditando = !copaEditando; copaEditSel = null; renderCopa() }
+function salirCopaBolFull() {
+  document.getElementById('copa-bol')?.classList.remove('bp-full')
+  document.body.classList.remove('bp-bloqueo')
+}
+function cbCruceHTML(i, c, mostrar = {}) {
+  const lado = (id, ver) => {
+    if (!id || !ver) return `<div class="cb-eq vacio"><span>—</span></div>`
+    const e = copaEq(id)
+    return `<div class="cb-eq" data-eq="${id}" style="--c:${colorDe(e?.dueno)}">${cbEscudo(id, 18)}<span>${e?.nombre || id}</span></div>`
+  }
+  return `<div class="cb-cruce" id="cb-cr-${i}"><div class="cb-n">${i + 1}</div>${lado(c.local, mostrar.local !== false)}<div class="cb-vs">VS</div>${lado(c.visitante, mostrar.visitante !== false)}</div>`
+}
+function botonesSorteoCopaHTML() {
+  return esAdmin ? `<button class="btn btn-gold" onclick="confirmarCopa()">✅ Confirmar sorteo</button>
+    <button class="btn btn-secondary" onclick="hacerSorteoCopa()">🔀 Sortear de nuevo</button>` : ''
+}
+function renderCopaSorteoPendiente(cont) {
+  const copa = estado.copaArgentina
+  const inv = d => (copa.equipos || []).find(e => e.origen === 'invitado' && e.dueno === d)
+  const invHTML = d => { const e = inv(d); return e ? `<div class="cb-inv lleno" style="--c:${colorDe(d)}"><span class="badge-${d}" style="font-size:11px;">${d === 'santi' ? 'SANTI' : 'LUCIANO'}</span>${cbEscudo(e.id, 28)}<b>${e.nombre}</b></div>` : '' }
+  cargarLogosMX((copa.equipos || []).filter(e => e.origen === 'invitado').map(e => e.nombre)).then(() => { if (!copa.configurado && copa.sorteo?.realizado) { const c2 = document.getElementById('copa-contenido'); if (c2 && !copaSorteoCorriendo) renderCopaSorteoPendiente(c2) } })
+  cont.innerHTML = `<div class="card">
+    <div class="card-titulo">🎲 Sorteo realizado — pendiente de confirmación</div>
+    ${esAdmin ? editorCrucesHTML() : `${extrasResumenHTML()}<div class="cb-fase">🇲🇽 Invitados Liga MX</div>
+    <div class="sorteo-grid" style="grid-template-columns:1fr 1fr;">${invHTML('santi')}${invHTML('luciano')}</div>
+    <div class="cb-fase">⚔️ Cruces — Ronda 1</div>
+    ${copa.bracket.r1.map((c, i) => cbCruceHTML(i, c)).join('')}`}
+    ${esAdmin ? `<div class="flex-gap mt">${botonesSorteoCopaHTML()}</div>` : '<p class="text-gris mt">Esperando que Santi confirme el sorteo.</p>'}
+  </div>${copaBolilleroHTML()}`
+}
+
+async function hacerSorteoCopa() {
+  const liga = estado.ligaAfa, copa = estado.copaArgentina
+  const pool = estado.poolArgentino || POOL_ARG
+  const enLiga = liga.equipos.map(e => e.id)
+  const resto = pool.filter(e => !enLiga.includes(e.id)).map(e => e.id)
+  if (resto.length < 10) { toast(`Faltan equipos argentinos fuera de la liga (hay ${resto.length}, se necesitan 10)`, true); return }
+  // 1) Los 10 argentinos que no están en la liga se reparten al azar: 5 y 5
+  const mezA = [...resto]; for (let i = mezA.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [mezA[i], mezA[j]] = [mezA[j], mezA[i]] }
+  const extras = mezA.slice(0, 10).map((id, i) => ({ id, dueno: i % 2 === 0 ? 'santi' : 'luciano', origen: 'extra' }))
+
+  // 2) Un invitado de la Liga MX para cada uno (distintos)
+  const mx = [...ligaMXNombres()].sort(() => Math.random() - 0.5)
+  const invitados = [
+    { id: 'mx_santi', nombre: mx[0], dueno: 'santi', origen: 'invitado' },
+    { id: 'mx_luciano', nombre: mx[1], dueno: 'luciano', origen: 'invitado' },
+  ]
+  // 3) Los 32 al bolillero → 16 cruces
+  const equipos = [...liga.equipos.map(e => ({ id: e.id, dueno: e.dueno, origen: 'liga' })), ...extras, ...invitados]
+  // Regla de oro: en la Ronda 1 siempre es Santi vs Luciano
+  const mezclar = a => { a = [...a]; for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]] } return a }
+  const s16 = mezclar(equipos.filter(e => e.dueno === 'santi').map(e => e.id))
+  const l16 = mezclar(equipos.filter(e => e.dueno === 'luciano').map(e => e.id))
+  if (s16.length !== 16 || l16.length !== 16) { toast(`Tienen que ser 16 y 16 (Santi ${s16.length}, Luciano ${l16.length})`, true); return }
   const r1 = []
   for (let i = 0; i < 16; i++) {
-    const eq1 = mezclados[i * 2]
-    const eq2 = mezclados[i * 2 + 1]
-    const cruce = {
-      id: `cr1_${i+1}`,
-      local: eq1 ? eq1.id : null,
-      visitante: eq2 ? eq2.id : null,
-      golesLocal: null,
-      golesVisitante: null,
-      ganador: eq1 && !eq2 ? eq1.id : (!eq1 && eq2 ? eq2.id : null) // auto-bye
-    }
-    r1.push(cruce)
+    const [loc, vis] = Math.random() < .5 ? [s16[i], l16[i]] : [l16[i], s16[i]]
+    r1.push({ id: `cr1_${i + 1}`, local: loc, visitante: vis, golesLocal: null, golesVisitante: null, ganador: null })
   }
-  return { r1, r2: [], cuartos: [], semis: [], final: [] }
+
+  copa.equipos = equipos
+  copa.bracket = { r1, r2: [], cuartos: [], semis: [], final: [] }
+  copa.sorteo = { realizado: true, confirmado: false }
+  copa.configurado = false
+
+  // Pasos del bolillero
+  copaPasos = [
+    ...extras.map(e => ({ tipo: 'extra', id: e.id })),
+    { tipo: 'inv', id: 'mx_santi' }, { tipo: 'inv', id: 'mx_luciano' },
+    ...r1.flatMap((c, i) => [{ tipo: 'cruce', i, lado: 'local', id: c.local }, { tipo: 'cruce', i, lado: 'visitante', id: c.visitante }])
+  ]
+
+  const cont = document.getElementById('copa-contenido')
+  renderCopaConfigConSorteo(cont)
+  const box = document.getElementById('copa-bol')
+  box.style.display = 'block'; box.classList.add('bp-full'); box.scrollTop = 0
+  document.body.classList.add('bp-bloqueo')
+  pintarCompLogos()
+  document.getElementById('cb-cruces').innerHTML = r1.map((c, i) => cbCruceHTML(i, c, { local: false, visitante: false })).join('')
+  copaSorteoCorriendo = true
+  const miAnim = ++copaAnimId
+  document.getElementById('cb-revela').innerHTML = `${compLogos.copa ? `<img src="${compLogos.copa}" alt="Copa Argentina" style="height:70px;object-fit:contain;display:block;margin:0 auto 4px;">` : ''}<div class="bolillero-texto">Preparando bolillas…</div>`
+  await Promise.race([cargarLogosMX(invitados.map(e => e.nombre)), new Promise(r => setTimeout(r, 3000))])
+  if (miAnim !== copaAnimId) return
+  animarSorteoCopa(0, miAnim)
+}
+// La pantalla del sorteo se monta sobre la vista de configuración
+function renderCopaConfigConSorteo(cont) {
+  if (!document.getElementById('copa-bol')) cont.insertAdjacentHTML('beforeend', copaBolilleroHTML())
+  const b = document.getElementById('copa-bol-botones'); if (b) { b.style.display = 'none'; b.innerHTML = '' }
+  const sk = document.getElementById('cb-saltar'); if (sk) sk.style.display = 'flex'
+  ;['santi', 'luciano'].forEach(d => {
+    const ex = document.getElementById(`cb-ext-${d}`); if (ex) ex.innerHTML = ''
+    const cn = document.getElementById(`cb-cnt-${d}`); if (cn) cn.textContent = '0'
+    const el = document.getElementById(`cb-inv-${d}`)
+    if (el) { el.classList.remove('lleno'); el.innerHTML = `<span class="badge-${d}" style="font-size:11px;">${d === 'santi' ? 'SANTI' : 'LUCIANO'}</span><span class="text-gris">Por sortear</span>` }
+  })
+}
+function cbPonerEnLista(p) {
+  const e = copaEq(p.id); if (!e) return
+  if (p.tipo === 'extra') {
+    const col = document.getElementById(`cb-ext-${e.dueno}`); if (!col || col.querySelector(`[data-eq="${p.id}"]`)) return
+    col.insertAdjacentHTML('beforeend', `<div class="cb-eq nuevo" data-eq="${p.id}" style="--c:${colorDe(e.dueno)};margin-bottom:4px;">${cbEscudo(p.id, 18)}<span>${e.nombre}</span></div>`)
+    const cn = document.getElementById(`cb-cnt-${e.dueno}`); if (cn) cn.textContent = col.children.length
+    return
+  }
+  if (p.tipo === 'inv') {
+    const el = document.getElementById(`cb-inv-${e.dueno}`)
+    if (el) { el.classList.add('lleno'); el.innerHTML = `<span class="badge-${e.dueno}" style="font-size:11px;">${e.dueno === 'santi' ? 'SANTI' : 'LUCIANO'}</span>${cbEscudo(p.id, 28)}<b>${e.nombre}</b>` }
+    return
+  }
+  const fila = document.getElementById(`cb-cr-${p.i}`); if (!fila) return
+  const slots = fila.querySelectorAll('.cb-eq')
+  const slot = slots[p.lado === 'local' ? 0 : 1]
+  const nuevo = document.createElement('div')
+  nuevo.className = 'cb-eq nuevo'; nuevo.style.setProperty('--c', colorDe(e.dueno))
+  nuevo.innerHTML = `${cbEscudo(p.id, 18)}<span>${e.nombre}</span>`
+  slot.replaceWith(nuevo)
+  const box = document.getElementById('copa-bol')
+  if (box?.classList.contains('bp-full')) {
+    const r = fila.getBoundingClientRect()
+    if (r.bottom > window.innerHeight - 80) box.scrollBy({ top: r.bottom - window.innerHeight + 120, behavior: 'smooth' })
+  }
+}
+function finSorteoCopa() {
+  copaSorteoCorriendo = false
+  const esfera = document.getElementById('cb-esfera'); esfera?.classList.remove('girando')
+  document.getElementById('cb-mano')?.classList.remove('baja', 'sube')
+  document.getElementById('cb-tomada')?.classList.remove('si')
+  const presi = document.getElementById('cb-presi'), bur = document.getElementById('cb-burbuja')
+  if (presi) { presi.classList.remove('mira'); presi.classList.add('habla', 'festeja'); setTimeout(() => presi.classList.remove('habla'), 1800) }
+  if (bur) { bur.innerHTML = '¡Que empiece la Copa! 🏆'; bur.classList.add('si') }
+  const rv = document.getElementById('cb-revela'); if (rv) rv.innerHTML = `${compLogos.copa ? `<img src="${compLogos.copa}" alt="" style="height:60px;object-fit:contain;display:block;margin:0 auto 4px;">` : ''}<div class="bolillero-texto">¡Listo!</div>`
+  const num = document.getElementById('cb-numero'); if (num) num.textContent = ''
+  const due = document.getElementById('cb-dueno'); if (due) due.innerHTML = ''
+  const sk = document.getElementById('cb-saltar'); if (sk) sk.style.display = 'none'
+  const b = document.getElementById('copa-bol-botones')
+  if (b) { b.innerHTML = botonesSorteoCopaHTML() + `<button class="btn btn-secondary" onclick="salirCopaBolFull();renderCopa()">⬇️ Ver en la página</button>`; b.style.display = 'flex' }
+  sfx.tribuna(2.5, .25)
+}
+function saltarSorteoCopa() {
+  ++copaAnimId
+  const r1 = estado.copaArgentina.bracket.r1
+  copaPasos.forEach(p => { if (p.tipo !== 'cruce') cbPonerEnLista(p) })
+  const lista = document.getElementById('cb-cruces')
+  if (lista) lista.innerHTML = r1.map((c, i) => cbCruceHTML(i, c)).join('')
+  finSorteoCopa()
+}
+function animarSorteoCopa(idx, animId) {
+  if (animId !== copaAnimId) return
+  if (idx >= copaPasos.length) { finSorteoCopa(); return }
+  const p = copaPasos[idx], e = copaEq(p.id)
+  const esInv = p.tipo === 'inv'
+  const color = colorDe(e.dueno)
+  const esfera = document.getElementById('cb-esfera'), mano = document.getElementById('cb-mano'), tomada = document.getElementById('cb-tomada')
+  const revela = document.getElementById('cb-revela'), num = document.getElementById('cb-numero'), due = document.getElementById('cb-dueno')
+  const presi = document.getElementById('cb-presi'), bur = document.getElementById('cb-burbuja')
+  if (!esfera) return
+  // Igual que el Mundial: cada bolilla con su escudo en grande
+  const T = { gira: 750, zoom: 1300, sig: 2350 }
+  esfera.classList.add('girando')
+  const esExtra = p.tipo === 'extra'
+  const nExtras = copaPasos.filter(x => x.tipo === 'extra').length
+  num.textContent = esExtra ? `Extra ${idx + 1} / ${nExtras}` : esInv ? `Invitado ${idx - nExtras + 1} / 2` : `Cruce ${p.i + 1} / 16`
+  due.innerHTML = ''
+  revela.innerHTML = `<div class="bolillero-texto">🎲 ${esExtra ? 'Extra argentino…' : esInv ? `Invitado de ${etiquetaDueno(e.dueno)}…` : 'Sacando bolilla…'}</div>`
+  tomada?.classList.remove('si')
+  if (mano) { mano.classList.remove('sube'); mano.classList.add('baja') }
+  if (presi) { presi.classList.remove('habla', 'festeja'); presi.classList.add('mira') }
+  bur?.classList.remove('si')
+  sfx.rattle(T.gira)
+
+  setTimeout(() => {
+    if (animId !== copaAnimId) return
+    esfera.classList.remove('girando')
+    const esc = esInv ? logoPorNombre(e.nombre) : (getPoolLogo(p.id) || logoPorNombre(e.nombre))
+    const ini = e.nombre.replace(/\s*\(.*?\)\s*/g, ' ').trim().split(' ').map(w => w[0]).filter(Boolean).slice(0, 2).join('').toUpperCase()
+    if (tomada) {
+      tomada.style.setProperty('--c', color)
+      document.getElementById('cb-tomada-esc').innerHTML = esc ? `<img src="${esc}" alt="">` : `<span>${ini}</span>`
+      tomada.classList.add('si')
+    }
+    if (mano) { mano.classList.remove('baja'); mano.classList.add('sube') }
+    sfx.pop()
+    if (presi) { presi.classList.remove('mira'); presi.classList.add('habla'); setTimeout(() => presi.classList.remove('habla'), 1500) }
+    if (bur) {
+      const txt = esExtra ? `¡Extra para ${etiquetaDueno(e.dueno)}!` : esInv ? `¡De México para ${etiquetaDueno(e.dueno)}!` : (p.lado === 'local' ? `Cruce ${p.i + 1}…` : '¡Contra…')
+      bur.innerHTML = `<div style="font-size:10px;color:#666;font-weight:700;">${txt}</div>${e.nombre}`
+      bur.classList.add('si')
+    }
+    revela.innerHTML = `<div class="bp-card" style="--c:${color}">${esc ? `<img src="${esc}" alt="">` : ''}<div><div class="bp-nom" style="color:${color}">${e.nombre}</div><div class="bp-liga">${e.liga}</div></div></div>`
+    due.innerHTML = `<span class="badge-${e.dueno}" style="font-size:13px;">${etiquetaDueno(e.dueno)}</span>`
+    setTimeout(() => { if (animId === copaAnimId) { sfx.whoosh(.2); sfx.revela(); zoomEquipo(e, color, esc, T.zoom) } }, 450)
+    setTimeout(() => { if (animId === copaAnimId) { cbPonerEnLista(p); tomada?.classList.remove('si') } }, 2000)
+    setTimeout(() => animarSorteoCopa(idx + 1, animId), T.sig)
+  }, T.gira)
 }
 
 function getCopaNombre(id) {
   if (!id) return 'Por definir'
   const eq = (estado.copaArgentina.equipos || []).find(e => e.id === id)
-  if (eq) return getPoolNombre(id)
+  if (eq) return eq.nombre || getPoolNombre(id)
   // Podría ser un equipo del bracket de Mundial de Clubes - no debería pasar
   return id
 }
@@ -5999,7 +6377,8 @@ function renderCopaBracket(cont) {
         ${copaColHTML(r1R,'r1','Ronda 1')}
       </div>
     </div>
-    ${esAdmin ? `<div class="mt flex-gap"><button class="btn btn-danger btn-sm" onclick="resetCopa()">↺ Reconfigurar copa</button></div>` : ''}
+    ${esAdmin ? `<div class="mt flex-gap"><button class="btn btn-secondary btn-sm" onclick="toggleEditarCopa()">${copaEditando ? '✅ Listo' : '✏️ Editar cruces'}</button><button class="btn btn-danger btn-sm" onclick="resetCopa()">↺ Reconfigurar copa</button></div>` : ''}
+    ${esAdmin && copaEditando ? `<div class="card mt">${editorCrucesHTML()}</div>` : ''}
     <div id="copa-modal"></div>
   `
 }
@@ -6063,6 +6442,7 @@ async function guardarResultadoCopa() {
 
 async function resetCopa() {
   if (!confirm('¿Reconfigurar la Copa Argentina? Se perderán todos los resultados.')) return
+  ++copaAnimId; copaSorteoCorriendo = false
   estado.copaArgentina = { configurado: false, equipos: [], bracket: { r1: [], r2: [], cuartos: [], semis: [], final: [] } }
   await guardarEstado()
   renderCopa()

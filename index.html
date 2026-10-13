@@ -272,6 +272,17 @@
     :is(#bolillero-container,#copa-bol).bp-full .equipo-row img { width: 18px !important; height: 18px !important; }
     :is(#bolillero-container,#copa-bol).bp-full .sorteo-col-titulo { font-size: 12px; position: sticky; top: 0; z-index: 1; }
     :is(#bolillero-container,#copa-bol).bp-full :is(#bol-botones,#copa-bol-botones) { position: sticky; bottom: 0; padding: 12px 0 6px; background: linear-gradient(transparent, #060a17 35%); justify-content: center; }
+    /* Zonas del sorteo del Mundial */
+    .zona-box { border: 1px solid var(--border); border-top: 3px solid var(--zc); border-radius: 12px; padding: 10px; margin-bottom: 12px; background: color-mix(in srgb, var(--zc) 6%, transparent); }
+    .zona-box.activa { box-shadow: 0 0 0 2px var(--zc), 0 0 24px color-mix(in srgb, var(--zc) 35%, transparent); }
+    .zona-tit { display: flex; align-items: center; justify-content: space-between; gap: 8px; font-weight: 900; font-size: 13px; letter-spacing: 1px; text-transform: uppercase; color: var(--zc); margin-bottom: 8px; }
+    .zona-tit small { font-size: 11px; font-weight: 700; color: var(--gris); letter-spacing: 0; text-transform: none; }
+    .zona-bombos { display: flex; flex-wrap: wrap; gap: 5px; margin-bottom: 8px; }
+    .zona-bombos span { font-size: 11px; background: rgba(255,255,255,.06); border: 1px solid var(--border); border-radius: 20px; padding: 2px 8px; }
+    .zona-cols { display: grid; grid-template-columns: minmax(0,1fr) minmax(0,1fr); gap: 8px; }
+    .zona-cols > div { min-width: 0; }
+    .zona-cols .sorteo-col-titulo { font-size: 11px; padding: 3px 6px; position: static !important; }
+    .zona-sig { text-align: center; padding: 10px 0 4px; }
     /* Paneles desplegables dentro de cada competencia */
     .sec-panel { border-radius: 14px; margin-bottom: 10px; }
     .sec-panel .hl-head { padding: 11px 12px; gap: 10px; }
@@ -3672,17 +3683,8 @@ function renderSorteo() {
     cont.innerHTML = `
       <div class="card">
         <div class="card-titulo">✅ Sorteo confirmado</div>
-        <p class="text-gris" style="margin:-4px 0 12px;">👆 Toca un equipo para verlo en grande y buscarlo en FC 27.</p>
-        <div class="sorteo-grid">
-          <div>
-            <div style="font-weight:700; margin-bottom:10px;" class="badge-santi">SANTI (${santi.length})</div>
-            ${santi.map(e => `<div class="equipo-row" style="cursor:pointer;" onclick="verEquipoSorteo('${e.id}')"><span style="display:flex;align-items:center;gap:8px;min-width:0;">${escudoNombre(e.nombre, 20)}<span class="equipo-nombre">${e.nombre}</span></span><span class="equipo-liga">${e.liga}</span>${lapiz(e.id)}</div>`).join('')}
-          </div>
-          <div>
-            <div style="font-weight:700; margin-bottom:10px;" class="badge-luciano">LUCIANO (${luciano.length})</div>
-            ${luciano.map(e => `<div class="equipo-row" style="cursor:pointer;" onclick="verEquipoSorteo('${e.id}')"><span style="display:flex;align-items:center;gap:8px;min-width:0;">${escudoNombre(e.nombre, 20)}<span class="equipo-nombre">${e.nombre}</span></span><span class="equipo-liga">${e.liga}</span>${lapiz(e.id)}</div>`).join('')}
-          </div>
-        </div>
+        <p class="text-gris" style="margin:-4px 0 12px;">👆 Toca un equipo para verlo en grande y buscarlo en FC 27. Santi ${santi.length} · Luciano ${luciano.length}</p>
+        ${zonasCajasHTML({ modo: 'resultado', equipos: estado.sorteo.internacionales, lapiz })}
         ${esAdmin ? `<div class="mt flex-gap"><button class="btn btn-secondary btn-sm" onclick="resetSorteo()">↺ Rehacer sorteo</button></div>` : ''}
       </div>
     `
@@ -3699,17 +3701,8 @@ function renderSorteo() {
     cont.innerHTML = `
       <div class="card">
         <div class="card-titulo">🎲 Sorteo realizado — pendiente de confirmación</div>
-        <p class="text-gris" style="margin:-4px 0 12px;">👆 Toca un equipo para verlo en grande y buscarlo en FC 27.${esAdmin ? ' ¿Alguno no está en el juego? Toca ✏️ para resortear solo ese.' : ''}</p>
-        <div class="sorteo-grid">
-          <div>
-            <div style="font-weight:700; margin-bottom:10px;" class="badge-santi">SANTI (${santi.length})</div>
-            ${santi.map(e => `<div class="equipo-row" style="cursor:pointer;" onclick="verEquipoSorteo('${e.id}')"><span style="display:flex;align-items:center;gap:8px;min-width:0;">${escudoNombre(e.nombre, 20)}<span class="equipo-nombre">${e.nombre}</span></span><span class="equipo-liga">${e.liga}</span>${lapiz(e.id)}</div>`).join('')}
-          </div>
-          <div>
-            <div style="font-weight:700; margin-bottom:10px;" class="badge-luciano">LUCIANO (${luciano.length})</div>
-            ${luciano.map(e => `<div class="equipo-row" style="cursor:pointer;" onclick="verEquipoSorteo('${e.id}')"><span style="display:flex;align-items:center;gap:8px;min-width:0;">${escudoNombre(e.nombre, 20)}<span class="equipo-nombre">${e.nombre}</span></span><span class="equipo-liga">${e.liga}</span>${lapiz(e.id)}</div>`).join('')}
-          </div>
-        </div>
+        <p class="text-gris" style="margin:-4px 0 12px;">👆 Toca un equipo para verlo en grande y buscarlo en FC 27.${esAdmin ? ' ¿Alguno no está en el juego? Toca ✏️ para resortear solo ese (sale del mismo bombo).' : ''}</p>
+        ${zonasCajasHTML({ modo: 'resultado', equipos: estado.sorteo.internacionales, lapiz })}
         ${esAdmin ? `
           <div class="mt flex-gap">
             <button class="btn btn-gold" onclick="confirmarSorteo()">✅ Confirmar sorteo</button>
@@ -3741,7 +3734,8 @@ function renderSorteo() {
           <div class="text-gris">= 16 equipos</div>
         </div>
       </div>
-      <p class="text-gris" style="margin-bottom:14px;">Pool disponible: ${poolClubes.length} clubes internacionales. El sorteo garantiza que ningún cruce de primera ronda sea entre el mismo dueño.</p>
+      <p class="text-gris" style="margin-bottom:10px;">El sorteo va por partes: primero la Zona América, después Europa y al final Asia y Oceanía. Cada bombo tiene sus cupos y se reparten parejo. Solo equipos de primera división. Ningún cruce de primera ronda es entre el mismo dueño.</p>
+      ${zonasCajasHTML({ modo: 'previa' })}
       ${esAdmin ? `
         <button class="btn btn-primary" onclick="hacerSorteo()">🎲 Iniciar bolillero</button>
       ` : '<p class="text-gris">Solo Santi puede realizar el sorteo.</p>'}
@@ -3813,16 +3807,8 @@ function renderSorteo() {
           <div class="bp-revela" id="bp-revela"><div class="bolillero-texto" id="bol-texto">Listo</div></div>
           <div id="bol-dueno" style="font-size:13px; min-height:24px;"></div>
         </div>
-        <div class="sorteo-grid">
-          <div>
-            <div class="sorteo-col-titulo badge-santi">SANTI — <span id="cnt-santi">0</span>/${intSanti}</div>
-            <div id="col-santi"></div>
-          </div>
-          <div>
-            <div class="sorteo-col-titulo badge-luciano">LUCIANO — <span id="cnt-luciano">0</span>/${intLuciano}</div>
-            <div id="col-luciano"></div>
-          </div>
-        </div>
+        <div id="bol-zonas"></div>
+        <div id="bol-sig-zona" class="zona-sig" style="display:none;"></div>
         <div id="bol-botones" class="flex-gap mt" style="display:none;">
           <button class="btn btn-gold" onclick="confirmarSorteo()">✅ Confirmar sorteo</button>
           <button class="btn btn-secondary" onclick="hacerSorteo()">🔀 Sortear de nuevo</button>
@@ -3833,6 +3819,79 @@ function renderSorteo() {
   `
 }
 
+// ══════════════════════════════════════════════
+// SORTEO POR ZONAS Y BOMBOS (Mundial de Clubes)
+// ══════════════════════════════════════════════
+const TOP5_LIGAS = ['Inglaterra - Premier League', 'España - LaLiga', 'Italia - Serie A', 'Alemania - Bundesliga', 'Francia - Ligue 1']
+const RESTO_EUROPA_LIGAS = ['Portugal - Liga Portugal', 'Países Bajos - Eredivisie', 'Bélgica - Pro League', 'Escocia - Premiership', 'Turquía - Süper Lig',
+  'Austria - Bundesliga', 'Suiza - Super League', 'Dinamarca - Superliga', 'Noruega - Eliteserien', 'Suecia - Allsvenskan', 'Polonia - Ekstraklasa', 'Rumania - SuperLiga', 'Irlanda - Premier Division']
+const RESTO_EUROPA_CLUBES = ['AEK Atenas', 'APOEL', 'Dinamo Kiev', 'Dinamo Zagreb', 'Ferencváros', 'Hajduk Split', 'HJK Helsinki', 'Ludogorets', 'Olympiacos', 'Omonia Nicosia', 'Panathinaikos', 'PAOK', 'Qarabağ FK', 'Shakhtar Donetsk', 'Slavia Praga', 'Sparta Praga', 'Viktoria Plzeň']
+const ZONAS_MUNDIAL = [
+  { id: 'america', nombre: 'Zona América', emoji: '🌎', color: '#2ecc71', bombos: [
+    { id: 'ligamx', nombre: '🇲🇽 Liga MX', cupos: 2, ligas: ['México - Liga MX'] },
+    { id: 'mls', nombre: '🇺🇸 MLS y Sudamérica', cupos: 2, ligas: ['Estados Unidos - MLS'], clubes: ['Universidad Católica'] },
+  ] },
+  { id: 'europa', nombre: 'Zona Europa', emoji: '🇪🇺', color: '#4a9eff', bombos: [
+    { id: 'eng', nombre: '🏴 Premier League', cupos: 2, ligas: ['Inglaterra - Premier League'] },
+    { id: 'esp', nombre: '🇪🇸 LaLiga', cupos: 2, ligas: ['España - LaLiga'] },
+    { id: 'ita', nombre: '🇮🇹 Serie A', cupos: 2, ligas: ['Italia - Serie A'] },
+    { id: 'ger', nombre: '🇩🇪 Bundesliga', cupos: 2, ligas: ['Alemania - Bundesliga'] },
+    { id: 'fra', nombre: '🇫🇷 Ligue 1', cupos: 2, ligas: ['Francia - Ligue 1'] },
+    { id: 'top5', nombre: '⭐ Comodín Top 5', cupos: 2, ligas: TOP5_LIGAS },
+    { id: 'reu', nombre: '🇪🇺 Resto de Europa', cupos: 4, ligas: RESTO_EUROPA_LIGAS, clubes: RESTO_EUROPA_CLUBES },
+  ] },
+  { id: 'resto', nombre: 'Asia y Oceanía', emoji: '🌏', color: '#f5a623', bombos: [
+    { id: 'asia', nombre: '🌏 Asia y Oceanía', cupos: 4, ligas: ['Arabia Saudita - Pro League', 'Corea del Sur - K League 1', 'China - Super League', 'India - ISL', 'Australia - A-League'], clubes: ['Al Ain FC'] },
+  ] },
+]
+function bomboDef(id) { for (const z of ZONAS_MUNDIAL) for (const b of z.bombos) if (b.id === id) return { ...b, zona: z.id } ; return null }
+function zonaDef(id) { return ZONAS_MUNDIAL.find(z => z.id === id) }
+function poolDeBombo(b) { return poolClubes.filter(c => b.ligas.includes(c.liga) || (b.clubes || []).includes(c.nombre)) }
+// Para equipos viejos sin zona guardada
+function zonaDeEquipo(e) {
+  if (e.zona && zonaDef(e.zona)) return e.zona
+  for (const z of ZONAS_MUNDIAL) for (const b of z.bombos) if (b.ligas.includes(e.liga) || (b.clubes || []).includes(e.nombre)) return z.id
+  return 'europa'
+}
+function bomboNombre(e) { const b = e.bombo && bomboDef(e.bombo); return b ? b.nombre : (e.liga || '') }
+// Reparte los cupos de cada bombo entre Santi y Luciano (parejo; se ajusta si tienen distinta cantidad de argentinos)
+function repartirCupos(needS, needL) {
+  const slots = []
+  let alterna = 0
+  for (const z of ZONAS_MUNDIAL) for (const b of z.bombos) for (let k = 0; k < b.cupos; k++) {
+    const d = b.cupos % 2 === 0 ? (k % 2 === 0 ? 'santi' : 'luciano') : ((k + alterna) % 2 === 0 ? 'santi' : 'luciano')
+    if (k === b.cupos - 1 && b.cupos % 2) alterna++
+    slots.push({ zona: z.id, bombo: b.id, dueno: d })
+  }
+  const cuenta = d => slots.filter(x => x.dueno === d).length
+  // ajustar si alguno necesita más (de atrás para adelante)
+  for (let i = slots.length - 1; i >= 0 && cuenta('santi') > needS; i--) if (slots[i].dueno === 'santi') slots[i].dueno = 'luciano'
+  for (let i = slots.length - 1; i >= 0 && cuenta('luciano') > needL; i--) if (slots[i].dueno === 'luciano') slots[i].dueno = 'santi'
+  return slots
+}
+function cuposTotal() { return ZONAS_MUNDIAL.reduce((a, z) => a + z.bombos.reduce((x, b) => x + b.cupos, 0), 0) }
+
+// HTML de las cajas por zona (pre-sorteo, bolillero y resultado)
+function zonasCajasHTML({ modo, equipos = [], lapiz = () => '' }) {
+  return ZONAS_MUNDIAL.map(z => {
+    const cupos = z.bombos.reduce((a, b) => a + b.cupos, 0)
+    const deZona = equipos.filter(e => zonaDeEquipo(e) === z.id)
+    const fila = e => `<div class="equipo-row" style="cursor:pointer;" onclick="verEquipoSorteo('${e.id}')"><span style="display:flex;align-items:center;gap:8px;min-width:0;">${escudoNombre(e.nombre, 20)}<span class="equipo-nombre">${e.nombre}</span></span><span class="equipo-liga">${bomboNombre(e)}</span>${lapiz(e.id)}</div>`
+    const col = d => {
+      const lista = deZona.filter(e => e.dueno === d)
+      const max = (sorteoSlotsPlan || []).filter(x => x.zona === z.id && x.dueno === d).length || (cupos / 2)
+      return `<div><div class="sorteo-col-titulo badge-${d}">${d === 'santi' ? 'SANTI' : 'LUCIANO'} — <span id="cnt-${z.id}-${d}">${modo === 'bolillero' ? 0 : lista.length}</span>/${modo === 'bolillero' ? max : lista.length}</div>
+        <div id="col-${z.id}-${d}">${modo === 'bolillero' ? '' : lista.map(fila).join('')}</div></div>`
+    }
+    return `<div class="zona-box" id="zona-${z.id}" style="--zc:${z.color}">
+      <div class="zona-tit"><span>${z.emoji} ${z.nombre}</span><small>${cupos} cupos</small></div>
+      ${modo !== 'resultado' ? `<div class="zona-bombos">${z.bombos.map(b => `<span>${b.nombre} · ${b.cupos}</span>`).join('')}</div>` : ''}
+      ${modo === 'previa' ? '' : `<div class="zona-cols">${col('santi')}${col('luciano')}</div>`}
+    </div>`
+  }).join('')
+}
+let sorteoSlotsPlan = null
+let sorteoZonasCola = []
 let sorteoAnimId = 0
 // Sorteo en dos pasos: primero una liga al azar (todas con la misma chance), después un equipo de esa liga
 function elegirPorLiga(lista) {
@@ -3850,61 +3909,93 @@ function salirBolilleroFull() {
 }
 function hacerSorteo() {
   if (poolClubes.length < 10) { toast('Pool de clubes no cargado', true); return }
-
-  // Calcular cuántos necesita cada uno
   const argSanti = estado.equiposArgentinos.filter(e => e.dueno === 'santi').length
   const argLuciano = estado.equiposArgentinos.filter(e => e.dueno === 'luciano').length
-  const intSanti = 16 - argSanti
-  const intLuciano = 16 - argLuciano
-  const totalInt = intSanti + intLuciano
+  const needS = 16 - argSanti, needL = 16 - argLuciano
+  if (needS + needL !== cuposTotal()) { toast(`Los cupos (${cuposTotal()}) no coinciden con lo que falta (${needS + needL})`, true); return }
 
-  // Mezclar pool y seleccionar
-  // Cada bolilla: primero sale una liga al azar y luego un equipo de esa liga (sin repetir equipos)
-  const mezclado = []
-  let restantes = [...poolClubes]
-  while (mezclado.length < totalInt && restantes.length) {
-    const c = elegirPorLiga(restantes)
-    mezclado.push(c)
-    restantes = restantes.filter(x => x !== c)
+  // Plan de cupos y sorteo de cada bombo (sin repetir clubes)
+  const plan = repartirCupos(needS, needL)
+  sorteoSlotsPlan = plan
+  const usados = new Set()
+  const cont = { santi: 0, luciano: 0 }
+  const elegidos = []
+  for (const z of ZONAS_MUNDIAL) for (const b of z.bombos) {
+    const slots = plan.filter(x => x.bombo === b.id)
+    // orden alternado dentro del bombo para el bolillero
+    for (const sl of slots) {
+      const disp = poolDeBombo(b).filter(c => !usados.has(c.nombre))
+      const c = elegirPorLiga(disp)
+      if (!c) { toast(`No hay clubes en el bombo ${b.nombre}`, true); return }
+      usados.add(c.nombre)
+      cont[sl.dueno]++
+      elegidos.push({ id: `int_${sl.dueno[0]}${cont[sl.dueno]}`, nombre: c.nombre, liga: c.liga, dueno: sl.dueno, zona: z.id, bombo: b.id })
+    }
   }
-  const seleccionados = mezclado.slice(0, totalInt)
-
-  // Repartir
-  const santiTeams = seleccionados.slice(0, intSanti).map((club, i) => ({
-    id: `int_s${i+1}`, nombre: club.nombre, liga: club.liga, dueno: 'santi'
-  }))
-  const lucianoTeams = seleccionados.slice(intSanti).map((club, i) => ({
-    id: `int_l${i+1}`, nombre: club.nombre, liga: club.liga, dueno: 'luciano'
-  }))
-
-  // Mezclar el orden para el bolillero (alternando dueños)
-  const bolillas = []
-  const maxLen = Math.max(santiTeams.length, lucianoTeams.length)
-  for (let i = 0; i < maxLen; i++) {
-    if (i < santiTeams.length) bolillas.push(santiTeams[i])
-    if (i < lucianoTeams.length) bolillas.push(lucianoTeams[i])
-  }
-
-  estado.sorteo.internacionales = [...santiTeams, ...lucianoTeams]
-  cargarLogosIntl(estado.sorteo.internacionales.map(e => e.nombre))
+  estado.sorteo.internacionales = elegidos
+  cargarLogosIntl(elegidos.map(e => e.nombre))
   estado.sorteo.realizado = true
   estado.sorteo.confirmado = false
 
-  // Mostrar bolillero
   const contBol = document.getElementById('bolillero-container')
   contBol.style.display = 'block'
   contBol.classList.add('bp-full'); contBol.scrollTop = 0
   document.body.classList.add('bp-bloqueo')
   pintarCompLogos()
   document.getElementById('bol-botones').style.display = 'none'
-  document.getElementById('col-santi').innerHTML = ''
-  document.getElementById('col-luciano').innerHTML = ''
-  document.getElementById('cnt-santi').textContent = '0'
-  document.getElementById('cnt-luciano').textContent = '0'
-
+  document.getElementById('bol-zonas').innerHTML = zonasCajasHTML({ modo: 'bolillero' })
+  // cola de zonas: se sortean por partes
+  sorteoZonasCola = ZONAS_MUNDIAL.map(z => ({ zona: z, bolillas: elegidos.filter(e => e.zona === z.id) }))
   const miAnim = ++sorteoAnimId
   document.querySelectorAll('[onclick="hacerSorteo()"]').forEach(b => b.disabled = true)
-  animarBolillero(bolillas, 0, miAnim)
+  sortearSiguienteZona(miAnim)
+}
+function sortearSiguienteZona(animId = sorteoAnimId) {
+  if (animId !== sorteoAnimId) return
+  const sig = document.getElementById('bol-sig-zona'); if (sig) { sig.style.display = 'none'; sig.innerHTML = '' }
+  const parte = sorteoZonasCola.shift()
+  if (!parte) return
+  document.querySelectorAll('.zona-box').forEach(b => b.classList.toggle('activa', b.id === `zona-${parte.zona.id}`))
+  const presi = document.getElementById('bp-presi'), bur = document.getElementById('bp-burbuja')
+  if (bur) { bur.innerHTML = `<div style="font-size:10px;color:#666;font-weight:700;">¡Arrancamos con la</div>${parte.zona.emoji} ${parte.zona.nombre}!`; bur.classList.add('si') }
+  if (presi) { presi.classList.add('habla'); setTimeout(() => presi.classList.remove('habla'), 1400) }
+  const rv = document.getElementById('bp-revela'); if (rv) rv.innerHTML = `<div class="bolillero-texto" id="bol-texto" style="color:${parte.zona.color}">${parte.zona.emoji} ${parte.zona.nombre}</div>`
+  sfx.revela()
+  // orden: por bombo, alternando dueños
+  const orden = []
+  for (const b of parte.zona.bombos) {
+    const s = parte.bolillas.filter(e => e.bombo === b.id && e.dueno === 'santi'), l = parte.bolillas.filter(e => e.bombo === b.id && e.dueno === 'luciano')
+    for (let i = 0; i < Math.max(s.length, l.length); i++) { if (s[i]) orden.push(s[i]); if (l[i]) orden.push(l[i]) }
+  }
+  setTimeout(() => animarBolillero(orden, 0, animId), 1600)
+}
+function zonaTerminada(animId) {
+  // Se llama al final de cada zona: si quedan zonas, pausa con botón para seguir
+  if (!sorteoZonasCola.length) return false
+  const prox = sorteoZonasCola[0].zona
+  const esfera = document.getElementById('bolillero-esfera'); esfera?.classList.remove('girando')
+  document.getElementById('bp-mano')?.classList.remove('baja', 'sube')
+  const bur = document.getElementById('bp-burbuja'); if (bur) { bur.innerHTML = `¡Lista la zona! Sigue ${prox.emoji} ${prox.nombre}`; bur.classList.add('si') }
+  const rv = document.getElementById('bp-revela'); if (rv) rv.innerHTML = `<div class="bolillero-texto" id="bol-texto">✅ Zona lista</div>`
+  document.getElementById('bol-numero').textContent = ''
+  document.getElementById('bol-dueno').innerHTML = ''
+  sfx.tribuna(1.4, .18)
+  const sig = document.getElementById('bol-sig-zona')
+  if (sig) {
+    sig.innerHTML = `<button class="btn btn-gold" onclick="sortearSiguienteZona(${animId})">▶️ Sortear ${prox.emoji} ${prox.nombre}</button>`
+    sig.style.display = 'block'
+    const box = document.getElementById('bolillero-container')
+    if (box?.classList.contains('bp-full')) setTimeout(() => sig.scrollIntoView({ behavior: 'smooth', block: 'center' }), 200)
+  }
+  return true
+}
+function colSorteoDe(club) {
+  const z = club.zona || zonaDeEquipo(club)
+  return document.getElementById(`col-${z}-${club.dueno}`) || document.getElementById(`col-${club.dueno}`)
+}
+function cntSorteoDe(club) {
+  const z = club.zona || zonaDeEquipo(club)
+  return document.getElementById(`cnt-${z}-${club.dueno}`) || document.getElementById(`cnt-${club.dueno}`)
 }
 
 function lanzarPapelito(nombre, dueno) {
@@ -4236,6 +4327,8 @@ function animarBolillero(bolillas, idx, animId = sorteoAnimId) {
   const duenoEl = document.getElementById('bol-dueno')
 
   if (idx >= bolillas.length) {
+    if (zonaTerminada(animId)) return
+    document.querySelectorAll('.zona-box').forEach(b => b.classList.remove('activa'))
     esfera.classList.remove('girando')
     document.getElementById('bp-mano')?.classList.remove('baja', 'sube')
     const presiF = document.getElementById('bp-presi'), burF = document.getElementById('bp-burbuja')
@@ -4249,7 +4342,7 @@ function animarBolillero(bolillas, idx, animId = sorteoAnimId) {
     document.getElementById('bol-botones').style.display = 'flex'
     document.querySelectorAll('[onclick="hacerSorteo()"]').forEach(b => b.disabled = false)
     // agregar ✏️ a cada equipo para resortearlo individualmente
-    if (esAdmin) document.querySelectorAll('#col-santi .bolilla-item, #col-luciano .bolilla-item').forEach(row => {
+    if (esAdmin) document.querySelectorAll('#bolillero-container .bolilla-item').forEach(row => {
       const id = row.dataset.id
       if (id && !row.querySelector('.lapiz-reemplazo')) row.insertAdjacentHTML('beforeend', `<button class="lapiz-reemplazo" onclick="event.stopPropagation();abrirReemplazoEquipo('${id}')" title="Resortear solo este equipo" style="background:none;border:none;cursor:pointer;font-size:14px;padding:2px 4px;opacity:0.75;">✏️</button>`)
     })
@@ -4309,7 +4402,7 @@ function animarBolillero(bolillas, idx, animId = sorteoAnimId) {
       burbuja.classList.add('si')
     }
     numEl.textContent = `${idx + 1} / ${bolillas.length}`
-    if (revela) revela.innerHTML = `<div class="bp-card" style="--c:${colorD}">${esc ? `<img src="${esc}" alt="">` : ''}<div><div class="bp-nom" style="color:${colorD}">${club.nombre}</div><div class="bp-liga">${club.liga}</div></div></div><div class="bolillero-texto" id="bol-texto" style="display:none">${club.nombre}</div>`
+    if (revela) revela.innerHTML = `<div class="bp-card" style="--c:${colorD}">${esc ? `<img src="${esc}" alt="">` : ''}<div><div class="bp-nom" style="color:${colorD}">${club.nombre}</div><div class="bp-liga">${club.bombo ? bomboNombre(club) + ' · ' : ''}${club.liga}</div></div></div><div class="bolillero-texto" id="bol-texto" style="display:none">${club.nombre}</div>`
     duenoEl.innerHTML = `<span class="badge-${club.dueno}" style="font-size:13px;">${club.dueno === 'santi' ? 'Santi' : 'Luciano'}</span>`
 
     // zoom: el equipo aparece en grande con su escudo
@@ -4318,7 +4411,7 @@ function animarBolillero(bolillas, idx, animId = sorteoAnimId) {
     // la bolilla vuela a la columna del dueño
     setTimeout(() => {
       if (animId !== sorteoAnimId || !tomada) return
-      const desde = tomada.getBoundingClientRect(), col = document.getElementById(`col-${club.dueno}`)
+      const desde = tomada.getBoundingClientRect(), col = colSorteoDe(club)
       if (!col) return
       const hasta = col.getBoundingClientRect()
       const v = document.createElement('div'); v.className = 'bp-vuela'; v.style.setProperty('--c', colorD)
@@ -4335,16 +4428,16 @@ function animarBolillero(bolillas, idx, animId = sorteoAnimId) {
     // el equipo entra a la columna del dueño cuando termina el zoom
     setTimeout(() => {
       if (animId !== sorteoAnimId) return
-      const col   = document.getElementById(`col-${club.dueno}`)
-      const cntEl = document.getElementById(`cnt-${club.dueno}`)
+      const col   = colSorteoDe(club)
+      const cntEl = cntSorteoDe(club)
       const div   = document.createElement('div')
       div.className = 'equipo-row bolilla-item'
       div.dataset.id = club.id
       div.style.cursor = 'pointer'
       div.onclick = () => verEquipoGrande(club)
-      div.innerHTML = `<span style="display:flex;align-items:center;gap:8px;min-width:0;">${escudoNombre(club.nombre, 20)}<span class="equipo-nombre">${club.nombre}</span></span><span class="equipo-liga">${club.liga}</span>`
+      div.innerHTML = `<span style="display:flex;align-items:center;gap:8px;min-width:0;">${escudoNombre(club.nombre, 20)}<span class="equipo-nombre">${club.nombre}</span></span><span class="equipo-liga">${bomboNombre(club)}</span>`
       col.appendChild(div)
-      cntEl.textContent = col.children.length
+      if (cntEl) cntEl.textContent = col.children.length
       if (!document.getElementById('bolillero-container')?.classList.contains('bp-full')) div.scrollIntoView({ behavior: 'smooth', block: 'nearest' })
     }, 2150)
 
@@ -4375,7 +4468,8 @@ function abrirReemplazoEquipo(id) {
 
   // Pool disponible: clubes que no están ya sorteados
   const yaUsados = new Set(estado.sorteo.internacionales.map(e => e.nombre))
-  const disponibles = poolClubes.filter(c => !yaUsados.has(c.nombre))
+  const bomboEq = eq.bombo && bomboDef(eq.bombo)
+  const disponibles = (bomboEq ? poolDeBombo(bomboEq) : poolClubes).filter(c => !yaUsados.has(c.nombre))
 
   if (disponibles.length === 0) {
     toast('No hay clubes disponibles en el pool para reemplazar', true)
@@ -4387,7 +4481,7 @@ function abrirReemplazoEquipo(id) {
       <div class="modal" style="width:380px;">
         <h3>✏️ Reemplazar equipo</h3>
         <p class="text-gris" style="margin-bottom:14px;">
-          Reemplazando: <strong>${eq.nombre}</strong> (${eq.dueno === 'santi' ? 'Santi' : 'Luciano'})
+          Reemplazando: <strong>${eq.nombre}</strong> (${eq.dueno === 'santi' ? 'Santi' : 'Luciano'})${bomboEq ? `<br>Sale del bombo <b>${bomboEq.nombre}</b>` : ''}
         </p>
         <div id="bol-reemplazo-wrap" style="text-align:center; padding:10px 0 16px;">
           <div id="bol-reemplazo-esfera" style="
@@ -4465,7 +4559,9 @@ async function confirmarReemplazo() {
     id: _reemplazoId,
     nombre: _reemplazoCandidato.nombre,
     liga: _reemplazoCandidato.liga || '',
-    dueno
+    dueno,
+    zona: estado.sorteo.internacionales[idx].zona,
+    bombo: estado.sorteo.internacionales[idx].bombo
   }
   cerrarReemplazo()
   await guardarEstado()
@@ -4499,6 +4595,7 @@ async function resetSorteo() {
   estado.sorteo.realizado = false
   estado.sorteo.confirmado = false
   estado.sorteo.internacionales = []
+  sorteoZonasCola = []; sorteoSlotsPlan = null
   estado.bracket = { dieciseisavos: [], octavos: [], cuartos: [], semis: [], final: [] }
   await guardarEstado()
   renderTodo()

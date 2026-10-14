@@ -3829,7 +3829,7 @@ const RESTO_EUROPA_CLUBES = ['AEK Atenas', 'APOEL', 'Dinamo Kiev', 'Dinamo Zagre
 const ZONAS_MUNDIAL = [
   { id: 'america', nombre: 'Zona América', emoji: '🌎', color: '#2ecc71', bombos: [
     { id: 'ligamx', nombre: '🇲🇽 Liga MX', cupos: 2, ligas: ['México - Liga MX'] },
-    { id: 'mls', nombre: '🇺🇸 MLS y Sudamérica', cupos: 2, ligas: ['Estados Unidos - MLS'], clubes: ['Universidad Católica'] },
+    { id: 'mls', nombre: '🇺🇸 MLS', cupos: 2, ligas: ['Estados Unidos - MLS'] },
   ] },
   { id: 'europa', nombre: 'Zona Europa', emoji: '🇪🇺', color: '#4a9eff', bombos: [
     { id: 'eng', nombre: '🏴 Premier League', cupos: 2, ligas: ['Inglaterra - Premier League'] },
@@ -3925,7 +3925,7 @@ function hacerSorteo() {
     // orden alternado dentro del bombo para el bolillero
     for (const sl of slots) {
       const disp = poolDeBombo(b).filter(c => !usados.has(c.nombre))
-      const c = elegirPorLiga(disp)
+      const c = disp[Math.floor(Math.random() * disp.length)]
       if (!c) { toast(`No hay clubes en el bombo ${b.nombre}`, true); return }
       usados.add(c.nombre)
       cont[sl.dueno]++
@@ -4510,6 +4510,7 @@ function abrirReemplazoEquipo(id) {
 
   // guardar disponibles para el sorteo
   window._reemplazoDisponibles = disponibles
+  window._reemplazoPorBombo = !!bomboEq
 }
 
 function girarReemplazo() {
@@ -4531,7 +4532,7 @@ function girarReemplazo() {
   sfx.rattle(1300)
 
   setTimeout(() => {
-    const elegido = elegirPorLiga(disponibles)
+    const elegido = window._reemplazoPorBombo ? disponibles[Math.floor(Math.random() * disponibles.length)] : elegirPorLiga(disponibles)
     _reemplazoCandidato = elegido
     esfera.style.animation = ''
     esfera.style.boxShadow = '0 0 30px rgba(245,166,35,0.3)'

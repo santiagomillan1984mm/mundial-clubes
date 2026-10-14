@@ -3828,8 +3828,8 @@ const RESTO_EUROPA_LIGAS = ['Portugal - Liga Portugal', 'Países Bajos - Eredivi
 const RESTO_EUROPA_CLUBES = ['AEK Atenas', 'APOEL', 'Dinamo Kiev', 'Dinamo Zagreb', 'Ferencváros', 'Hajduk Split', 'HJK Helsinki', 'Ludogorets', 'Olympiacos', 'Omonia Nicosia', 'Panathinaikos', 'PAOK', 'Qarabağ FK', 'Shakhtar Donetsk', 'Slavia Praga', 'Sparta Praga', 'Viktoria Plzeň']
 const ZONAS_MUNDIAL = [
   { id: 'america', nombre: 'Zona América', emoji: '🌎', color: '#2ecc71', bombos: [
-    { id: 'ligamx', nombre: '🇲🇽 Liga MX', cupos: 2, ligas: ['México - Liga MX'] },
-    { id: 'mls', nombre: '🇺🇸 MLS', cupos: 2, ligas: ['Estados Unidos - MLS'] },
+    { id: 'ligamx', nombre: '🇲🇽 Liga MX', cupos: 4, ligas: ['México - Liga MX'] },
+    { id: 'mls', nombre: '🇺🇸 MLS', cupos: 4, ligas: ['Estados Unidos - MLS'] },
   ] },
   { id: 'europa', nombre: 'Zona Europa', emoji: '🇪🇺', color: '#4a9eff', bombos: [
     { id: 'eng', nombre: '🏴 Premier League', cupos: 2, ligas: ['Inglaterra - Premier League'] },
@@ -3837,11 +3837,10 @@ const ZONAS_MUNDIAL = [
     { id: 'ita', nombre: '🇮🇹 Serie A', cupos: 2, ligas: ['Italia - Serie A'] },
     { id: 'ger', nombre: '🇩🇪 Bundesliga', cupos: 2, ligas: ['Alemania - Bundesliga'] },
     { id: 'fra', nombre: '🇫🇷 Ligue 1', cupos: 2, ligas: ['Francia - Ligue 1'] },
-    { id: 'top5', nombre: '⭐ Comodín Top 5', cupos: 2, ligas: TOP5_LIGAS },
     { id: 'reu', nombre: '🇪🇺 Resto de Europa', cupos: 4, ligas: RESTO_EUROPA_LIGAS, clubes: RESTO_EUROPA_CLUBES },
   ] },
   { id: 'resto', nombre: 'Asia y Oceanía', emoji: '🌏', color: '#f5a623', bombos: [
-    { id: 'asia', nombre: '🌏 Asia y Oceanía', cupos: 4, ligas: ['Arabia Saudita - Pro League', 'Corea del Sur - K League 1', 'China - Super League', 'India - ISL', 'Australia - A-League'], clubes: ['Al Ain FC'] },
+    { id: 'asia', nombre: '🌏 Asia y Oceanía', cupos: 2, ligas: ['Arabia Saudita - Pro League', 'Corea del Sur - K League 1', 'China - Super League', 'India - ISL', 'Australia - A-League'], clubes: ['Al Ain FC'] },
   ] },
 ]
 function bomboDef(id) { for (const z of ZONAS_MUNDIAL) for (const b of z.bombos) if (b.id === id) return { ...b, zona: z.id } ; return null }

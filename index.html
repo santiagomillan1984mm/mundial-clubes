@@ -3198,9 +3198,9 @@ function renderEstadoInicio() {
       <div class="tabla-pos-wrap"><table class="tabla-pos">
         <thead><tr><th>#</th><th style="text-align:left">Equipo</th><th>PJ</th><th>GF</th><th>PTS</th></tr></thead>
         <tbody>
-          ${tabla.slice(0,5).map((eq,i) => `<tr class="${i<8?'clasifica':''}">
+          ${tabla.slice(0,5).map((eq,i) => `<tr class="${i<7?'clasifica':''}">
             <td><span class="pos-num">${i+1}</span></td>
-            <td><div style="display:flex;align-items:center;gap:6px;">${logoHTML(eq.id,20)}<strong>${getPoolNombre(eq.id)}</strong>${i<8?'<span class="clasifica-badge">TOP8</span>':''}</div></td>
+            <td><div style="display:flex;align-items:center;gap:6px;">${logoHTML(eq.id,20)}<strong>${getPoolNombre(eq.id)}</strong>${i<7?'<span class="clasifica-badge">MUNDIAL</span>':''}</div></td>
             <td>${eq.pj}</td><td>${eq.gf}</td><td class="pts-cell">${eq.pts}</td>
           </tr>`).join('')}
         </tbody>
@@ -3639,7 +3639,21 @@ function getTodosEquipos() {
 function renderArgentinos() {
   const lista = document.getElementById('lista-argentinos')
   if (!estado) return
-  lista.innerHTML = estado.equiposArgentinos.map((eq, i) => `
+  let reglaHTML = ''
+  if (estado.ligaAfa?.configurado) {
+    const cl = getClasificadosMundial()
+    const listo = cl.every(c => c.id) && (estado.ligaAfa.partidos || []).every(p => p.golesLocal !== null)
+    reglaHTML = `<div style="background:var(--azul3);border-radius:10px;padding:10px 12px;margin-bottom:12px;">
+      <div style="font-size:11px;font-weight:900;letter-spacing:1px;text-transform:uppercase;color:var(--dorado2);margin-bottom:6px;">📋 Según las reglas ${listo ? '' : '(tentativo)'}</div>
+      ${cl.map((c, i) => `<div style="display:flex;align-items:center;gap:8px;padding:3px 0;font-size:13px;">
+        <span style="width:16px;color:var(--gris);font-weight:700;">${i + 1}</span>
+        ${c.id ? logoHTML(c.id, 18) : '<span style="width:18px;text-align:center;">🏆</span>'}
+        <span style="flex:1;font-weight:700;color:${c.id ? colorDe(c.dueno) : 'var(--dorado2)'}">${c.id ? getPoolNombre(c.id) : 'Campeón Copa Argentina'}</span>
+        <span style="font-size:11px;color:var(--gris);">${c.motivo === 'liga' ? `${i + 1}º Liga` : MOTIVO_CUPO[c.motivo]}</span></div>`).join('')}
+      ${esAdmin && cl.every(c => c.id) ? `<button class="btn btn-secondary btn-sm" style="margin-top:8px;" onclick="usarClasificadosRegla()">⬇️ Usar estos 8</button>` : ''}
+    </div>`
+  }
+  lista.innerHTML = reglaHTML + estado.equiposArgentinos.map((eq, i) => `
     <div class="equipo-row">
       ${esAdmin ? `
         <input type="text" value="${eq.nombre}" id="arg-nombre-${i}" style="flex:1; min-width:120px;" placeholder="Nombre del equipo" />
@@ -3653,6 +3667,16 @@ function renderArgentinos() {
       `}
     </div>
   `).join('')
+}
+
+async function usarClasificadosRegla() {
+  const cl = getClasificadosMundial()
+  if (!cl.every(c => c.id)) { toast('Falta definir el cupo de la Copa', true); return }
+  if (!confirm('¿Reemplazar los 8 argentinos del Mundial por los de la lista?')) return
+  estado.equiposArgentinos = estado.equiposArgentinos.map((eq, i) => ({ ...eq, nombre: getPoolNombre(cl[i].id), dueno: cl[i].dueno || eq.dueno }))
+  await guardarEstado()
+  renderTodo()
+  toast('✅ Argentinos actualizados')
 }
 
 async function guardarArgentinos() {
@@ -5188,7 +5212,7 @@ function renderGraficoPuntos() {
   if (lastJ === 0) return ''
 
   const tabla = calcularTablaLiga()
-  const top8ids = new Set(tabla.slice(0, 8).map(t => t.id))
+  const top8ids = idsClasificadosLiga(tabla)
 
   const W = 560, H = 260, mL = 34, mR = 10, mT = 12, mB = 28
   const pw = W - mL - mR, ph = H - mT - mB
@@ -5334,6 +5358,32 @@ function predGoles(m, A, B) {
   return [predPoisson(la), predPoisson(lb)]
 }
 
+// Una simulación de la Copa: devuelve [campeón, subcampeón]
+function predCopaUnaVez(m, F) {
+  const c = estado.copaArgentina
+  if (!c?.configurado) return [null, null]
+  const b = c.bracket
+  const rondas = [b.r1 || [], predSlots(b.r2, 'cr2_', 8), predSlots(b.cuartos, 'cc_', 4), predSlots(b.semis, 'cs_', 2), predSlots(b.final, 'cf_', 1)]
+  const fz = id => F[id] ||= m.fuerza(getCopaNombre(id), getCopaDueno(id))
+  let prev = null, finalistas = null
+  for (let r = 0; r < rondas.length; r++) {
+    const sig = []
+    if (r === rondas.length - 1) finalistas = prev
+    for (let i = 0; i < rondas[r].length; i++) {
+      const cr = rondas[r][i]
+      const [a, b2] = r === 0 ? [cr?.local, cr?.visitante] : [prev[2 * i], prev[2 * i + 1]]
+      let g = null
+      if (cr?.ganador && (cr.ganador === a || cr.ganador === b2)) g = cr.ganador
+      else if (!a || !b2) g = a || b2 || null
+      else { const [ga, gb] = predGoles(m, fz(a), fz(b2)); g = ga > gb ? a : gb > ga ? b2 : (Math.random() < .5 ? a : b2) }
+      sig.push(g)
+    }
+    prev = sig
+  }
+  const camp = prev[0]
+  const sub = finalistas ? (finalistas[0] === camp ? finalistas[1] : finalistas[0]) : null
+  return [camp, sub]
+}
 // ── Liga AFA
 function predLiga() {
   predCacheOk()
@@ -5358,6 +5408,8 @@ function predLiga() {
   const clave = pend.filter(p => p.jornada === jActual).map(p => ({ p, r: { L: [0, 0, 0, 0, 0], E: [0, 0, 0, 0, 0], V: [0, 0, 0, 0, 0] } }))
   let santiCamp = 0, santiTop8 = 0, lucTop8 = 0
   const dueno = Object.fromEntries(liga.equipos.map(e => [e.id, e.dueno]))
+  const hayCopa = !!estado.copaArgentina?.configurado
+  const Fc = {}
   for (let s = 0; s < PRED_SIMS; s++) {
     const t = {}; for (const id of ids) t[id] = { id, pts: base[id].pts, gf: base[id].gf, gc: base[id].gc, r: Math.random() }
     const res = new Map()
@@ -5368,15 +5420,20 @@ function predLiga() {
       if (gl > gv) { a.pts += 3; res.set(p, 'L') } else if (gv > gl) { b.pts += 3; res.set(p, 'V') } else { a.pts++; b.pts++; res.set(p, 'E') }
     }
     const orden = Object.values(t).sort((a, b) => b.pts - a.pts || (b.gf - b.gc) - (a.gf - a.gc) || b.gf - a.gf || a.r - b.r)
-    orden.forEach((x, i) => { posSum[x.id] += i + 1; if (i < 8) top8[x.id]++; if (i >= n - 4) baja[x.id]++ })
+    // Cupos al Mundial: 7 de la liga + el de la Copa (si la Copa no está armada, cuenta el 8º como antes)
+    const oIds = orden.map(x => x.id)
+    const [cc, cs] = hayCopa ? predCopaUnaVez(m, Fc) : [null, null]
+    const cupo = hayCopa ? cupoCopaMundial(oIds, cc, cs) : { id: oIds[7] }
+    const clasif = new Set([...oIds.slice(0, 7), cupo.id].filter(Boolean))
+    orden.forEach((x, i) => { posSum[x.id] += i + 1; if (clasif.has(x.id)) top8[x.id]++; if (i >= n - 4) baja[x.id]++ })
     campeon[orden[0].id]++
     if (dueno[orden[0].id] === 'santi') santiCamp++
-    for (let i = 0; i < 8; i++) dueno[orden[i].id] === 'santi' ? santiTop8++ : lucTop8++
+    for (const id of clasif) { const d = dueno[id] || getCopaDueno(id); d === 'santi' ? santiTop8++ : lucTop8++ }
     for (const c of clave) {
       const r = c.r[res.get(c.p)]
       r[0]++
       if (top8[c.p.local] !== undefined) { const pl = orden.findIndex(x => x.id === c.p.local), pv = orden.findIndex(x => x.id === c.p.visitante)
-        if (pl < 8) r[1]++; if (pv < 8) r[2]++; if (pl === 0) r[3]++; if (pv === 0) r[4]++ }
+        if (clasif.has(c.p.local)) r[1]++; if (clasif.has(c.p.visitante)) r[2]++; if (pl === 0) r[3]++; if (pv === 0) r[4]++ }
     }
   }
   const pct = x => x / PRED_SIMS * 100
@@ -5499,10 +5556,10 @@ function predLigaHTML() {
       ${logoHTML(e.id, 22)}
       <span class="pred-nom" style="color:${colorDe(e.dueno)}">${getPoolNombre(e.id)}</span>
       <span class="pred-num" title="Campeón">${predPct(e.campeon)}</span>
-      <span class="pred-num" title="Top 8">${predPct(e.top8)}</span>
+      <span class="pred-num" title="Clasifica al Mundial">${predPct(e.top8)}</span>
       <span class="pred-num baja" title="4 últimos">${predPct(e.baja)}</span>
     </div>`
-  const cab = `<div class="pred-fila pred-cab"><span style="width:22px"></span><span class="pred-nom">Equipo</span><span class="pred-num">Campeón</span><span class="pred-num">Top 8</span><span class="pred-num baja">Abajo</span></div>`
+  const cab = `<div class="pred-fila pred-cab"><span style="width:22px"></span><span class="pred-nom">Equipo</span><span class="pred-num">Campeón</span><span class="pred-num">Mundial</span><span class="pred-num baja">Abajo</span></div>`
   const ord = [...pr.equipos].sort((a, b) => b.campeon - a.campeon || a.pos - b.pos)
   let claveHTML = ''
   const pc = pr.partidoClave
@@ -5522,7 +5579,7 @@ function predLigaHTML() {
   const frases = predFrasesLiga(pr)
   return `<div class="card pred-card">
     <div class="card-titulo">🔮 Predicciones — Liga AFA</div>
-    <div class="text-gris" style="margin:-4px 0 10px;">Simulamos ${PRED_SIMS.toLocaleString('es-AR')} veces lo que falta de la liga con los goles de cada equipo y de cada jugador. <b>Top 8</b> = clasifica al Mundial · <b>Abajo</b> = termina entre los 4 últimos.</div>
+    <div class="text-gris" style="margin:-4px 0 10px;">Simulamos ${PRED_SIMS.toLocaleString('es-AR')} veces lo que falta de la liga con los goles de cada equipo y de cada jugador. <b>Mundial</b> = clasifica al Mundial (7 primeros + cupo de la Copa Argentina) · <b>Abajo</b> = termina entre los 4 últimos.</div>
     ${predDueloHTML(pr.santiCamp, 100 - pr.santiCamp, `<div class="pred-duelo-extra">Clasificados al Mundial esperados: <b style="color:#4a9eff">${pr.santiTop8.toFixed(1)}</b> Santi · <b style="color:#ff6b6b">${pr.lucTop8.toFixed(1)}</b> Luciano</div>`)}
     <div class="pred-tabla">${cab}${ord.slice(0, 8).map(fila).join('')}
       <details class="pred-mas"><summary>Ver los ${ord.length - 8} restantes</summary>${ord.slice(8).map(fila).join('')}</details>
@@ -5622,7 +5679,7 @@ function ligaPanelesHTML(S, tabla, totalJugados) {
     secPanel('liga_tabla', '📊', 'Tabla de posiciones', lider ? `Líder: ${getPoolNombre(lider.id)} · ${lider.pts} pts` : 'Todavía sin partidos', S.tabla, true, '#4a9eff'),
     secPanel('liga_partidos', '📅', 'Partidos', `Jornada ${getLigaJornadaActual()} · ${totalJugados}/${(liga.partidos || []).length} jugados${posp ? ` · ⏸ ${posp} pospuesto${posp === 1 ? '' : 's'}` : ''}`, S.partidos, true, '#4a9eff'),
     secPanel('liga_pred', '🔮', 'Predicciones', fav, S.pred, false, '#a855f7'),
-    secPanel('liga_clasif', '🏅', 'Clasificados al Mundial', 'Los 8 que hoy entran', S.clasif, false, '#2ecc71'),
+    secPanel('liga_clasif', '🏅', 'Clasificados al Mundial', '7 de la Liga + 1 de la Copa', S.clasif, false, '#2ecc71'),
     secPanel('liga_grafico', '📈', 'Evolución de puntos', 'Cómo va sumando cada equipo', S.grafico, false, '#f5a623'),
     secPanel('liga_duelo', '⚔️', 'Santi vs Luciano', `Santi ${ws} · ${em} empates · Luciano ${wl}`, S.duelo, false, '#e94560'),
     secPanel('liga_h2h', '🤝', 'Head to Head', 'Historial entre dos equipos', S.h2h, false, '#94a3b8'),
@@ -5653,6 +5710,7 @@ function renderLiga() {
   S.pred = predLigaHTML()
 
   // Tabla de posiciones
+  const clasifSet = idsClasificadosLiga(tabla)
   S.tabla = `<div class="card">
     <div class="card-titulo">📊 Tabla de posiciones — ${totalJugados}/100 partidos jugados</div>
     <div class="tabla-pos-wrap"><table class="tabla-pos">
@@ -5662,14 +5720,14 @@ function renderLiga() {
       <tbody>
         ${tabla.map((eq, i) => {
           const dg = eq.gf - eq.gc
-          const clasifica = i < 8
+          const clasifica = clasifSet.has(eq.id)
           return `<tr class="${clasifica ? 'clasifica' : ''}">
             <td><span class="pos-num">${i+1}</span></td>
             <td>
               <div style="display:flex;align-items:center;gap:6px;">
                 ${logoHTML(eq.id, 22)}
                 <strong>${getPoolNombre(eq.id)}</strong>
-                ${clasifica ? '<span class="clasifica-badge">TOP 8</span>' : ''}
+                ${clasifica ? '<span class="clasifica-badge">MUNDIAL</span>' : ''}
               </div>
             </td>
             <td>${eq.pj}</td><td>${eq.pg}</td><td>${eq.pe}</td><td>${eq.pp}</td>
@@ -6132,15 +6190,16 @@ function actualizarTablaLigaDOM(tabla) {
   // Actualiza solo el tbody para no destruir los inputs
   const tbody = document.querySelector('#liga-contenido .tabla-pos tbody')
   if (!tbody) return
+  const clasifSet = idsClasificadosLiga(tabla)
   tbody.innerHTML = tabla.map((eq, i) => {
     const dg = eq.gf - eq.gc
-    const clasifica = i < 8
+    const clasifica = clasifSet.has(eq.id)
     return `<tr class="${clasifica ? 'clasifica' : ''}">
       <td><span class="pos-num">${i+1}</span></td>
       <td><div style="display:flex;align-items:center;gap:6px;">
         ${logoHTML(eq.id, 22)}
         <strong>${getPoolNombre(eq.id)}</strong>
-        ${clasifica ? '<span class="clasifica-badge">TOP 8</span>' : ''}
+        ${clasifica ? '<span class="clasifica-badge">MUNDIAL</span>' : ''}
       </div></td>
       <td>${eq.pj}</td><td>${eq.pg}</td><td>${eq.pe}</td><td>${eq.pp}</td>
       <td>${eq.gf}</td><td>${eq.gc}</td>
@@ -6177,17 +6236,61 @@ async function resetLiga() {
 // CLASIFICACIÓN TENTATIVA (widget reutilizable)
 // ══════════════════════════════════════════════
 
+// ══════════════════════════════════════════════
+// CUPOS ARGENTINOS AL MUNDIAL: 7 de la Liga + 1 de la Copa Argentina
+// - Clasifican los 7 primeros de la Liga AFA.
+// - El campeón de la Copa clasifica directo.
+// - Si el campeón ya está entre los 7 (o es el invitado de la Liga MX), el cupo pasa al subcampeón.
+// - Si el subcampeón también está entre los 7 (o es el invitado), el cupo vuelve al 8º de la Liga.
+// ══════════════════════════════════════════════
+function esInvitadoMX(id) { return String(id || '').startsWith('mx_') }
+function cupoCopaMundial(ordenIds, campId, subId) {
+  const top7 = ordenIds.slice(0, 7)
+  if (!campId) return { id: null, motivo: 'pendiente' }
+  if (!esInvitadoMX(campId) && !top7.includes(campId)) return { id: campId, motivo: 'copa' }
+  if (subId && !esInvitadoMX(subId) && !top7.includes(subId)) return { id: subId, motivo: 'subcopa' }
+  return { id: ordenIds[7] || null, motivo: 'liga8' }
+}
+function finalistasCopa() {
+  const fin = estado.copaArgentina?.bracket?.final?.[0]
+  if (!fin?.ganador) return { camp: null, sub: null }
+  return { camp: fin.ganador, sub: fin.ganador === fin.local ? fin.visitante : fin.local }
+}
+// Lista de los 8: [{ id, dueno, motivo }] — motivo: liga | copa | subcopa | liga8 | pendiente
+function getClasificadosMundial(tabla) {
+  tabla = tabla || (estado?.ligaAfa?.configurado ? calcularTablaLiga() : [])
+  const ids = tabla.map(t => t.id)
+  const { camp, sub } = finalistasCopa()
+  const out = tabla.slice(0, 7).map(t => ({ id: t.id, dueno: t.dueno, motivo: 'liga' }))
+  const cupo = cupoCopaMundial(ids, camp, sub)
+  out.push({ id: cupo.id, dueno: cupo.id ? (getCopaDueno(cupo.id) || tabla.find(t => t.id === cupo.id)?.dueno || '') : '', motivo: cupo.motivo })
+  return out
+}
+function idsClasificadosLiga(tabla) {
+  const cl = getClasificadosMundial(tabla)
+  return new Set(cl.filter(c => c.id).map(c => c.id))
+}
+const MOTIVO_CUPO = { liga: 'Liga', copa: '🏆 Campeón Copa', subcopa: '🥈 Subcampeón Copa', liga8: '8º de la Liga', pendiente: 'Cupo Copa Argentina' }
+
 function renderClasifItems(tabla, n) {
   if (!tabla.length) return '<p class="text-gris">Aún no hay partidos jugados.</p>'
-  return tabla.slice(0, n).map((eq, i) => {
+  if (n !== 8) return tabla.slice(0, n).map((eq, i) => `<div class="clasif-item"><span class="clasif-pos">${i+1}</span>${logoHTML(eq.id, 22)}<span class="clasif-nombre" style="color:${colorDe(eq.dueno)}">${getPoolNombre(eq.id)}</span><span class="clasif-pts">${eq.pts}pts</span></div>`).join('')
+  return getClasificadosMundial(tabla).map((c, i) => {
+    const t = tabla.find(x => x.id === c.id)
+    if (!c.id) return `<div class="clasif-item" style="opacity:.7;">
+      <span class="clasif-pos">8</span>
+      <div class="logo-init" style="width:22px;height:22px;font-size:11px;">🏆</div>
+      <span class="clasif-nombre" style="color:var(--dorado2)">Campeón Copa Argentina</span>
+      <span style="font-size:11px;color:var(--gris);">por definir</span>
+    </div>`
     return `<div class="clasif-item">
       <span class="clasif-pos">${i+1}</span>
-      ${logoHTML(eq.id, 22)}
-      <span class="clasif-nombre" style="color:${eq.dueno==='santi'?'#4a9eff':'#ff6b6b'}">${getPoolNombre(eq.id)}</span>
-      <span style="font-size:11px;color:var(--gris);margin-right:6px;">${eq.pj}PJ</span>
-      <span class="clasif-pts">${eq.pts}pts</span>
+      ${logoHTML(c.id, 22)}
+      <span class="clasif-nombre" style="color:${colorDe(c.dueno)}">${getPoolNombre(c.id)}</span>
+      ${c.motivo === 'liga' ? `<span style="font-size:11px;color:var(--gris);margin-right:6px;">${t?.pj ?? 0}PJ</span><span class="clasif-pts">${t?.pts ?? 0}pts</span>`
+        : `<span style="font-size:11px;font-weight:800;color:var(--dorado2);">${MOTIVO_CUPO[c.motivo]}</span>`}
     </div>`
-  }).join('')
+  }).join('') + `<div style="font-size:11px;color:var(--gris);margin-top:6px;">Clasifican los 7 primeros de la Liga + el campeón de la Copa Argentina. Si el campeón ya está entre los 7, el cupo es del subcampeón.</div>`
 }
 
 function renderClasifTentativa(tabla, n, titulo, compact = false) {

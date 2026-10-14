@@ -1,6 +1,6 @@
 {
   "version": "1.0",
-  "ultimaActualizacion": "2026-10-12T23:09:53.212Z",
+  "ultimaActualizacion": "2026-10-14T22:24:56.613Z",
   "equiposArgentinos": [
     {
       "id": "arg1",
@@ -44,9 +44,202 @@
     }
   ],
   "sorteo": {
-    "realizado": false,
-    "confirmado": false,
-    "internacionales": []
+    "realizado": true,
+    "confirmado": true,
+    "internacionales": [
+      {
+        "id": "int_s1",
+        "nombre": "Puebla",
+        "liga": "México - Liga MX",
+        "dueno": "santi",
+        "zona": "america",
+        "bombo": "ligamx"
+      },
+      {
+        "id": "int_l1",
+        "nombre": "Guadalajara",
+        "liga": "México - Liga MX",
+        "dueno": "luciano",
+        "zona": "america",
+        "bombo": "ligamx"
+      },
+      {
+        "id": "int_s2",
+        "nombre": "Atlante",
+        "liga": "México - Liga MX",
+        "dueno": "santi",
+        "zona": "america",
+        "bombo": "ligamx"
+      },
+      {
+        "id": "int_l2",
+        "nombre": "Santos Laguna",
+        "liga": "México - Liga MX",
+        "dueno": "luciano",
+        "zona": "america",
+        "bombo": "ligamx"
+      },
+      {
+        "id": "int_s3",
+        "nombre": "New England Revolution",
+        "liga": "Estados Unidos - MLS",
+        "dueno": "santi",
+        "zona": "america",
+        "bombo": "mls"
+      },
+      {
+        "id": "int_l3",
+        "nombre": "San Diego FC",
+        "liga": "Estados Unidos - MLS",
+        "dueno": "luciano",
+        "zona": "america",
+        "bombo": "mls"
+      },
+      {
+        "id": "int_s4",
+        "nombre": "Nashville SC",
+        "liga": "Estados Unidos - MLS",
+        "dueno": "santi",
+        "zona": "america",
+        "bombo": "mls"
+      },
+      {
+        "id": "int_l4",
+        "nombre": "Sporting Kansas City",
+        "liga": "Estados Unidos - MLS",
+        "dueno": "luciano",
+        "zona": "america",
+        "bombo": "mls"
+      },
+      {
+        "id": "int_s5",
+        "nombre": "Everton",
+        "liga": "Inglaterra - Premier League",
+        "dueno": "santi",
+        "zona": "europa",
+        "bombo": "eng"
+      },
+      {
+        "id": "int_l5",
+        "nombre": "Manchester United",
+        "liga": "Inglaterra - Premier League",
+        "dueno": "luciano",
+        "zona": "europa",
+        "bombo": "eng"
+      },
+      {
+        "id": "int_s6",
+        "nombre": "Celta de Vigo",
+        "liga": "España - LaLiga",
+        "dueno": "santi",
+        "zona": "europa",
+        "bombo": "esp"
+      },
+      {
+        "id": "int_l6",
+        "nombre": "Deportivo Alavés",
+        "liga": "España - LaLiga",
+        "dueno": "luciano",
+        "zona": "europa",
+        "bombo": "esp"
+      },
+      {
+        "id": "int_s7",
+        "nombre": "Bologna",
+        "liga": "Italia - Serie A",
+        "dueno": "santi",
+        "zona": "europa",
+        "bombo": "ita"
+      },
+      {
+        "id": "int_l7",
+        "nombre": "Monza (Brianza Calcio)",
+        "liga": "Italia - Serie A",
+        "dueno": "luciano",
+        "zona": "europa",
+        "bombo": "ita"
+      },
+      {
+        "id": "int_s8",
+        "nombre": "Hamburger SV",
+        "liga": "Alemania - Bundesliga",
+        "dueno": "santi",
+        "zona": "europa",
+        "bombo": "ger"
+      },
+      {
+        "id": "int_l8",
+        "nombre": "FC Schalke 04",
+        "liga": "Alemania - Bundesliga",
+        "dueno": "luciano",
+        "zona": "europa",
+        "bombo": "ger"
+      },
+      {
+        "id": "int_s9",
+        "nombre": "LOSC Lille",
+        "liga": "Francia - Ligue 1",
+        "dueno": "santi",
+        "zona": "europa",
+        "bombo": "fra"
+      },
+      {
+        "id": "int_l9",
+        "nombre": "OGC Nice",
+        "liga": "Francia - Ligue 1",
+        "dueno": "luciano",
+        "zona": "europa",
+        "bombo": "fra"
+      },
+      {
+        "id": "int_s10",
+        "nombre": "Västerås SK",
+        "liga": "Suecia - Allsvenskan",
+        "dueno": "santi",
+        "zona": "europa",
+        "bombo": "reu"
+      },
+      {
+        "id": "int_l10",
+        "nombre": "Hajduk Split",
+        "liga": "Resto del Mundo",
+        "dueno": "luciano",
+        "zona": "europa",
+        "bombo": "reu"
+      },
+      {
+        "id": "int_s11",
+        "nombre": "APOEL",
+        "liga": "Resto del Mundo",
+        "dueno": "santi",
+        "zona": "europa",
+        "bombo": "reu"
+      },
+      {
+        "id": "int_l11",
+        "nombre": "CD Nacional",
+        "liga": "Portugal - Liga Portugal",
+        "dueno": "luciano",
+        "zona": "europa",
+        "bombo": "reu"
+      },
+      {
+        "id": "int_s12",
+        "nombre": "Chongqing Tonglianglong",
+        "liga": "China - Super League",
+        "dueno": "santi",
+        "zona": "resto",
+        "bombo": "asia"
+      },
+      {
+        "id": "int_l12",
+        "nombre": "Gimcheon Sangmu",
+        "liga": "Corea del Sur - K League 1",
+        "dueno": "luciano",
+        "zona": "resto",
+        "bombo": "asia"
+      }
+    ]
   },
   "bracket": {
     "dieciseisavos": [],

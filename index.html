@@ -907,7 +907,11 @@
     .partido-row.pospuesto { box-shadow: inset 3px 0 0 #f5a623; padding-left: 6px; }
     .liga-row { flex-wrap: nowrap; gap: 6px; }
     .liga-row .partido-equipo { min-width: 0; }
-    .liga-row .partido-equipo > span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; min-width: 0; }
+    .liga-row .partido-equipo { font-size: 12.5px; gap: 4px !important; white-space: normal; }
+    .liga-row .partido-equipo > span { min-width: 0; overflow: hidden; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; line-height: 1.15; overflow-wrap: normal; word-break: normal; }
+    .liga-row .partido-equipo > img, .liga-row .partido-equipo > .logo-init { width: 18px !important; height: 18px !important; }
+    .liga-row .partido-score { gap: 4px; }
+    .liga-row .score-input { width: 34px !important; padding: 3px; }
     .liga-acc { display: flex; flex-direction: column; align-items: center; gap: 2px; flex-shrink: 0; }
     .liga-acc button { padding: 1px 3px !important; font-size: 14px !important; line-height: 1.2; }
     .posp-sep { color: #f5a623 !important; font-size: 15px; }
@@ -5884,11 +5888,21 @@ function compartirResultadoCopa(localId, visitId, gl, gv, ronda) {
   window.open('https://wa.me/?text=' + encodeURIComponent(texto), '_blank')
 }
 
+// Nombres cortos para que los partidos entren en un renglón en el celular
+const NOMBRE_CORTO = {
+  'Boca Juniors': 'Boca', 'River Plate': 'River', 'Racing Club': 'Racing', 'Rosario Central': 'Rosario C.',
+  'Vélez Sarsfield': 'Vélez', 'Estudiantes': 'Estud. LP', 'Argentinos Juniors': 'Argentinos', 'Independiente': 'Independ.', 'San Lorenzo': 'San Lorenzo',
+  'Indep. Rivadavia': 'Ind. Rivadavia', 'Defensa y Justicia': 'Def. y Justicia', 'Atlético Tucumán': 'Atl. Tucumán',
+  'Unión de Santa Fe': 'Unión', 'Barracas Central': 'Barracas', 'Gimnasia LP': 'Gimnasia LP', 'Gimnasia (Mendoza)': 'Gimnasia Mza.',
+  'Central Córdoba': 'Central Cba.', 'Dep. Riestra': 'Riestra', 'Estudiantes (Río Cuarto)': 'Estud. RC'
+}
+function nombreCorto(id) { const n = getPoolNombre(id); return NOMBRE_CORTO[n] || n }
+
 function renderPartidoLigaHTML(p) {
   const gl = p.golesLocal !== null ? p.golesLocal : ''
   const gv = p.golesVisitante !== null ? p.golesVisitante : ''
-  const localN = getPoolNombre(p.local)
-  const visitN = getPoolNombre(p.visitante)
+  const localN = nombreCorto(p.local)
+  const visitN = nombreCorto(p.visitante)
   const dLocal = estado.ligaAfa.equipos.find(e => e.id === p.local)?.dueno || ''
   const dVisit = estado.ligaAfa.equipos.find(e => e.id === p.visitante)?.dueno || ''
   const esGanL = p.golesLocal !== null && p.golesLocal > p.golesVisitante

@@ -904,7 +904,18 @@
     }
     .partido-row:last-child { border-bottom: none; }
     .partido-row.pospuesto { opacity: .75; }
-    .posp-tag { flex-basis: 100%; text-align: center; font-size: 11px; font-weight: 800; letter-spacing: 1px; color: #f5a623; margin-top: -2px; }
+    .partido-row.pospuesto { box-shadow: inset 3px 0 0 #f5a623; padding-left: 6px; }
+    .liga-row { flex-wrap: nowrap; gap: 6px; }
+    .liga-row .partido-equipo { min-width: 0; }
+    .liga-row .partido-equipo > span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; min-width: 0; }
+    .liga-acc { display: flex; flex-direction: column; align-items: center; gap: 2px; flex-shrink: 0; }
+    .liga-acc button { padding: 1px 3px !important; font-size: 14px !important; line-height: 1.2; }
+    .posp-sep { color: #f5a623 !important; font-size: 15px; }
+    .partido-row.pospuesto { opacity: 1; }
+    .partido-row.pospuesto .partido-equipo, .partido-row.pospuesto .score-input { opacity: .6; }
+    .liga-row .score-input { width: 36px; }
+    .posp-vista { display: flex; flex-direction: column; align-items: center; line-height: 1.1; color: #f5a623; font-size: 15px; }
+    .posp-vista small { font-size: 9px; font-weight: 800; letter-spacing: .5px; }
     .btn-posp { background: none; border: 1px solid var(--border); border-radius: 6px; cursor: pointer; font-size: 12px; padding: 2px 6px; color: var(--gris); flex-shrink: 0; }
     .partido-equipo {
       flex: 1;
@@ -5885,28 +5896,28 @@ function renderPartidoLigaHTML(p) {
   const esEmpate = p.golesLocal !== null && p.golesLocal === p.golesVisitante
   const posp = p.pospuesto && p.golesLocal === null
   const btnPosp = esAdmin && p.golesLocal === null ? `<button class="btn-posp" onclick="event.stopPropagation();togglePosponerLiga('${p.id}')" title="${posp ? 'Reprogramar' : 'Posponer'}">${posp ? '▶️' : '⏸'}</button>` : ''
-  const tagPosp = posp ? `<div class="posp-tag">⏸ POSPUESTO</div>` : ''
+  const tagPosp = ''
   const btnWA = p.golesLocal !== null
     ? `<button onclick="event.stopPropagation();compartirResultadoLiga('${p.local}','${p.visitante}',${p.golesLocal},${p.golesVisitante},${p.jornada})" title="Compartir por WhatsApp" style="background:none;border:none;cursor:pointer;font-size:15px;padding:2px 4px;flex-shrink:0;" >📤</button>`
     : btnVS(`vsLiga('${p.id}')`)
   if (esAdmin) {
-    return `<div class="partido-row${posp ? ' pospuesto' : ''}" data-local="${dLocal}" data-visita="${dVisit}" data-jugado="${p.golesLocal !== null}" data-pospuesto="${posp}">
+    return `<div class="partido-row liga-row${posp ? ' pospuesto' : ''}" data-local="${dLocal}" data-visita="${dVisit}" data-jugado="${p.golesLocal !== null}" data-pospuesto="${posp}">
       <div class="partido-equipo" style="display:flex;align-items:center;gap:6px;color:${dLocal==='santi'?'#4a9eff':'#ff6b6b'};font-weight:${esGanL?700:400}">${logoHTML(p.local,20)}<span>${localN}</span></div>
       <div class="partido-score">
         <input class="input score-input" type="number" min="0" max="99" value="${gl}" placeholder="-" id="gl_${p.id}" onchange="guardarPartidoLiga('${p.id}')">
-        <span class="score-sep">-</span>
+        <span class="score-sep${posp ? ' posp-sep' : ''}" title="${posp ? 'Pospuesto' : ''}">${posp ? '⏸' : '-'}</span>
         <input class="input score-input" type="number" min="0" max="99" value="${gv}" placeholder="-" id="gv_${p.id}" onchange="guardarPartidoLiga('${p.id}')">
       </div>
       <div class="partido-equipo derecha" style="display:flex;align-items:center;justify-content:flex-end;gap:6px;color:${dVisit==='santi'?'#4a9eff':'#ff6b6b'};font-weight:${esGanV?700:400}"><span>${visitN}</span>${logoHTML(p.visitante,20)}</div>
-      ${btnWA}${btnPosp}${tagPosp}
+      <div class="liga-acc">${btnWA}${btnPosp}</div>
     </div>`
   } else {
-    const sc = p.golesLocal !== null ? `<span style="font-size:15px;font-weight:800;color:${esEmpate?'var(--gris)':'var(--dorado2)'};">${p.golesLocal} - ${p.golesVisitante}</span>` : `<span style="color:var(--gris);font-size:13px;">vs</span>`
-    return `<div class="partido-row${posp ? ' pospuesto' : ''}" data-local="${dLocal}" data-visita="${dVisit}" data-jugado="${p.golesLocal !== null}" data-pospuesto="${posp}">
+    const sc = posp ? `<span class="posp-vista">⏸<small>POSPUESTO</small></span>` : p.golesLocal !== null ? `<span style="font-size:15px;font-weight:800;color:${esEmpate?'var(--gris)':'var(--dorado2)'};">${p.golesLocal} - ${p.golesVisitante}</span>` : `<span style="color:var(--gris);font-size:13px;">vs</span>`
+    return `<div class="partido-row liga-row${posp ? ' pospuesto' : ''}" data-local="${dLocal}" data-visita="${dVisit}" data-jugado="${p.golesLocal !== null}" data-pospuesto="${posp}">
       <div class="partido-equipo" style="display:flex;align-items:center;gap:6px;color:${dLocal==='santi'?'#4a9eff':'#ff6b6b'};font-weight:${esGanL?700:400}">${logoHTML(p.local,20)}<span>${localN}</span></div>
       <div style="flex-shrink:0;padding:0 10px;">${sc}</div>
       <div class="partido-equipo derecha" style="display:flex;align-items:center;justify-content:flex-end;gap:6px;color:${dVisit==='santi'?'#4a9eff':'#ff6b6b'};font-weight:${esGanV?700:400}"><span>${visitN}</span>${logoHTML(p.visitante,20)}</div>
-      ${btnWA}${tagPosp}
+      ${btnWA}
     </div>`
   }
 }

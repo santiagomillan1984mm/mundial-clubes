@@ -1,6 +1,6 @@
 {
   "version": "1.0",
-  "ultimaActualizacion": "2026-10-15T03:07:59.216Z",
+  "ultimaActualizacion": "2026-10-15T03:53:52.616Z",
   "equiposArgentinos": [
     {
       "id": "arg1",
@@ -1245,9 +1245,9 @@
           "id": "cr1_2",
           "local": "pa22",
           "visitante": "pa6",
-          "golesLocal": null,
-          "golesVisitante": null,
-          "ganador": null
+          "golesLocal": 4,
+          "golesVisitante": 5,
+          "ganador": "pa6"
         },
         {
           "id": "cr1_3",
@@ -1362,7 +1362,16 @@
           "ganador": null
         }
       ],
-      "r2": [],
+      "r2": [
+        {
+          "id": "cr2_1",
+          "local": "pa32",
+          "visitante": "pa6",
+          "golesLocal": null,
+          "golesVisitante": null,
+          "ganador": null
+        }
+      ],
       "cuartos": [],
       "semis": [],
       "final": []

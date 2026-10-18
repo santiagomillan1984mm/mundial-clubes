@@ -1,6 +1,6 @@
 {
   "version": "1.0",
-  "ultimaActualizacion": "2026-10-17T06:43:56.129Z",
+  "ultimaActualizacion": "2026-10-18T19:37:12.462Z",
   "equiposArgentinos": [
     {
       "id": "arg1",
@@ -1417,7 +1417,88 @@
       "dueno": "luciano"
     }
   ],
-  "torneosRelampago": [],
+  "torneosRelampago": [
+    {
+      "id": "rl_1792352232386_tnglw",
+      "nombre": "Relámpago",
+      "formato": "parejas",
+      "equipos": [
+        {
+          "id": "rl_1792352200237_v2n7k",
+          "nombre": "Roberto",
+          "dueno": ""
+        },
+        {
+          "id": "rl_1792352206021_cei7w",
+          "nombre": "Luciano",
+          "dueno": ""
+        },
+        {
+          "id": "rl_1792352210691_3x5ho",
+          "nombre": "Santiago",
+          "dueno": ""
+        },
+        {
+          "id": "rl_1792352215180_ykddj",
+          "nombre": "Jesus",
+          "dueno": ""
+        }
+      ],
+      "creadoEn": "2026-10-18T19:37:12.386Z",
+      "campeon": null,
+      "idaVuelta": false,
+      "partidos": [
+        {
+          "id": "rl_1792352232388_625lb",
+          "jornada": 1,
+          "a": [
+            "rl_1792352215180_ykddj",
+            "rl_1792352210691_3x5ho"
+          ],
+          "b": [
+            "rl_1792352206021_cei7w",
+            "rl_1792352200237_v2n7k"
+          ],
+          "golesA": null,
+          "golesB": null,
+          "clubA": "",
+          "clubB": ""
+        },
+        {
+          "id": "rl_1792352232388_m977j",
+          "jornada": 2,
+          "a": [
+            "rl_1792352210691_3x5ho",
+            "rl_1792352206021_cei7w"
+          ],
+          "b": [
+            "rl_1792352215180_ykddj",
+            "rl_1792352200237_v2n7k"
+          ],
+          "golesA": null,
+          "golesB": null,
+          "clubA": "",
+          "clubB": ""
+        },
+        {
+          "id": "rl_1792352232389_cy67y",
+          "jornada": 3,
+          "a": [
+            "rl_1792352206021_cei7w",
+            "rl_1792352215180_ykddj"
+          ],
+          "b": [
+            "rl_1792352200237_v2n7k",
+            "rl_1792352210691_3x5ho"
+          ],
+          "golesA": null,
+          "golesB": null,
+          "clubA": "",
+          "clubB": ""
+        }
+      ]
+    }
+  ],
   "supercopa": {
     "localId": null,
     "visitanteId": null,

@@ -272,6 +272,8 @@
     :is(#bolillero-container,#copa-bol).bp-full .equipo-row img { width: 18px !important; height: 18px !important; }
     :is(#bolillero-container,#copa-bol).bp-full .sorteo-col-titulo { font-size: 12px; position: sticky; top: 0; z-index: 1; }
     :is(#bolillero-container,#copa-bol).bp-full :is(#bol-botones,#copa-bol-botones) { position: sticky; bottom: 0; padding: 12px 0 6px; background: linear-gradient(transparent, #060a17 35%); justify-content: center; }
+    .av-jug { border-radius: 50%; object-fit: cover; flex-shrink: 0; border: 2px solid var(--c); box-shadow: 0 1px 4px rgba(0,0,0,.4); display: inline-flex; align-items: center; justify-content: center; vertical-align: middle; }
+    .av-ini { background: color-mix(in srgb, var(--c) 30%, var(--azul3)); color: #fff; font-weight: 900; }
     .rlp-partido { display: grid; grid-template-columns: minmax(0,1fr) auto minmax(0,1fr); align-items: center; gap: 6px; padding: 8px 0; border-bottom: 1px solid var(--border); }
     .rlp-partido:last-child { border-bottom: none; }
     .rlp-lado { display: flex; align-items: center; gap: 6px; min-width: 0; }
@@ -282,7 +284,7 @@
     .rlp-lado.der .rlp-info { align-items: flex-end; }
     .rlp-jug { display: flex; flex-wrap: wrap; gap: 3px; }
     .rlp-lado.der .rlp-jug { justify-content: flex-end; }
-    .rlp-chip { display: inline-block; font-size: 12px; font-weight: 800; padding: 2px 7px; border-radius: 10px; background: color-mix(in srgb, var(--c) 22%, transparent); color: var(--c); border: 1px solid color-mix(in srgb, var(--c) 45%, transparent); white-space: nowrap; }
+    .rlp-chip { display: inline-flex; align-items: center; gap: 4px; font-size: 12px; font-weight: 800; padding: 2px 7px 2px 2px; border-radius: 10px; background: color-mix(in srgb, var(--c) 22%, transparent); color: var(--c); border: 1px solid color-mix(in srgb, var(--c) 45%, transparent); white-space: nowrap; }
     .rlp-club { width: 100%; max-width: 140px; padding: 3px 6px; font-size: 11px; border-radius: 6px; border: 1px solid var(--border); background: var(--azul2); color: var(--texto); }
     .rlp-centro { display: flex; flex-direction: column; align-items: center; gap: 2px; }
     .rl-hero { display: flex; align-items: center; gap: 14px; padding: 14px; margin-bottom: 14px; border-radius: 16px; border: 1px solid var(--border);
@@ -7657,8 +7659,8 @@ function renderCrearTorneoRL(cont) {
   const parejasInfo = esParejas ? `<p class="text-gris" style="font-size:12px;margin-top:10px;line-height:1.5;">🤝 2 vs 2 con <b>parejas que rotan</b>: cada fecha cambian los compañeros, una sola vuelta. La tabla es <b>individual</b>: si tu pareja gana, sumás 3. Mínimo 4 jugadores; si sobran, rotan los que descansan.</p>` : ''
   const equiposHTML = esParejas ? d.equipos.map((eq,i) => `
     <div style="display:flex;gap:8px;align-items:center;margin-bottom:8px;">
-      <span class="logo-init" style="width:28px;height:28px;font-size:12px;background:${rlColor(eq.nombre)};color:#111;">${(eq.nombre||'?').trim().slice(0,1).toUpperCase() || '?'}</span>
-      <input value="${eq.nombre}" oninput="rlCreando.equipos[${i}].nombre=this.value" placeholder="Jugador ${i+1}"
+      <span id="rl-av-${i}" style="display:flex;">${avatarJugador(eq.nombre, 28)}</span>
+      <input value="${eq.nombre}" oninput="rlCreando.equipos[${i}].nombre=this.value;rlAvatarPrev(${i})" placeholder="Jugador ${i+1}"
         style="flex:1;min-width:110px;padding:7px 10px;border-radius:6px;border:1px solid var(--border);background:var(--azul2);color:var(--texto);font-size:13px;">
       <button onclick="rlQuitarEquipo(${i})" style="background:#fee2e2;color:#dc2626;border:none;border-radius:6px;padding:4px 8px;cursor:pointer;font-weight:700;font-size:12px;">✕</button>
     </div>`).join('') : d.equipos.map((eq,i) => `
@@ -7666,7 +7668,8 @@ function renderCrearTorneoRL(cont) {
       <span id="rl-esc-${i}" class="rl-esc-prev">${rlEscudoPrev(eq.nombre)}</span>
       <input value="${eq.nombre}" list="rl-clubes" oninput="rlCreando.equipos[${i}].nombre=this.value;rlBuscarEscudo(${i})" onchange="rlBuscarEscudo(${i}, true)" placeholder="Buscá el equipo…"
         style="flex:1;min-width:110px;padding:7px 10px;border-radius:6px;border:1px solid var(--border);background:var(--azul2);color:var(--texto);font-size:13px;">
-      <input value="${eq.dueno}" oninput="rlCreando.equipos[${i}].dueno=this.value" placeholder="Dueño"
+      <span id="rl-av-${i}" style="display:flex;">${avatarJugador(eq.dueno, 28)}</span>
+      <input value="${eq.dueno}" oninput="rlCreando.equipos[${i}].dueno=this.value;rlAvatarPrev(${i})" placeholder="Dueño"
         style="width:85px;padding:7px 10px;border-radius:6px;border:1px solid var(--border);background:var(--azul2);color:var(--texto);font-size:13px;">
       <button onclick="rlQuitarEquipo(${i})" style="background:#fee2e2;color:#dc2626;border:none;border-radius:6px;padding:4px 8px;cursor:pointer;font-weight:700;font-size:12px;">✕</button>
     </div>`).join('')
@@ -7859,6 +7862,23 @@ function rlBuscarEscudo(i, ya = false) {
   }, ya ? 0 : 350)
 }
 function rlEsc(t, id, size = 18) { const n = id && rlNombre(t, id); return n ? escudoNombre(n, size) : '' }
+// ── Fotos de los amigos: aparecen cuando se escribe su nombre
+const FOTOS_JUGADORES = { santi: 'fotos/santi.jpg', santiago: 'fotos/santi.jpg', jesus: 'fotos/jesus.jpg', luciano: 'fotos/luciano.jpg', roberto: 'fotos/roberto.jpg' }
+function fotoJugador(nombre) {
+  const k = String(nombre || '').trim().toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '')
+  return FOTOS_JUGADORES[k] || null
+}
+function avatarJugador(nombre, size = 22) {
+  const u = fotoJugador(nombre)
+  if (u) return `<img src="${u}" alt="" class="av-jug" style="width:${size}px;height:${size}px;--c:${rlColor(nombre)}">`
+  const n = String(nombre || '?').trim()
+  return `<span class="av-jug av-ini" style="width:${size}px;height:${size}px;font-size:${Math.round(size * .45)}px;--c:${rlColor(n)}">${(n[0] || '?').toUpperCase()}</span>`
+}
+function rlAvatarPrev(i) {
+  const el = document.getElementById(`rl-av-${i}`)
+  const d = rlCreando.equipos[i]
+  if (el && d) el.innerHTML = avatarJugador(rlCreando.formato === 'parejas' ? d.nombre : d.dueno, 28)
+}
 function rlNombre(t,id){ return t.equipos.find(e=>e.id===id)?.nombre||id }
 function rlDueno(t,id){ return t.equipos.find(e=>e.id===id)?.dueno||'' }
 function rlColor(dueno) {
@@ -7893,8 +7913,8 @@ function rlCampeonHTML(t) {
     <div class="rl-camp-trofeo">${rlTrofeo(t.formato, 58)}</div>
     <div style="min-width:0;">
       <div class="rl-camp-tit">🏆 Campeón ${c.nombre}</div>
-      <div class="rl-camp-eq">${escudoNombre(t.campeon, 40)}<span style="color:${rlColor(d)}">${t.campeon}</span></div>
-      ${d ? `<div class="text-gris" style="font-size:12px;">${d}</div>` : ''}
+      <div class="rl-camp-eq">${t.formato === 'parejas' ? avatarJugador(t.campeon, 44) : escudoNombre(t.campeon, 40)}<span style="color:${rlColor(t.formato === 'parejas' ? t.campeon : d)}">${t.campeon}</span></div>
+      ${d ? `<div class="text-gris" style="font-size:12px;display:flex;align-items:center;gap:5px;margin-top:4px;">${avatarJugador(d, 24)}${d}</div>` : (t.formato === 'parejas' ? '' : '')}
     </div>
   </div>`
 }
@@ -8062,7 +8082,7 @@ function rlTablaParejas(t) {
 }
 function rlJugadorChip(t, id) {
   const n = rlNombre(t, id)
-  return `<span class="rlp-chip" style="--c:${rlColor(n)}">${n}</span>`
+  return `<span class="rlp-chip" style="--c:${rlColor(n)}">${avatarJugador(n, 24)}${n}</span>`
 }
 function rlParejaLadoHTML(t, p, lado) {
   const par = lado === 'a' ? p.a : p.b, club = lado === 'a' ? p.clubA : p.clubB
@@ -8186,7 +8206,7 @@ function rlTablaHTML(t, tabla) {
         <td><div style="display:flex;align-items:center;gap:6px;">
           <div style="width:8px;height:8px;border-radius:50%;background:${c};flex-shrink:0;"></div>
           ${rlEsc(t,eq.id,20)}<strong>${rlNombre(t,eq.id)}</strong>
-          ${eq.dueno?`<span style="font-size:10px;color:${c};font-weight:700;">${eq.dueno}</span>`:''}
+          ${eq.dueno?`<span style="font-size:10px;color:${c};font-weight:700;display:inline-flex;align-items:center;gap:3px;">${avatarJugador(eq.dueno, 18)}${eq.dueno}</span>`:''}
         </div></td>
         <td>${eq.pj}</td><td>${eq.pg}</td><td>${eq.pe}</td><td>${eq.pp}</td>
         <td>${eq.gf}</td><td>${eq.gc}</td>

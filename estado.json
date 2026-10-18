@@ -1,6 +1,6 @@
 {
   "version": "1.0",
-  "ultimaActualizacion": "2026-10-18T21:10:06.377Z",
+  "ultimaActualizacion": "2026-10-18T21:54:46.381Z",
   "equiposArgentinos": [
     {
       "id": "arg1",
@@ -1417,7 +1417,69 @@
       "dueno": "luciano"
     }
   ],
-  "torneosRelampago": [],
+  "torneosRelampago": [
+    {
+      "id": "rl_1792360486380_yvcgi",
+      "nombre": "Copa relámpago",
+      "formato": "eliminatorias",
+      "equipos": [
+        {
+          "id": "rl_1792360442097_mlxa4",
+          "nombre": "Boca Juniors",
+          "dueno": "Santiago"
+        },
+        {
+          "id": "rl_1792360452059_oo5wr",
+          "nombre": "Celta de Vigo",
+          "dueno": "Roberto"
+        },
+        {
+          "id": "rl_1792360466928_9116s",
+          "nombre": "Rayo Vallecano",
+          "dueno": "Luciano"
+        }
+      ],
+      "creadoEn": "2026-10-18T21:54:46.380Z",
+      "campeon": null,
+      "idaVuelta": false,
+      "rondas": {
+        "rondas": {
+          "final": [
+            {
+              "id": "rl_1792360486380_2xnqu",
+              "local": "rl_1792360452059_oo5wr",
+              "visitante": "rl_1792360442097_mlxa4",
+              "golesLocal": null,
+              "golesVisitante": null,
+              "ganador": null
+            },
+            {
+              "id": "rl_1792360486380_b73ll",
+              "local": "rl_1792360466928_9116s",
+              "visitante": null,
+              "golesLocal": null,
+              "golesVisitante": null,
+              "ganador": "rl_1792360466928_9116s"
+            }
+          ],
+          "semis": [
+            {
+              "id": "rl_1792360486380_a08jt",
+              "local": null,
+              "visitante": "rl_1792360466928_9116s",
+              "golesLocal": null,
+              "golesVisitante": null,
+              "ganador": null
+            }
+          ]
+        },
+        "nombres": [
+          "final",
+          "semis"
+        ]
+      }
+    }
+  ],
   "supercopa": {
     "localId": null,
     "visitanteId": null,

@@ -310,6 +310,24 @@
     .zona-cols > div { min-width: 0; }
     .zona-cols .sorteo-col-titulo { font-size: 11px; padding: 3px 6px; position: static !important; }
     .zona-sig { text-align: center; padding: 10px 0 4px; }
+    /* Álbum de fotos */
+    .alb-filtros { display: flex; gap: 6px; overflow-x: auto; padding-bottom: 6px; margin-bottom: 10px; -webkit-overflow-scrolling: touch; }
+    .alb-filtros button { flex-shrink: 0; padding: 6px 12px; border-radius: 16px; border: 1px solid var(--border); background: var(--card); color: var(--gris); font-size: 12px; cursor: pointer; white-space: nowrap; }
+    .alb-filtros button.on { border-color: var(--dorado2); color: var(--dorado2); background: rgba(245,166,35,.1); font-weight: 700; }
+    .alb-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(110px, 1fr)); gap: 6px; }
+    .alb-item { position: relative; aspect-ratio: 1; border-radius: 10px; overflow: hidden; cursor: pointer; background: var(--azul3); }
+    .alb-item img { width: 100%; height: 100%; object-fit: cover; display: block; transition: transform .3s; }
+    .alb-item:active img { transform: scale(1.05); }
+    .alb-item .alb-tag { position: absolute; left: 0; right: 0; bottom: 0; padding: 14px 6px 4px; font-size: 10px; font-weight: 700; color: #fff; background: linear-gradient(transparent, rgba(0,0,0,.75)); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .alb-grupo { font-size: 12px; font-weight: 900; letter-spacing: 1px; text-transform: uppercase; color: var(--dorado2); margin: 14px 2px 8px; }
+    .alb-lb { position: fixed; inset: 0; z-index: 9500; background: rgba(0,0,0,.94); display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 16px; touch-action: pan-y; }
+    .alb-lb img { max-width: 100%; max-height: 72vh; object-fit: contain; border-radius: 8px; box-shadow: 0 10px 40px rgba(0,0,0,.6); }
+    .alb-lb-info { color: #fff; text-align: center; margin-top: 12px; max-width: 520px; }
+    .alb-lb-info b { display: block; font-size: 16px; }
+    .alb-lb-info small { color: var(--gris); font-size: 12px; }
+    .alb-lb-nav { position: absolute; top: 50%; transform: translateY(-50%); background: rgba(255,255,255,.1); border: none; color: #fff; font-size: 26px; width: 44px; height: 44px; border-radius: 50%; cursor: pointer; }
+    .alb-lb-cerrar { position: absolute; top: 14px; right: 14px; background: rgba(255,255,255,.12); border: none; color: #fff; font-size: 18px; width: 38px; height: 38px; border-radius: 10px; cursor: pointer; }
+    .alb-subiendo { font-size: 12px; color: var(--gris); margin-top: 8px; }
     /* Paneles desplegables dentro de cada competencia */
     .sec-panel { border-radius: 14px; margin-bottom: 10px; }
     .sec-panel .hl-head { padding: 11px 12px; gap: 10px; }
@@ -1224,6 +1242,7 @@
   <button class="nav-btn" onclick="mostrarSeccion('historial')">🏅 Historial</button>
   <button class="nav-btn" onclick="mostrarSeccion('relampago')">⚡ Relámpago</button>
   <button class="nav-btn" onclick="mostrarSeccion('premios')">🎁 Premios</button>
+  <button class="nav-btn" onclick="mostrarSeccion('album')">📸 Álbum</button>
   <button class="nav-btn" onclick="mostrarSeccion('admin')">Admin</button>
 </nav>
 
@@ -1307,6 +1326,12 @@
   <div id="sec-relampago" class="seccion">
     <div class="sec-titulo">⚡ Torneos Relámpago</div>
     <div id="relampago-contenido"></div>
+  </div>
+
+  <!-- ÁLBUM DE FOTOS -->
+  <div id="sec-album" class="seccion">
+    <div class="sec-titulo">📸 Álbum</div>
+    <div id="album-contenido"></div>
   </div>
 
   <!-- PREMIOS -->
@@ -2285,6 +2310,7 @@ function renderTodo() {
   renderPromocion()
   renderRelampago()
   renderPremios()
+  renderAlbum()
 }
 
 // ── Stats helpers ──────────────────────────────
@@ -7527,6 +7553,133 @@ function getPerdedorPremio(competId) {
     return { id: perd.logoId || null, dueno: perd.dueno, nombre: perd.nombre }
   }
   return null
+}
+
+// ══════════════════════════════════════════════
+// ÁLBUM — fotos de los torneos (se guardan en el repositorio, carpeta /recuerdos)
+// ══════════════════════════════════════════════
+let albumFiltro = 'todos'
+let albumIdx = -1
+function albumLista() { return [...(estado?.recuerdos || [])].sort((a, b) => (b.fecha || '').localeCompare(a.fecha || '')) }
+function albumUrl(f) { return f.url || `https://raw.githubusercontent.com/${GH_USER}/${GH_REPO}/main/${f.path}` }
+// Opciones de "¿de qué torneo es?": las competencias + cada torneo relámpago
+function albumTorneos() {
+  const base = [['liga', '🇦🇷 Liga AFA'], ['copa', '🏆 Copa Argentina'], ['mundial', '🌍 Mundial de Clubes'], ['supercopa', '🥇 Supercopa'], ['superfinal', '👑 Súper Final'], ['promocion', '🔃 Promoción']]
+  const rl = (estado?.torneosRelampago || []).map(t => ['rl_' + t.id, `⚡ ${t.nombre}`])
+  return [...base, ...rl, ['otro', '🎉 Otros']]
+}
+function albumTorneoNombre(k) { return (albumTorneos().find(x => x[0] === k) || [k, k === 'otro' ? '🎉 Otros' : k])[1] }
+function renderAlbum() {
+  const cont = document.getElementById('album-contenido')
+  if (!cont || !estado) return
+  const lista = albumLista()
+  const usados = [...new Set(lista.map(f => f.torneo || 'otro'))]
+  const filtrada = albumFiltro === 'todos' ? lista : lista.filter(f => (f.torneo || 'otro') === albumFiltro)
+  const opciones = albumTorneos().map(([k, n]) => `<option value="${k}">${n}</option>`).join('')
+  let html = ''
+  if (esAdmin) html += `<div class="card" style="margin-bottom:12px;">
+    <div class="card-titulo">➕ Subir fotos</div>
+    <div style="display:flex;flex-direction:column;gap:8px;">
+      <select id="alb-torneo" style="padding:9px;border-radius:8px;border:1px solid var(--border);background:var(--azul2);color:var(--texto);">${opciones}</select>
+      <input id="alb-titulo" placeholder="Descripción (opcional): ej. Final de la Copa, el festejo…" style="padding:9px 12px;border-radius:8px;border:1px solid var(--border);background:var(--azul2);color:var(--texto);">
+      <label class="btn btn-primary" style="text-align:center;cursor:pointer;">📷 Elegir fotos<input type="file" accept="image/*" multiple style="display:none" onchange="subirFotosAlbum(this.files)"></label>
+      <div id="alb-progreso" class="alb-subiendo"></div>
+    </div>
+  </div>`
+  if (!lista.length) {
+    html += `<div class="card" style="text-align:center;padding:30px 16px;"><div style="font-size:42px;">📸</div><p class="text-gris" style="margin-top:8px;">Todavía no hay fotos.${esAdmin ? ' Subí la primera arriba.' : ''}</p></div>`
+    cont.innerHTML = html; return
+  }
+  html += `<div class="alb-filtros"><button class="${albumFiltro === 'todos' ? 'on' : ''}" onclick="albumFiltrar('todos')">Todas (${lista.length})</button>${usados.map(k => `<button class="${albumFiltro === k ? 'on' : ''}" onclick="albumFiltrar('${k}')">${albumTorneoNombre(k)} (${lista.filter(f => (f.torneo || 'otro') === k).length})</button>`).join('')}</div>`
+  // agrupar por mes
+  const grupos = {}
+  filtrada.forEach(f => { const m = (f.fecha || '').slice(0, 7) || 'Sin fecha'; (grupos[m] ||= []).push(f) })
+  for (const [m, fotos] of Object.entries(grupos)) {
+    const tit = m === 'Sin fecha' ? m : new Date(m + '-15').toLocaleDateString('es-MX', { month: 'long', year: 'numeric' })
+    html += `<div class="alb-grupo">${tit}</div><div class="alb-grid">${fotos.map(f => `<div class="alb-item" onclick="albumAbrir('${f.id}')"><img src="${albumUrl(f)}" loading="lazy" alt="">${f.titulo ? `<div class="alb-tag">${f.titulo}</div>` : ''}</div>`).join('')}</div>`
+  }
+  cont.innerHTML = html
+}
+function albumFiltrar(k) { albumFiltro = k; renderAlbum() }
+// Achica la foto en el celular antes de subirla (máx. 1600px, JPG)
+function albumComprimir(file) {
+  return new Promise((ok, mal) => {
+    const img = new Image(), url = URL.createObjectURL(file)
+    img.onload = () => {
+      const max = 1600, k = Math.min(1, max / Math.max(img.width, img.height))
+      const c = document.createElement('canvas'); c.width = Math.round(img.width * k); c.height = Math.round(img.height * k)
+      c.getContext('2d').drawImage(img, 0, 0, c.width, c.height)
+      URL.revokeObjectURL(url)
+      ok(c.toDataURL('image/jpeg', .82).split(',')[1])
+    }
+    img.onerror = () => { URL.revokeObjectURL(url); mal(new Error('No se pudo leer la imagen')) }
+    img.src = url
+  })
+}
+async function subirFotosAlbum(files) {
+  if (!esAdmin || !files?.length) return
+  const token = getToken()
+  const torneo = document.getElementById('alb-torneo')?.value || 'otro'
+  const titulo = document.getElementById('alb-titulo')?.value.trim() || ''
+  const prog = document.getElementById('alb-progreso')
+  if (!estado.recuerdos) estado.recuerdos = []
+  let ok = 0
+  for (let i = 0; i < files.length; i++) {
+    if (prog) prog.textContent = `Subiendo ${i + 1} de ${files.length}…`
+    try {
+      const b64 = await albumComprimir(files[i])
+      const id = 'f' + Date.now().toString(36) + Math.random().toString(36).slice(2, 6)
+      const path = `recuerdos/${id}.jpg`
+      const res = await fetch(`https://api.github.com/repos/${GH_USER}/${GH_REPO}/contents/${path}`, {
+        method: 'PUT', headers: { Authorization: `token ${token}`, 'Content-Type': 'application/json' },
+        body: JSON.stringify({ message: 'Álbum: nueva foto', content: b64 })
+      })
+      if (!res.ok) throw new Error((await res.json().catch(() => ({}))).message || res.status)
+      estado.recuerdos.push({ id, path, torneo, titulo, fecha: new Date().toISOString() })
+      ok++
+    } catch (e) { toast('No se pudo subir una foto: ' + e.message, true) }
+  }
+  if (ok) { await guardarEstado(); toast(`📸 ${ok} foto${ok === 1 ? '' : 's'} subida${ok === 1 ? '' : 's'}`) }
+  if (prog) prog.textContent = ''
+  renderAlbum()
+}
+function albumAbrir(id) {
+  const lista = albumFiltro === 'todos' ? albumLista() : albumLista().filter(f => (f.torneo || 'otro') === albumFiltro)
+  albumIdx = lista.findIndex(f => f.id === id)
+  if (albumIdx < 0) return
+  const pintar = () => {
+    const f = lista[albumIdx]
+    document.getElementById('alb-lb')?.remove()
+    const d = document.createElement('div'); d.className = 'alb-lb'; d.id = 'alb-lb'
+    d.innerHTML = `<button class="alb-lb-cerrar" onclick="document.getElementById('alb-lb').remove()">✕</button>
+      ${lista.length > 1 ? `<button class="alb-lb-nav" style="left:10px" data-d="-1">‹</button><button class="alb-lb-nav" style="right:10px" data-d="1">›</button>` : ''}
+      <img src="${albumUrl(f)}" alt="">
+      <div class="alb-lb-info">${f.titulo ? `<b>${f.titulo}</b>` : ''}<small>${albumTorneoNombre(f.torneo || 'otro')} · ${f.fecha ? new Date(f.fecha).toLocaleDateString('es-MX', { day: 'numeric', month: 'long', year: 'numeric' }) : ''} · ${albumIdx + 1}/${lista.length}</small>
+        ${esAdmin ? `<div style="margin-top:10px;"><button class="btn btn-danger btn-sm" onclick="borrarFotoAlbum('${f.id}')">🗑️ Borrar foto</button></div>` : ''}</div>`
+    d.onclick = e => { if (e.target === d) d.remove() }
+    d.querySelectorAll('.alb-lb-nav').forEach(b => b.onclick = e => { e.stopPropagation(); albumIdx = (albumIdx + +b.dataset.d + lista.length) % lista.length; pintar() })
+    // deslizar con el dedo para pasar de foto
+    let x0 = null
+    d.addEventListener('touchstart', e => { x0 = e.touches[0].clientX }, { passive: true })
+    d.addEventListener('touchend', e => { if (x0 === null || lista.length < 2) return; const dx = e.changedTouches[0].clientX - x0; if (Math.abs(dx) > 50) { albumIdx = (albumIdx + (dx < 0 ? 1 : -1) + lista.length) % lista.length; pintar() } x0 = null })
+    document.body.appendChild(d)
+  }
+  pintar()
+}
+async function borrarFotoAlbum(id) {
+  if (!confirm('¿Borrar esta foto del álbum?')) return
+  const f = (estado.recuerdos || []).find(x => x.id === id); if (!f) return
+  estado.recuerdos = estado.recuerdos.filter(x => x.id !== id)
+  document.getElementById('alb-lb')?.remove()
+  await guardarEstado()
+  // borrar también el archivo del repositorio
+  try {
+    const token = getToken(), api = `https://api.github.com/repos/${GH_USER}/${GH_REPO}/contents/${f.path}`
+    const info = await fetch(api, { headers: { Authorization: `token ${token}` } }).then(r => r.json())
+    if (info.sha) await fetch(api, { method: 'DELETE', headers: { Authorization: `token ${token}`, 'Content-Type': 'application/json' }, body: JSON.stringify({ message: 'Álbum: borrar foto', sha: info.sha }) })
+  } catch (e) {}
+  renderAlbum()
+  toast('🗑️ Foto borrada')
 }
 
 function renderPremios() {

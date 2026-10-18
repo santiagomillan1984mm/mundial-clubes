@@ -7566,9 +7566,9 @@ function albumUrl(f) { return f.url || `https://raw.githubusercontent.com/${GH_U
 function albumTorneos() {
   const base = [['liga', '🇦🇷 Liga AFA'], ['copa', '🏆 Copa Argentina'], ['mundial', '🌍 Mundial de Clubes'], ['supercopa', '🥇 Supercopa'], ['superfinal', '👑 Súper Final'], ['promocion', '🔃 Promoción']]
   const rl = (estado?.torneosRelampago || []).map(t => ['rl_' + t.id, `⚡ ${t.nombre}`])
-  return [...base, ...rl, ['otro', '🎉 Otros']]
+  return [...base, ['otro', '⚡ Torneos Relámpago'], ...rl]
 }
-function albumTorneoNombre(k) { return (albumTorneos().find(x => x[0] === k) || [k, k === 'otro' ? '🎉 Otros' : k])[1] }
+function albumTorneoNombre(k) { return (albumTorneos().find(x => x[0] === k) || [k, k === 'otro' ? '⚡ Torneos Relámpago' : k])[1] }
 function renderAlbum() {
   const cont = document.getElementById('album-contenido')
   if (!cont || !estado) return

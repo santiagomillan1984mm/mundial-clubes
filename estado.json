@@ -1,6 +1,6 @@
 {
   "version": "1.0",
-  "ultimaActualizacion": "2026-10-18T20:05:31.953Z",
+  "ultimaActualizacion": "2026-10-18T20:06:07.395Z",
   "equiposArgentinos": [
     {
       "id": "arg1",
@@ -1465,8 +1465,8 @@
           ],
           "golesA": null,
           "golesB": null,
-          "clubA": "",
-          "clubB": ""
+          "clubA": "Austin FC",
+          "clubB": "1. FC Köln"
         },
         {
           "id": "rl_1792353931882_56s3e",

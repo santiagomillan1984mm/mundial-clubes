@@ -6598,12 +6598,12 @@ const COPA_STAGE_HTML = `<div class="bp-stage">
               <div class="bp-tomada" id="cb-tomada"><div class="bp-esc" id="cb-tomada-esc"></div></div>
             </div>
           </div>`
-const LIGA_MX_FALLBACK = ['Club América', 'Atlas', 'Atlético San Luis', 'Cruz Azul', 'Guadalajara', 'FC Juárez', 'León', 'Mazatlán FC', 'Monterrey', 'Necaxa', 'Pachuca', 'Puebla', 'Querétaro', 'Santos Laguna', 'Club Tijuana', 'Toluca', 'Tigres UANL', 'Pumas UNAM']
+const LIGA_MX_FALLBACK = ['Club América', 'Atlas', 'Atlético San Luis', 'Cruz Azul', 'Guadalajara', 'FC Juárez', 'León', 'Atlante', 'Monterrey', 'Necaxa', 'Pachuca', 'Puebla', 'Querétaro', 'Santos Laguna', 'Club Tijuana', 'Toluca', 'Tigres UANL', 'Pumas UNAM']
 const LIGA_MX_LABEL = 'México - Liga MX'
 // Títulos exactos en Wikipedia (en) para que el escudo salga bien
 const WIKI_MX = {
   'Club América': 'Club América', 'Atlas': 'Atlas F.C.', 'Atlético San Luis': 'Atlético San Luis', 'Cruz Azul': 'Cruz Azul',
-  'Guadalajara': 'C.D. Guadalajara', 'FC Juárez': 'FC Juárez', 'León': 'Club León', 'Mazatlán FC': 'Mazatlán F.C.', 'Monterrey': 'C.F. Monterrey',
+  'Guadalajara': 'C.D. Guadalajara', 'FC Juárez': 'FC Juárez', 'León': 'Club León', 'Atlante': 'Atlante F.C.', 'Monterrey': 'C.F. Monterrey',
   'Necaxa': 'Club Necaxa', 'Pachuca': 'C.F. Pachuca', 'Puebla': 'Club Puebla', 'Querétaro': 'Querétaro F.C.', 'Santos Laguna': 'Santos Laguna',
   'Club Tijuana': 'Club Tijuana', 'Toluca': 'Deportivo Toluca F.C.', 'Tigres UANL': 'Tigres UANL', 'Pumas UNAM': 'Club Universidad Nacional'
 }
@@ -8006,14 +8006,10 @@ function rlGenerarGrupos(equipos, numGrupos, idaVuelta = false) {
 // ─── Helpers ──────────────────────────────────────
 
 // ── Escudos en los torneos relámpago
-// Los 30 de la Liga Profesional tal como están en el FC 27 (fuente: FIFPlay)
-const ARG_FC27 = ['Aldosivi', 'Argentinos Juniors', 'Atlético Tucumán', 'Banfield', 'Barracas Central', 'Belgrano', 'Boca Juniors', 'Central Córdoba', 'Defensa y Justicia', 'Dep. Riestra',
-  'Estudiantes', 'Gimnasia LP', 'Gimnasia (Mendoza)', 'Godoy Cruz', 'Huracán', 'Independiente', 'Indep. Rivadavia', 'Instituto', 'Lanús', "Newell's", 'Platense', 'Racing Club', 'River Plate',
-  'Rosario Central', 'San Lorenzo', 'Sarmiento', 'Talleres', 'Tigre', 'Unión de Santa Fe', 'Vélez Sarsfield']
 // Clubes dudosos en el juego: no salen en los sorteos
 const NO_SORTEAR = new Set(['Universidad Católica'])
 function rlPoolSorteo() {
-  return [...new Set([...ARG_FC27, ...(poolClubes || []).map(c => c.nombre)])].filter(n => !NO_SORTEAR.has(n))
+  return [...new Set([...(estado?.poolArgentino || POOL_ARG).map(e => e.nombre), ...(poolClubes || []).map(c => c.nombre)])].filter(n => !NO_SORTEAR.has(n))
 }
 function rlListaClubes() {
   const set = new Set([...(estado?.poolArgentino || POOL_ARG).map(e => e.nombre), ...(poolClubes || []).map(c => c.nombre)])

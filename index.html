@@ -292,6 +292,7 @@
     .rlp-lado.der .rlp-jug { justify-content: flex-end; }
     .rlp-chip { display: inline-flex; align-items: center; gap: 4px; font-size: 12px; font-weight: 800; padding: 2px 7px 2px 2px; border-radius: 10px; background: color-mix(in srgb, var(--c) 22%, transparent); color: var(--c); border: 1px solid color-mix(in srgb, var(--c) 45%, transparent); white-space: nowrap; }
     .rlp-club { width: 100%; max-width: 140px; padding: 3px 6px; font-size: 11px; border-radius: 6px; border: 1px solid var(--border); background: var(--azul2); color: var(--texto); }
+    .rlp-liga { font-size: 10px; color: var(--gris); opacity: .85; line-height: 1.2; }
     .rlp-centro { display: flex; flex-direction: column; align-items: center; gap: 2px; }
     .rl-hero { display: flex; align-items: center; gap: 14px; padding: 14px; margin-bottom: 14px; border-radius: 16px; border: 1px solid var(--border);
       background: radial-gradient(circle at 12% 50%, color-mix(in srgb, var(--c) 28%, transparent), transparent 60%), var(--card); box-shadow: inset 4px 0 0 var(--c); }
@@ -1521,11 +1522,16 @@ let logosIntl = {}
 try { logosIntl = JSON.parse(localStorage.getItem(INTL_LOGO_KEY) || '{}') || {} } catch(e) { logosIntl = {} }
 const intlBuscando = new Set()
 
-function logoPorNombre(nombre) {
+function logoPorNombre(nombre, deducir = true) {
   if (!nombre) return null
   if (logosIntl[nombre]) return logosIntl[nombre]
   const pa = (estado?.poolArgentino || POOL_ARG).find(e => e.nombre === nombre)
-  return pa ? (resolvedLogos[pa.id] || null) : null
+  if (pa) return resolvedLogos[pa.id] || null
+  if (deducir && typeof resolverClub === 'function' && !String(nombre).includes(' & ') && !(typeof fotoJugador === 'function' && fotoJugador(nombre))) {
+    const r = resolverClub(nombre)
+    if (r && r !== nombre) return logoPorNombre(r, false)
+  }
+  return null
 }
 function escudoNombre(nombre, size = 20) {
   const u = logoPorNombre(nombre)
@@ -1562,7 +1568,7 @@ async function buscarLogoIntl(nombre) {
 }
 async function cargarLogosIntl(nombres) {
   // Las parejas ("Santi & Nico") no son clubes: no se buscan
-  const pend = [...new Set(nombres)].filter(n => n && !String(n).includes(' & ') && !logoPorNombre(n) && !intlBuscando.has(n))
+  const pend = [...new Set(nombres.map(n => (n && typeof resolverClub === 'function' && !String(n).includes(' & ') && resolverClub(n)) || n))].filter(n => n && !String(n).includes(' & ') && !logoPorNombre(n) && !intlBuscando.has(n))
   if (!pend.length) return false
   pend.forEach(n => intlBuscando.add(n))
   let i = 0, nuevos = 0
@@ -4278,6 +4284,7 @@ function fotosFX(fotos, size) {
     : `<div class="fx-ini" style="--c:${f.c};width:${s2}px;height:${s2}px;font-size:${Math.round(s2 * .4)}px;border-radius:50%;${i ? `margin-left:-${Math.round(s2 * .28)}px;` : ''}">${f.ini}</div>`).join('')}</div>`
 }
 function escudoFX(nombre, size, color, logoId, fotos) {
+  if (fotos?.solo) return fotosFX(fotos, size)
   const u = (logoId && getPoolLogo(logoId)) || logoPorNombre(nombre)
   if (!u && fotos?.length) return fotosFX(fotos, size)
   if (u) return `<img src="${u}" alt="">`
@@ -4301,7 +4308,7 @@ function mostrarVS(L, V, titulo) {
   if (!L?.nombre || !V?.nombre) return
   cargarLogosIntl([L.nombre, V.nombre])
   const lado = (e, cls) => `<div class="fx-lado ${cls}" style="--c:${colorDe(e.dueno)}"><div class="fx-esc">${escudoFX(e.nombre, 96, colorDe(e.dueno), e.logoId, e.fotos)}</div>
-    <div class="fx-nom">${e.nombre}</div>${e.fotos?.length && logoPorNombre(e.nombre) ? `<div style="margin-top:6px;">${fotosFX(e.fotos, 40)}</div>` : ''}${e.dueno ? `<div class="fx-dueno">${etiquetaDueno(e.dueno)}</div>` : ''}</div>`
+    <div class="fx-nom">${e.nombre}</div>${e.liga ? `<div style="font-size:11px;color:var(--gris);margin-top:2px;">🔎 ${e.liga}</div>` : ''}${e.fotos?.length && !e.fotos.solo && logoPorNombre(e.nombre) ? `<div style="margin-top:6px;">${fotosFX(e.fotos, 40)}</div>` : ''}${e.dueno ? `<div class="fx-dueno">${etiquetaDueno(e.dueno)}</div>` : ''}</div>`
   sfx.whoosh(.2); setTimeout(() => sfx.impacto(), 300)
   fxMostrar(`${titulo ? `<div class="fx-titulo">${titulo}</div>` : ''}<div class="fx-vs">${lado(L, 'izq')}<div class="fx-vs-txt">VS</div>${lado(V, 'der')}</div>`, '#f5a623', 3600)
 }
@@ -4310,7 +4317,7 @@ function zoomResultado(L, V, gl, gv, extra = {}) {
   if (gl == null || gv == null || !L?.nombre || !V?.nombre) return
   const gana = gl > gv ? L : gv > gl ? V : null
   const color = gana ? colorDe(gana.dueno) : '#f5a623'
-  const eq = (e, g) => `<div class="fx-res-eq ${gana ? (gana === e ? 'gana' : 'pierde') : ''}"><div class="fx-esc">${escudoFX(e.nombre, 76, colorDe(e.dueno), e.logoId, e.fotos)}</div>${e.fotos?.length && logoPorNombre(e.nombre) ? `<div style="margin:4px 0;">${fotosFX(e.fotos, 30)}</div>` : ''}
+  const eq = (e, g) => `<div class="fx-res-eq ${gana ? (gana === e ? 'gana' : 'pierde') : ''}"><div class="fx-esc">${escudoFX(e.nombre, 76, colorDe(e.dueno), e.logoId, e.fotos)}</div>${e.fotos?.length && !e.fotos.solo && logoPorNombre(e.nombre) ? `<div style="margin:4px 0;">${fotosFX(e.fotos, 30)}</div>` : ''}
     <div class="fx-nom" style="color:${colorDe(e.dueno)};font-size:${e.nombre.length > 12 ? 11 : 13}px;overflow-wrap:normal">${e.nombre}</div></div>`
   const linea = extra.mensaje || (gana ? `¡Gana ${gana.nombre}!` : '¡Empate!')
   sfx.silbato(); if (gana) sfx.tribuna(2.2, .3, .35); else sfx.ooh()
@@ -7892,7 +7899,8 @@ async function confirmarCrearTorneoRL() {
   if (d.formato === 'parejas' && d.equipos.length < 4) { toast('Para parejas se necesitan al menos 4 jugadores',true); return }
   if (d.equipos.length < 2) { toast('Necesitás al menos 2 equipos',true); return }
   if (d.equipos.some(e=>!e.nombre.trim())) { toast('Todos los equipos necesitan nombre',true); return }
-  const equipos = d.equipos.map(e=>({...e, nombre:e.nombre.trim(), dueno:(e.dueno||'').trim(), ...(d.formato==='parejas' ? { club:(e.club||'').trim() } : {})}))
+  const ded = n => { const v = (n || '').trim(); return v ? (resolverClub(v) || v) : '' }
+  const equipos = d.equipos.map(e=>({...e, nombre: d.formato==='parejas' ? e.nombre.trim() : ded(e.nombre), dueno:(e.dueno||'').trim(), ...(d.formato==='parejas' ? { club: ded(e.club) } : {})}))
   if (d.formato !== 'parejas') cargarLogosIntl(equipos.map(e => e.nombre)).then(n => { if (n) renderSiQuieto() })
   const torneo = { id:rlId(), nombre:d.nombre.trim(), formato:d.formato, equipos, creadoEn:new Date().toISOString(), campeon:null, idaVuelta:!!d.idaVuelta }
   if (d.formato==='parejas') {
@@ -8011,6 +8019,85 @@ const NO_SORTEAR = new Set(['Universidad Católica'])
 function rlPoolSorteo() {
   return [...new Set([...(estado?.poolArgentino || POOL_ARG).map(e => e.nombre), ...(poolClubes || []).map(c => c.nombre)])].filter(n => !NO_SORTEAR.has(n))
 }
+// ══════════════════════════════════════════════
+// NOMBRES DE CLUBES "A OJO": se escribe como sea y la app deduce el club
+// ══════════════════════════════════════════════
+const STOP_CLUB = new Set(['fc', 'cf', 'club', 'cd', 'ca', 'ac', 'sc', 'afc', 'de', 'del', 'la', 'el', 'the', 'calcio', 'football', 'futbol', 'atletico', 'atl', 'sv', 'vfb', 'vfl', 'ssc', 'us', 'as', 'rc', 'rcd', 'ud', 'sd', 'cs', 'sk', 'fk', 'if', 'bk'])
+function normClub(n, conStop = false) {
+  const base = String(n || '').toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '').replace(/['’´`.]/g, '').replace(/[^a-z0-9]+/g, ' ').trim()
+  if (conStop) return base
+  const sin = base.split(' ').filter(w => w && !STOP_CLUB.has(w)).join(' ')
+  return sin || base
+}
+// Apodos y formas comunes → nombre en la app
+const ALIAS_CLUB = {
+  'newells': "Newell's", 'newell': "Newell's", 'newels': "Newell's", 'nob': "Newell's", 'newells old boys': "Newell's", 'newell old boys': "Newell's", 'manchester utd': 'Manchester United', 'man u': 'Manchester United', 'leprosos': "Newell's",
+  'boca': 'Boca Juniors', 'river': 'River Plate', 'racing': 'Racing Club', 'velez': 'Vélez Sarsfield', 'rosario': 'Rosario Central', 'central': 'Rosario Central',
+  'argentinos': 'Argentinos Juniors', 'independiente rivadavia': 'Indep. Rivadavia', 'rivadavia': 'Indep. Rivadavia', 'defensa': 'Defensa y Justicia', 'dyj': 'Defensa y Justicia',
+  'gimnasia': 'Gimnasia LP', 'gimnasia la plata': 'Gimnasia LP', 'gimnasia mendoza': 'Gimnasia (Mendoza)', 'tucuman': 'Atlético Tucumán', 'riestra': 'Dep. Riestra', 'deportivo riestra': 'Dep. Riestra',
+  'union': 'Unión de Santa Fe', 'barracas': 'Barracas Central', 'estudiantes la plata': 'Estudiantes', 'estudiantes rio cuarto': 'Estudiantes (Río Cuarto)', 'pincha': 'Estudiantes',
+  'america': 'Club América', 'chivas': 'Guadalajara', 'pumas': 'Pumas UNAM', 'unam': 'Pumas UNAM', 'tigres': 'Tigres UANL', 'rayados': 'Monterrey', 'santos': 'Santos Laguna', 'xolos': 'Club Tijuana', 'tijuana': 'Club Tijuana', 'juarez': 'FC Juárez', 'san luis': 'Atlético San Luis',
+  'barca': 'FC Barcelona', 'barcelona': 'FC Barcelona', 'madrid': 'Real Madrid', 'atletico madrid': 'Atlético de Madrid', 'atleti': 'Atlético de Madrid', 'atl madrid': 'Atlético de Madrid', 'betis': 'Real Betis', 'sevilla': 'Sevilla FC', 'valencia': 'Valencia CF', 'villarreal': 'Villarreal CF', 'athletic bilbao': 'Athletic Club', 'bilbao': 'Athletic Club', 'sociedad': 'Real Sociedad',
+  'inter': 'Inter de Milán (Lombardia FC)', 'inter milan': 'Inter de Milán (Lombardia FC)', 'internazionale': 'Inter de Milán (Lombardia FC)', 'milan': 'AC Milán (Milano FC)', 'ac milan': 'AC Milán (Milano FC)', 'atalanta': 'Atalanta (Bergamo Calcio)', 'monza': 'Monza (Brianza Calcio)', 'juve': 'Juventus', 'roma': 'AS Roma',
+  'psg': 'Paris Saint-Germain', 'paris': 'Paris Saint-Germain', 'marsella': 'Olympique de Marseille', 'marseille': 'Olympique de Marseille', 'om': 'Olympique de Marseille', 'lyon': 'Olympique Lyonnais', 'lille': 'LOSC Lille', 'monaco': 'AS Monaco',
+  'bayern': 'FC Bayern München', 'bayern munich': 'FC Bayern München', 'dortmund': 'Borussia Dortmund', 'bvb': 'Borussia Dortmund', 'leverkusen': 'Bayer 04 Leverkusen', 'leipzig': 'RB Leipzig', 'gladbach': 'Borussia Mönchengladbach', 'frankfurt': 'Eintracht Frankfurt', 'schalke': 'FC Schalke 04',
+  'man united': 'Manchester United', 'man utd': 'Manchester United', 'united': 'Manchester United', 'man city': 'Manchester City', 'city': 'Manchester City', 'spurs': 'Tottenham Hotspur', 'tottenham': 'Tottenham Hotspur', 'villa': 'Aston Villa', 'newcastle': 'Newcastle United', 'forest': 'Nottingham Forest', 'wolves': 'Wolverhampton Wanderers', 'west ham': 'West Ham United', 'leeds': 'Leeds United',
+  'porto': 'FC Porto', 'benfica': 'Benfica', 'sporting': 'Sporting CP', 'braga': 'Sporting Braga', 'ajax': 'Ajax', 'psv': 'PSV', 'celtic': 'Celtic', 'rangers': 'Rangers', 'galatasaray': 'Galatasaray', 'fenerbahce': 'Fenerbahçe', 'besiktas': 'Beşiktaş',
+  'al nassr': 'Al-Nassr', 'nassr': 'Al-Nassr', 'al hilal': 'Al-Hilal', 'hilal': 'Al-Hilal', 'al ittihad': 'Al-Ittihad', 'inter miami': 'Inter Miami CF', 'miami': 'Inter Miami CF', 'galaxy': 'LA Galaxy', 'lafc': 'Los Angeles FC',
+}
+let _idxClubes = null
+function idxClubes() {
+  const lista = rlListaClubes()
+  if (_idxClubes && _idxClubes.n === lista.length) return _idxClubes
+  _idxClubes = { n: lista.length, items: lista.map(nombre => ({ nombre, k: normClub(nombre), k2: normClub(nombre, true) })) }
+  return _idxClubes
+}
+function distLev(a, b) {
+  if (Math.abs(a.length - b.length) > 3) return 99
+  const m = Array.from({ length: a.length + 1 }, (_, i) => [i])
+  for (let j = 1; j <= b.length; j++) m[0][j] = j
+  for (let i = 1; i <= a.length; i++) for (let j = 1; j <= b.length; j++)
+    m[i][j] = Math.min(m[i - 1][j] + 1, m[i][j - 1] + 1, m[i - 1][j - 1] + (a[i - 1] === b[j - 1] ? 0 : 1))
+  return m[a.length][b.length]
+}
+const _resolverCache = new Map()
+// Devuelve el nombre del club como está en la app, o null si no lo reconoce
+function resolverClub(texto) {
+  const t = String(texto || '').trim()
+  if (!t) return null
+  if (_resolverCache.has(t)) return _resolverCache.get(t)
+  const { items } = idxClubes()
+  const q = normClub(t), q2 = normClub(t, true)
+  let r = null
+  const exacto = items.find(x => x.nombre === t) || items.find(x => x.k2 === q2) || items.find(x => x.k === q)
+  if (exacto) r = exacto.nombre
+  if (!r && (ALIAS_CLUB[q2] || ALIAS_CLUB[q])) r = ALIAS_CLUB[q2] || ALIAS_CLUB[q]
+  if (!r && q.length >= 3) {
+    // empieza igual o contiene la palabra completa → el más corto
+    const re = new RegExp(`(^| )${q.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}( |$)`)
+    const cands = items.filter(x => x.k.startsWith(q) || re.test(x.k) || x.k2.startsWith(q2))
+    if (cands.length) r = cands.sort((a, b) => a.k.length - b.k.length)[0].nombre
+  }
+  if (!r && q.length >= 4) {
+    // con errores de tipeo
+    let best = null
+    for (const x of items) {
+      const d = Math.min(distLev(q, x.k), ...x.k.split(' ').filter(w => w.length >= 4).map(w => distLev(q, w) + 0.5))
+      if (!best || d < best.d) best = { d, nombre: x.nombre }
+    }
+    if (best && best.d <= (q.length <= 8 ? 1 : 2) && normClub(best.nombre).slice(0, 2) === q.slice(0, 2)) r = best.nombre
+  }
+  _resolverCache.set(t, r)
+  return r
+}
+
+function ligaDeClub(nombre) {
+  if (!nombre) return ''
+  const n = resolverClub(nombre) || nombre
+  if ((estado?.poolArgentino || POOL_ARG).some(e => e.nombre === n)) return 'Argentina · Liga Profesional'
+  const c = (poolClubes || []).find(x => x.nombre === n)
+  return c ? c.liga.replace(' - ', ' · ') : ''
+}
 function rlListaClubes() {
   const set = new Set([...(estado?.poolArgentino || POOL_ARG).map(e => e.nombre), ...(poolClubes || []).map(c => c.nombre)])
   return [...set].sort((a, b) => a.localeCompare(b, 'es'))
@@ -8024,9 +8111,11 @@ let rlEscTimer = {}
 function rlBuscarEscudo(i, ya = false) {
   clearTimeout(rlEscTimer[i])
   rlEscTimer[i] = setTimeout(async () => {
-    const n = (rlCreando.equipos[i]?.nombre || '').trim()
+    let n = (rlCreando.equipos[i]?.nombre || '').trim()
     const el = () => document.getElementById(`rl-esc-${i}`)
     if (!n) { if (el()) el().innerHTML = rlEscudoPrev(''); return }
+    const ded = resolverClub(n)
+    if (ya && ded && ded !== n) { rlCreando.equipos[i].nombre = ded; const inp = el()?.nextElementSibling; if (inp) inp.value = ded; n = ded }
     // Solo busca en internet si el nombre es de la lista (o si ya terminó de escribir)
     const enLista = rlListaClubes().includes(n)
     if (!logoPorNombre(n) && (enLista || ya)) { if (el()) el().innerHTML = '<span class="logo-init" style="width:28px;height:28px;font-size:11px;">…</span>'; await cargarLogosIntl([n]) }
@@ -8040,8 +8129,10 @@ function rlBuscarEscudoClub(i, ya = false) {
   // igual que rlBuscarEscudo pero con el equipo del jugador (formato parejas)
   clearTimeout(rlEscTimer['c' + i])
   rlEscTimer['c' + i] = setTimeout(async () => {
-    const n = (rlCreando.equipos[i]?.club || '').trim(), el = () => document.getElementById(`rl-esc-${i}`)
+    let n = (rlCreando.equipos[i]?.club || '').trim(), el = () => document.getElementById(`rl-esc-${i}`)
     if (!n) { if (el()) el().innerHTML = rlEscudoPrev(''); return }
+    const ded = resolverClub(n)
+    if (ya && ded && ded !== n) { rlCreando.equipos[i].club = ded; const inp = el()?.nextElementSibling; if (inp) inp.value = ded; n = ded }
     const enLista = rlListaClubes().includes(n)
     if (!logoPorNombre(n) && (enLista || ya)) await cargarLogosIntl([n])
     if ((rlCreando.equipos[i]?.club || '').trim() === n && el()) { el().innerHTML = rlEscudoPrev(n); if (enLista && logoPorNombre(n)) { el().classList.remove('pop'); void el().offsetWidth; el().classList.add('pop') } }
@@ -8238,12 +8329,17 @@ function rlGenerarParejas(jugadores) {
   return mejor.partidos
 }
 function rlFotoFX(t, id) { const n = rlNombre(t, id); return { u: fotoJugador(n), c: rlColor(n), ini: (n[0] || '?').toUpperCase() } }
-function rlIndivEq(t, id) { const e = t.equipos.find(x => x.id === id) || {}; return { nombre: e.club || e.nombre, dueno: e.club ? e.nombre : '', fotos: [rlFotoFX(t, id)] } }
+function rlIndivEq(t, id) {
+  const e = t.equipos.find(x => x.id === id) || {}, fotos = [rlFotoFX(t, id)]
+  if (!e.club) fotos.solo = true
+  return { nombre: e.club || e.nombre, dueno: e.club ? e.nombre : '', fotos, liga: ligaDeClub(e.club) }
+}
 function rlParejaNombre(t, par) { return par.map(id => rlNombre(t, id)).join(' & ') }
 function rlParejaEq(t, p, lado) {
   const club = lado === 'a' ? p.clubA : p.clubB, par = lado === 'a' ? p.a : p.b
   // Con equipo: escudo y nombre del club, la pareja abajo. Sin equipo: las fotos de los dos.
-  return { nombre: club || rlParejaNombre(t, par), dueno: club ? rlParejaNombre(t, par) : '', fotos: par.map(id => rlFotoFX(t, id)) }
+  const fotos = par.map(id => rlFotoFX(t, id)); if (!club) fotos.solo = true
+  return { nombre: club || rlParejaNombre(t, par), dueno: club ? rlParejaNombre(t, par) : '', fotos, liga: ligaDeClub(club) }
 }
 // ¿El fixture da la misma cantidad de partidos a todos? (con 6, 7 o 10 jugadores no siempre se puede)
 function rlParejasParejo(t) {
@@ -8283,11 +8379,12 @@ function rlParejaLadoHTML(t, p, lado) {
   const clubCampo = esAdmin
     ? `<input class="rlp-club" list="rl-clubes" value="${(club || '').replace(/"/g, '&quot;')}" placeholder="Equipo (opcional)" onchange="rlSetClubPareja('${t.id}','${p.id}','${lado}',this.value)">`
     : (club ? `<span class="text-gris" style="font-size:11px;">${club}</span>` : '')
+  const ligaTxt = club && ligaDeClub(club) ? `<span class="rlp-liga">🔎 ${ligaDeClub(club)}</span>` : ''
   return `<div class="rlp-lado ${lado === 'b' ? 'der' : ''} ${gan ? 'gana' : ''}">
     <div class="rlp-esc">${club ? (escudoNombre(club, 30) || `<span class="logo-init" style="width:30px;height:30px;font-size:11px;">${club.slice(0, 2).toUpperCase()}</span>`) : '🤝'}</div>
     <div class="rlp-info">
       <div class="rlp-jug">${par.map(id => rlJugadorChip(t, id)).join('')}</div>
-      ${clubCampo}
+      ${clubCampo}${ligaTxt}
     </div>
   </div>`
 }
@@ -8312,7 +8409,7 @@ function rlIndivLadoHTML(t, p, lado) {
   const gan = p.golesLocal !== null && p.golesVisitante !== null && (lado === 'a' ? p.golesLocal > p.golesVisitante : p.golesVisitante > p.golesLocal)
   return `<div class="rlp-lado ${lado === 'b' ? 'der' : ''} ${gan ? 'gana' : ''}">
     <div class="rlp-esc">${e.club ? (escudoNombre(e.club, 30) || `<span class="logo-init" style="width:30px;height:30px;font-size:11px;">${e.club.slice(0, 2).toUpperCase()}</span>`) : avatarJugador(e.nombre, 30)}</div>
-    <div class="rlp-info"><div class="rlp-jug">${rlJugadorChip(t, id)}</div>${e.club ? `<span class="text-gris" style="font-size:11px;">${e.club}</span>` : ''}</div>
+    <div class="rlp-info"><div class="rlp-jug">${rlJugadorChip(t, id)}</div>${e.club ? `<span class="text-gris" style="font-size:11px;">${e.club}</span>${ligaDeClub(e.club) ? `<span class="rlp-liga">🔎 ${ligaDeClub(e.club)}</span>` : ''}` : ''}</div>
   </div>`
 }
 function rlPartidoIndivHTML(t, p) {
@@ -8351,7 +8448,7 @@ function renderTorneoRLParejas(cont, t) {
     <div class="alb-filtros">${[['general', '🏆 General'], ['individual', '👤 Solo 1 vs 1'], ['parejas', '🤝 Solo parejas']].map(([k, l]) => `<button class="${rlpTablaModo === k ? 'on' : ''}" onclick="rlpTablaModo='${k}';renderTorneoRLParejas(document.getElementById('relampago-contenido'),estado.torneosRelampago.find(x=>x.id==='${t.id}'))">${l}</button>`).join('')}</div>
     <div class="tabla-pos-wrap"><table class="tabla-pos" style="min-width:330px;">
       <thead><tr><th>#</th><th style="text-align:left">Jugador</th><th>PJ</th><th>PG</th><th>PE</th><th>PP</th><th>GF</th><th>GC</th><th>DG</th><th>PTS</th>${parejo ? '' : '<th>PROM</th>'}</tr></thead>
-      <tbody>${tabla.map((f, i) => { const dg = f.gf - f.gc, fin = rlpTablaModo === 'general' && i < 2 && f.pj; return `<tr class="${fin ? 'clasifica' : ''}"><td><span class="pos-num">${i + 1}</span></td>
+      <tbody>${tabla.map((f, i) => { const dg = f.gf - f.gc, fin = rlpTablaModo === 'general' && i < 2 && f.pj && t.final; return `<tr class="${fin ? 'clasifica' : ''}"><td><span class="pos-num">${i + 1}</span></td>
         <td>${rlJugadorChip(t, f.id)}${fin ? ' <span class="clasifica-badge">FINAL</span>' : ''}</td><td>${f.pj}</td><td>${f.pg}</td><td>${f.pe}</td><td>${f.pp}</td><td>${f.gf}</td><td>${f.gc}</td>
         <td style="color:${dg > 0 ? '#2ecc71' : dg < 0 ? '#e74c3c' : 'var(--gris)'}">${dg > 0 ? '+' : ''}${dg}</td><td class="pts-cell">${f.pts}</td>${parejo ? '' : `<td>${f.prom.toFixed(2)}</td>`}</tr>` }).join('')}</tbody>
     </table></div>
@@ -8445,6 +8542,7 @@ async function rlSetClubJugador(tid, eid, valor) {
   const t = estado.torneosRelampago.find(x => x.id === tid); if (!t) return
   const e = t.equipos.find(x => x.id === eid); if (!e) return
   e.club = (valor || '').trim()
+  if (e.club) e.club = resolverClub(e.club) || e.club
   if (e.club) await cargarLogosIntl([e.club])
   await guardarEstado()
   renderTorneoRLParejas(document.getElementById('relampago-contenido'), t)
@@ -8491,7 +8589,8 @@ async function guardarPartidoParejas(tid, pid) {
 async function rlSetClubPareja(tid, pid, lado, valor) {
   const t = estado.torneosRelampago.find(x => x.id === tid); if (!t) return
   const p = t.partidos.find(x => x.id === pid); if (!p) return
-  const v = (valor || '').trim()
+  let v = (valor || '').trim()
+  if (v) v = resolverClub(v) || v
   if (lado === 'a') p.clubA = v; else p.clubB = v
   if (v) await cargarLogosIntl([v])
   await guardarEstado()

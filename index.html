@@ -272,6 +272,19 @@
     :is(#bolillero-container,#copa-bol).bp-full .equipo-row img { width: 18px !important; height: 18px !important; }
     :is(#bolillero-container,#copa-bol).bp-full .sorteo-col-titulo { font-size: 12px; position: sticky; top: 0; z-index: 1; }
     :is(#bolillero-container,#copa-bol).bp-full :is(#bol-botones,#copa-bol-botones) { position: sticky; bottom: 0; padding: 12px 0 6px; background: linear-gradient(transparent, #060a17 35%); justify-content: center; }
+    .rlp-partido { display: grid; grid-template-columns: minmax(0,1fr) auto minmax(0,1fr); align-items: center; gap: 6px; padding: 8px 0; border-bottom: 1px solid var(--border); }
+    .rlp-partido:last-child { border-bottom: none; }
+    .rlp-lado { display: flex; align-items: center; gap: 6px; min-width: 0; }
+    .rlp-lado.der { flex-direction: row-reverse; text-align: right; }
+    .rlp-lado.gana .rlp-chip { box-shadow: 0 0 0 2px #2ecc71; }
+    .rlp-esc { width: 30px; height: 30px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; font-size: 20px; }
+    .rlp-info { display: flex; flex-direction: column; gap: 3px; min-width: 0; }
+    .rlp-lado.der .rlp-info { align-items: flex-end; }
+    .rlp-jug { display: flex; flex-wrap: wrap; gap: 3px; }
+    .rlp-lado.der .rlp-jug { justify-content: flex-end; }
+    .rlp-chip { display: inline-block; font-size: 12px; font-weight: 800; padding: 2px 7px; border-radius: 10px; background: color-mix(in srgb, var(--c) 22%, transparent); color: var(--c); border: 1px solid color-mix(in srgb, var(--c) 45%, transparent); white-space: nowrap; }
+    .rlp-club { width: 100%; max-width: 140px; padding: 3px 6px; font-size: 11px; border-radius: 6px; border: 1px solid var(--border); background: var(--azul2); color: var(--texto); }
+    .rlp-centro { display: flex; flex-direction: column; align-items: center; gap: 2px; }
     .rl-hero { display: flex; align-items: center; gap: 14px; padding: 14px; margin-bottom: 14px; border-radius: 16px; border: 1px solid var(--border);
       background: radial-gradient(circle at 12% 50%, color-mix(in srgb, var(--c) 28%, transparent), transparent 60%), var(--card); box-shadow: inset 4px 0 0 var(--c); }
     .rl-hero-trofeo { flex-shrink: 0; filter: drop-shadow(0 4px 12px color-mix(in srgb, var(--c) 55%, transparent)); }
@@ -1515,7 +1528,8 @@ async function buscarLogoIntl(nombre) {
   return url ? await limpiarFondoSiHace(url) : null
 }
 async function cargarLogosIntl(nombres) {
-  const pend = [...new Set(nombres)].filter(n => n && !logoPorNombre(n) && !intlBuscando.has(n))
+  // Las parejas ("Santi & Nico") no son clubes: no se buscan
+  const pend = [...new Set(nombres)].filter(n => n && !String(n).includes(' & ') && !logoPorNombre(n) && !intlBuscando.has(n))
   if (!pend.length) return false
   pend.forEach(n => intlBuscando.add(n))
   let i = 0, nuevos = 0
@@ -1567,7 +1581,7 @@ async function cargarCompLogos() {
 
 function nombresMundial() {
   return [...(estado?.sorteo?.internacionales || []).map(e => e.nombre), ...(estado?.equiposArgentinos || []).map(e => e.nombre),
-    ...(estado?.torneosRelampago || []).flatMap(t => (t.equipos || []).map(e => e.nombre)),
+    ...(estado?.torneosRelampago || []).flatMap(t => t.formato === 'parejas' ? (t.partidos || []).flatMap(p => [p.clubA, p.clubB]).filter(Boolean) : (t.equipos || []).map(e => e.nombre)),
     ...(estado?.archivo || []).flatMap(a => (a.partidos || []).flatMap(m => [m.l?.nombre, m.v?.nombre]))]
 }
 function renderSiQuieto() {
@@ -4303,6 +4317,7 @@ const btnVS = onclick => `<button onclick="event.stopPropagation();${onclick}" t
 
 // Sorteo animado de los torneos relámpago
 async function revelarSorteoRL(t) {
+  if (t.formato === 'parejas') return revelarParejasRL(t)
   const nombres = t.equipos.map(e => e.nombre)
   await Promise.race([cargarLogosIntl(nombres), new Promise(r => setTimeout(r, 2500))])
   const pasos = []
@@ -7572,7 +7587,7 @@ function renderRelampago() {
 
 function renderListaTorneosRL(cont) {
   const torneos = estado.torneosRelampago || []
-  const fmt = { liga:'🔄 Liga', eliminatorias:'⚔️ Eliminatorias', grupos:'🌍 Grupos+Elim' }
+  const fmt = { liga:'🔄 Liga', eliminatorias:'⚔️ Eliminatorias', grupos:'🌍 Grupos+Elim', parejas:'🤝 Parejas' }
   let html = esAdmin ? `<button class="btn btn-primary" style="margin-bottom:16px;" onclick="iniciarCrearTorneoRL()">+ Nuevo torneo</button>` : ''
   if (!torneos.length) {
     html += `<div class="card"><p class="text-gris" style="text-align:center;padding:20px 0;">No hay torneos creados aún.</p></div>`
@@ -7620,8 +7635,8 @@ function volverListaRL() {
 
 function renderCrearTorneoRL(cont) {
   const d = rlCreando
-  const fmtBtns = ['liga','eliminatorias','grupos'].map(f => {
-    const labels = { liga:'🔄 Liga Relámpago', eliminatorias:'⚔️ Copa Relámpago', grupos:'🌍 Torneo Relámpago' }
+  const fmtBtns = ['liga','eliminatorias','grupos','parejas'].map(f => {
+    const labels = { liga:'🔄 Liga Relámpago', eliminatorias:'⚔️ Copa Relámpago', grupos:'🌍 Torneo Relámpago', parejas:'🤝 Parejas Relámpago' }
     const on = d.formato === f
     return `<button onclick="rlSetFormato('${f}')" style="padding:8px 14px;border-radius:8px;border:2px solid ${on?'var(--dorado2)':'var(--border)'};background:${on?'rgba(245,166,35,0.1)':'var(--azul2)'};color:${on?'var(--dorado2)':'var(--gris)'};cursor:pointer;font-weight:${on?700:400};font-size:13px;">${labels[f]}</button>`
   }).join('')
@@ -7638,7 +7653,15 @@ function renderCrearTorneoRL(cont) {
         </select></div>
     </div>` : ''
 
-  const equiposHTML = d.equipos.map((eq,i) => `
+  const esParejas = d.formato === 'parejas'
+  const parejasInfo = esParejas ? `<p class="text-gris" style="font-size:12px;margin-top:10px;line-height:1.5;">🤝 2 vs 2 con <b>parejas que rotan</b>: cada fecha cambian los compañeros, una sola vuelta. La tabla es <b>individual</b>: si tu pareja gana, sumás 3. Mínimo 4 jugadores; si sobran, rotan los que descansan.</p>` : ''
+  const equiposHTML = esParejas ? d.equipos.map((eq,i) => `
+    <div style="display:flex;gap:8px;align-items:center;margin-bottom:8px;">
+      <span class="logo-init" style="width:28px;height:28px;font-size:12px;background:${rlColor(eq.nombre)};color:#111;">${(eq.nombre||'?').trim().slice(0,1).toUpperCase() || '?'}</span>
+      <input value="${eq.nombre}" oninput="rlCreando.equipos[${i}].nombre=this.value" placeholder="Jugador ${i+1}"
+        style="flex:1;min-width:110px;padding:7px 10px;border-radius:6px;border:1px solid var(--border);background:var(--azul2);color:var(--texto);font-size:13px;">
+      <button onclick="rlQuitarEquipo(${i})" style="background:#fee2e2;color:#dc2626;border:none;border-radius:6px;padding:4px 8px;cursor:pointer;font-weight:700;font-size:12px;">✕</button>
+    </div>`).join('') : d.equipos.map((eq,i) => `
     <div style="display:flex;gap:8px;align-items:center;margin-bottom:8px;flex-wrap:wrap;">
       <span id="rl-esc-${i}" class="rl-esc-prev">${rlEscudoPrev(eq.nombre)}</span>
       <input value="${eq.nombre}" list="rl-clubes" oninput="rlCreando.equipos[${i}].nombre=this.value;rlBuscarEscudo(${i})" onchange="rlBuscarEscudo(${i}, true)" placeholder="Buscá el equipo…"
@@ -7663,15 +7686,15 @@ function renderCrearTorneoRL(cont) {
       <div>
         <label style="display:block;font-size:13px;font-weight:600;color:var(--gris);margin-bottom:8px;">Formato</label>
         <div style="display:flex;gap:8px;flex-wrap:wrap;">${fmtBtns}</div>
-        ${gruposConf}
+        ${gruposConf}${parejasInfo}
       </div>
     </div>
     <div class="card" style="margin-bottom:12px;">
       <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
-        <div class="card-titulo">👥 Equipos (${d.equipos.length})</div>
+        <div class="card-titulo">👥 ${d.formato === 'parejas' ? 'Jugadores' : 'Equipos'} (${d.equipos.length})</div>
         <button class="btn btn-secondary btn-sm" onclick="rlAgregarEquipo()">+ Agregar</button>
       </div>
-      ${!d.equipos.length ? `<p class="text-gris" style="font-size:13px;">Agregá los equipos del torneo.</p>` : `<p class="text-gris" style="font-size:12px;margin:-4px 0 10px;">Empezá a escribir y elegí el equipo de la lista para que salga su escudo.</p>`}
+      ${!d.equipos.length ? `<p class="text-gris" style="font-size:13px;">${d.formato === 'parejas' ? 'Agregá a los jugadores (mínimo 4).' : 'Agregá los equipos del torneo.'}</p>` : d.formato === 'parejas' ? '' : `<p class="text-gris" style="font-size:12px;margin:-4px 0 10px;">Empezá a escribir y elegí el equipo de la lista para que salga su escudo.</p>`}
       ${equiposHTML}
       <datalist id="rl-clubes">${rlListaClubes().map(n => `<option value="${n.replace(/"/g, '&quot;')}">`).join('')}</datalist>
     </div>
@@ -7688,12 +7711,14 @@ function rlQuitarEquipo(i) { rlCreando.equipos.splice(i,1); renderCrearTorneoRL(
 async function confirmarCrearTorneoRL() {
   const d = rlCreando
   if (!d.nombre.trim()) { toast('Ponele un nombre al torneo',true); return }
+  if (d.formato === 'parejas' && d.equipos.length < 4) { toast('Para parejas se necesitan al menos 4 jugadores',true); return }
   if (d.equipos.length < 2) { toast('Necesitás al menos 2 equipos',true); return }
   if (d.equipos.some(e=>!e.nombre.trim())) { toast('Todos los equipos necesitan nombre',true); return }
   const equipos = d.equipos.map(e=>({...e, nombre:e.nombre.trim(), dueno:e.dueno.trim()}))
-  cargarLogosIntl(equipos.map(e => e.nombre)).then(n => { if (n) renderSiQuieto() })
+  if (d.formato !== 'parejas') cargarLogosIntl(equipos.map(e => e.nombre)).then(n => { if (n) renderSiQuieto() })
   const torneo = { id:rlId(), nombre:d.nombre.trim(), formato:d.formato, equipos, creadoEn:new Date().toISOString(), campeon:null }
-  if (d.formato==='liga') torneo.partidos = rlGenerarLiga(equipos)
+  if (d.formato==='parejas') { equipos.forEach(e => e.dueno = ''); torneo.partidos = rlGenerarParejas(equipos) }
+  else if (d.formato==='liga') torneo.partidos = rlGenerarLiga(equipos)
   else if (d.formato==='eliminatorias') torneo.rondas = rlGenerarBracket(equipos)
   else { torneo.numGrupos=d.numGrupos; torneo.clasificadosPorGrupo=d.clasificadosPorGrupo; torneo.grupos=rlGenerarGrupos(equipos,d.numGrupos); torneo.rondas=null; torneo.faseGrupos=true }
   if (!estado.torneosRelampago) estado.torneosRelampago=[]
@@ -7836,6 +7861,7 @@ const RL_COMP = {
   liga:          { nombre: 'Liga Relámpago',   color: '#4a9eff', c2: '#1e5bb8' },
   eliminatorias: { nombre: 'Copa Relámpago',   color: '#f5c542', c2: '#c8901c' },
   grupos:        { nombre: 'Torneo Relámpago', color: '#a855f7', c2: '#6d28d9' },
+  parejas:       { nombre: 'Parejas Relámpago', color: '#2ecc71', c2: '#15803d' },
 }
 function rlComp(t) { return RL_COMP[t?.formato] || RL_COMP.eliminatorias }
 function rlTrofeo(formato, size = 64) {
@@ -7888,7 +7914,7 @@ function rlBracketEspejoHTML(t, bracket, nombres) {
 }
 
 function rlHeaderHTML(t) {
-  const fmt={liga:'🔄 Liga',eliminatorias:'⚔️ Eliminatorias',grupos:'🌍 Grupos+Elim'}
+  const fmt={liga:'🔄 Liga',eliminatorias:'⚔️ Eliminatorias',grupos:'🌍 Grupos+Elim',parejas:'🤝 Parejas rotativas'}
   const c = rlComp(t)
   return `<div style="display:flex;align-items:center;gap:10px;margin-bottom:10px;flex-wrap:wrap;">
     <button class="btn btn-secondary btn-sm" onclick="volverListaRL()">← Torneos</button>
@@ -7899,7 +7925,7 @@ function rlHeaderHTML(t) {
     <div style="min-width:0;">
       <div class="rl-hero-comp">⚡ ${c.nombre}</div>
       <div class="rl-hero-nom">${t.nombre}</div>
-      <span class="clasifica-badge">${fmt[t.formato]||t.formato}</span> <span class="text-gris" style="font-size:12px;">${t.equipos.length} equipos</span>
+      <span class="clasifica-badge">${fmt[t.formato]||t.formato}</span> <span class="text-gris" style="font-size:12px;">${t.equipos.length} ${t.formato === 'parejas' ? 'jugadores' : 'equipos'}</span>
     </div>
   </div>`
 }
@@ -7932,12 +7958,193 @@ function rlPartidoRowHTML(t, p, onchangeFn, waFn) {
 // ─── Detalle torneo ────────────────────────────────
 
 function renderTorneoRLDetalle(cont,t) {
-  if (t.formato==='liga') renderTorneoRLLiga(cont,t)
+  if (t.formato==='parejas') renderTorneoRLParejas(cont,t)
+  else if (t.formato==='liga') renderTorneoRLLiga(cont,t)
   else if (t.formato==='eliminatorias') renderTorneoRLElim(cont,t)
   else renderTorneoRLGrupos(cont,t)
 }
 
 // ─── Liga ─────────────────────────────────────────
+
+// ══════════════════════════════════════════════
+// PAREJAS RELÁMPAGO — 2 vs 2 con parejas rotativas, una vuelta, tabla individual
+// ══════════════════════════════════════════════
+// Arma las fechas: cada fecha juegan floor(N/4) partidos; los demás descansan (rotando).
+// Busca que cada par de jugadores sea compañero una vez, que todos jueguen parejo y que se crucen lo más variado posible.
+function rlGenerarParejas(jugadores) {
+  const ids = jugadores.map(j => j.id), N = ids.length
+  const key = (a, b) => a < b ? a + '|' + b : b + '|' + a
+  const totalPares = N * (N - 1) / 2
+  let mejor = null
+  for (let intento = 0; intento < 400; intento++) {
+    const usados = new Map(), rivales = new Map(), juegos = Object.fromEntries(ids.map(i => [i, 0])), descansos = Object.fromEntries(ids.map(i => [i, 0]))
+    const partidos = []
+    let jornada = 0, cubiertos = 0
+    while (cubiertos < totalPares && jornada < 40) {
+      jornada++
+      const porFecha = Math.floor(N / 4)
+      // juegan los que menos jugaron (desempate al azar)
+      const orden = [...ids].sort((a, b) => juegos[a] - juegos[b] || descansos[b] - descansos[a] || Math.random() - .5)
+      let libres = orden.slice(0, porFecha * 4)
+      orden.slice(porFecha * 4).forEach(i => descansos[i]++)
+      for (let m = 0; m < porFecha; m++) {
+        // elegir dos parejas entre los libres: preferir pares no usados y rivales poco repetidos
+        let best = null
+        for (let x = 0; x < 60; x++) {
+          const pool = [...libres].sort(() => Math.random() - .5).slice(0, 4)
+          if (pool.length < 4) break
+          const [a, b, c, d] = pool
+          const pen = (usados.get(key(a, b)) || 0) * 10 + (usados.get(key(c, d)) || 0) * 10 +
+            [key(a, c), key(a, d), key(b, c), key(b, d)].reduce((s, k) => s + (rivales.get(k) || 0), 0) + Math.random() * .1
+          if (!best || pen < best.pen) best = { pen, a, b, c, d }
+        }
+        const { a, b, c, d } = best
+        for (const k of [key(a, b), key(c, d)]) { if (!usados.get(k)) cubiertos++; usados.set(k, (usados.get(k) || 0) + 1) }
+        for (const k of [key(a, c), key(a, d), key(b, c), key(b, d)]) rivales.set(k, (rivales.get(k) || 0) + 1)
+        ;[a, b, c, d].forEach(i => juegos[i]++)
+        libres = libres.filter(i => ![a, b, c, d].includes(i))
+        partidos.push({ id: rlId(), jornada, a: [a, b], b: [c, d], golesA: null, golesB: null, clubA: '', clubB: '' })
+      }
+      const descansan = ids.filter(i => !partidos.some(p => p.jornada === jornada && [...p.a, ...p.b].includes(i)))
+      if (descansan.length) partidos.filter(p => p.jornada === jornada).forEach(p => p.descansan = descansan)
+    }
+    const js = Object.values(juegos), dif = Math.max(...js) - Math.min(...js)
+    const repes = [...usados.values()].reduce((s, v) => s + Math.max(0, v - 1), 0)
+    const repRiv = [...rivales.values()].reduce((s, v) => s + Math.max(0, v - 2), 0)
+    const score = partidos.length * 100 + dif * 40 + repes * 25 + repRiv
+    if (!mejor || score < mejor.score) mejor = { score, partidos }
+  }
+  return mejor.partidos
+}
+function rlParejaNombre(t, par) { return par.map(id => rlNombre(t, id)).join(' & ') }
+function rlParejaEq(t, p, lado) {
+  const club = lado === 'a' ? p.clubA : p.clubB, par = lado === 'a' ? p.a : p.b
+  // Con equipo elegido: el escudo y el nombre del club, y la pareja abajo (como el dueño en el resto de la app)
+  return { nombre: club || rlParejaNombre(t, par), dueno: club ? rlParejaNombre(t, par) : '' }
+}
+// ¿El fixture da la misma cantidad de partidos a todos? (con 6, 7 o 10 jugadores no siempre se puede)
+function rlParejasParejo(t) {
+  const g = {}; t.equipos.forEach(e => g[e.id] = 0)
+  for (const p of t.partidos || []) [...p.a, ...p.b].forEach(i => g[i]++)
+  return new Set(Object.values(g)).size <= 1
+}
+function rlTablaParejas(t) {
+  const tb = {}
+  t.equipos.forEach(e => { tb[e.id] = { id: e.id, pj: 0, pg: 0, pe: 0, pp: 0, gf: 0, gc: 0, pts: 0 } })
+  for (const p of t.partidos || []) {
+    if (p.golesA === null || p.golesB === null) continue
+    const lados = [[p.a, p.golesA, p.golesB], [p.b, p.golesB, p.golesA]]
+    for (const [par, gf, gc] of lados) for (const id of par) {
+      const r = tb[id]; if (!r) continue
+      r.pj++; r.gf += gf; r.gc += gc
+      if (gf > gc) { r.pg++; r.pts += 3 } else if (gf < gc) r.pp++; else { r.pe++; r.pts++ }
+    }
+  }
+  const filas = Object.values(tb)
+  const parejo = rlParejasParejo(t)
+  filas.forEach(f => f.prom = f.pj ? f.pts / f.pj : 0)
+  return filas.sort((a, b) => (parejo ? b.pts - a.pts : b.prom - a.prom || b.pts - a.pts) || (b.gf - b.gc) - (a.gf - a.gc) || b.gf - a.gf)
+}
+function rlJugadorChip(t, id) {
+  const n = rlNombre(t, id)
+  return `<span class="rlp-chip" style="--c:${rlColor(n)}">${n}</span>`
+}
+function rlParejaLadoHTML(t, p, lado) {
+  const par = lado === 'a' ? p.a : p.b, club = lado === 'a' ? p.clubA : p.clubB
+  const gan = p.golesA !== null && p.golesB !== null && (lado === 'a' ? p.golesA > p.golesB : p.golesB > p.golesA)
+  const clubCampo = esAdmin
+    ? `<input class="rlp-club" list="rl-clubes" value="${(club || '').replace(/"/g, '&quot;')}" placeholder="Equipo (opcional)" onchange="rlSetClubPareja('${t.id}','${p.id}','${lado}',this.value)">`
+    : (club ? `<span class="text-gris" style="font-size:11px;">${club}</span>` : '')
+  return `<div class="rlp-lado ${lado === 'b' ? 'der' : ''} ${gan ? 'gana' : ''}">
+    <div class="rlp-esc">${club ? (escudoNombre(club, 30) || `<span class="logo-init" style="width:30px;height:30px;font-size:11px;">${club.slice(0, 2).toUpperCase()}</span>`) : '🤝'}</div>
+    <div class="rlp-info">
+      <div class="rlp-jug">${par.map(id => rlJugadorChip(t, id)).join('')}</div>
+      ${clubCampo}
+    </div>
+  </div>`
+}
+function rlPartidoParejasHTML(t, p) {
+  const jug = p.golesA !== null && p.golesB !== null
+  const centro = esAdmin
+    ? `<div class="partido-score">
+        <input class="input score-input" type="number" min="0" max="99" value="${p.golesA ?? ''}" placeholder="-" id="rlp_${p.id}_a" onchange="guardarPartidoParejas('${t.id}','${p.id}')">
+        <span class="score-sep">-</span>
+        <input class="input score-input" type="number" min="0" max="99" value="${p.golesB ?? ''}" placeholder="-" id="rlp_${p.id}_b" onchange="guardarPartidoParejas('${t.id}','${p.id}')">
+      </div>`
+    : `<div style="font-size:17px;font-weight:900;color:${jug ? 'var(--dorado2)' : 'var(--gris)'};">${jug ? `${p.golesA} - ${p.golesB}` : 'vs'}</div>`
+  return `<div class="rlp-partido">
+    ${rlParejaLadoHTML(t, p, 'a')}
+    <div class="rlp-centro">${centro}${!jug ? btnVS(`vsParejas('${t.id}','${p.id}')`) : ''}</div>
+    ${rlParejaLadoHTML(t, p, 'b')}
+  </div>`
+}
+function renderTorneoRLParejas(cont, t) {
+  const tabla = rlTablaParejas(t)
+  const total = (t.partidos || []).length, jug = (t.partidos || []).filter(p => p.golesA !== null && p.golesB !== null).length
+  if (jug === total && total > 0 && !t.campeon) { t.campeon = rlNombre(t, tabla[0].id); guardarEstado(); verificarCampeonRL(t) }
+  const parejo = rlParejasParejo(t)
+  let html = rlHeaderHTML(t) + rlCampeonHTML(t)
+  html += `<div class="card" style="margin-bottom:12px;"><div class="card-titulo">📊 Tabla individual — ${jug}/${total} partidos</div>
+    <div class="tabla-pos-wrap"><table class="tabla-pos" style="min-width:330px;">
+      <thead><tr><th>#</th><th style="text-align:left">Jugador</th><th>PJ</th><th>PG</th><th>PE</th><th>PP</th><th>GF</th><th>GC</th><th>DG</th><th>PTS</th>${parejo ? '' : '<th>PROM</th>'}</tr></thead>
+      <tbody>${tabla.map((f, i) => { const dg = f.gf - f.gc; return `<tr class="${i === 0 && f.pj ? 'clasifica' : ''}"><td><span class="pos-num">${i + 1}</span></td>
+        <td>${rlJugadorChip(t, f.id)}</td><td>${f.pj}</td><td>${f.pg}</td><td>${f.pe}</td><td>${f.pp}</td><td>${f.gf}</td><td>${f.gc}</td>
+        <td style="color:${dg > 0 ? '#2ecc71' : dg < 0 ? '#e74c3c' : 'var(--gris)'}">${dg > 0 ? '+' : ''}${dg}</td><td class="pts-cell">${f.pts}</td>${parejo ? '' : `<td>${f.prom.toFixed(2)}</td>`}</tr>` }).join('')}</tbody>
+    </table></div>
+    ${parejo ? '' : '<p class="text-gris" style="font-size:11px;margin-top:6px;">Con esta cantidad de jugadores no todos juegan la misma cantidad de partidos, así que se ordena por promedio de puntos.</p>'}
+  </div>`
+  const jornadas = [...new Set((t.partidos || []).map(p => p.jornada))].sort((a, b) => a - b)
+  html += `<div class="card"><div class="card-titulo">📅 Fechas</div>`
+  jornadas.forEach(j => {
+    const ps = t.partidos.filter(p => p.jornada === j)
+    const desc = ps[0]?.descansan || []
+    html += `<div style="margin-bottom:14px;"><div style="display:flex;justify-content:space-between;align-items:center;gap:8px;font-size:12px;font-weight:700;color:var(--gris);text-transform:uppercase;margin-bottom:6px;">
+      <span>Fecha ${j}</span>${desc.length ? `<span style="text-transform:none;font-weight:600;">💤 Descansa: ${desc.map(id => rlNombre(t, id)).join(', ')}</span>` : ''}</div>
+      ${ps.map(p => rlPartidoParejasHTML(t, p)).join('')}</div>`
+  })
+  html += `</div><datalist id="rl-clubes">${esAdmin ? rlListaClubes().map(n => `<option value="${n.replace(/"/g, '&quot;')}">`).join('') : ''}</datalist>`
+  cont.innerHTML = html
+}
+async function guardarPartidoParejas(tid, pid) {
+  const t = estado.torneosRelampago.find(x => x.id === tid); if (!t) return
+  const p = t.partidos.find(x => x.id === pid); if (!p) return
+  const a = document.getElementById(`rlp_${pid}_a`), b = document.getElementById(`rlp_${pid}_b`)
+  if (!a || !b) return
+  const antes = `${p.golesA}-${p.golesB}`
+  p.golesA = a.value !== '' ? parseInt(a.value) : null
+  p.golesB = b.value !== '' ? parseInt(b.value) : null
+  if (p.golesA !== null && p.golesB !== null && antes !== `${p.golesA}-${p.golesB}`)
+    zoomResultado(rlParejaEq(t, p, 'a'), rlParejaEq(t, p, 'b'), p.golesA, p.golesB, { titulo: `⚡ ${rlComp(t).nombre} · Fecha ${p.jornada}` })
+  await guardarEstado()
+  renderTorneoRLParejas(document.getElementById('relampago-contenido'), t)
+}
+async function rlSetClubPareja(tid, pid, lado, valor) {
+  const t = estado.torneosRelampago.find(x => x.id === tid); if (!t) return
+  const p = t.partidos.find(x => x.id === pid); if (!p) return
+  const v = (valor || '').trim()
+  if (lado === 'a') p.clubA = v; else p.clubB = v
+  if (v) await cargarLogosIntl([v])
+  await guardarEstado()
+  renderTorneoRLParejas(document.getElementById('relampago-contenido'), t)
+}
+function vsParejas(tid, pid) {
+  const t = estado.torneosRelampago.find(x => x.id === tid); if (!t) return
+  const p = t.partidos.find(x => x.id === pid); if (!p) return
+  mostrarVS(rlParejaEq(t, p, 'a'), rlParejaEq(t, p, 'b'), `⚡ ${rlComp(t).nombre} · Fecha ${p.jornada}`)
+}
+// Sorteo animado: muestra las parejas de la primera fecha
+function revelarParejasRL(t) {
+  const ps = (t.partidos || []).filter(p => p.jornada === 1)
+  let i = 0
+  const siguiente = () => {
+    if (i >= ps.length) { if (fxActual) fxActual.click(); return }
+    const p = ps[i++]
+    mostrarVS(rlParejaEq(t, p, 'a'), rlParejaEq(t, p, 'b'), `⚡ ${rlComp(t).nombre} · Fecha 1${ps.length > 1 ? ` · Partido ${i}` : ''}`)
+    const capa = fxActual
+    setTimeout(() => { if (capa === fxActual) siguiente() }, 2800)
+  }
+  setTimeout(siguiente, 300)
+}
 
 function rlTabla(t, partidos) {
   const tb={}

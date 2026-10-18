@@ -7568,7 +7568,7 @@ function renderPremios() {
 
 function rlId() { return 'rl_' + Date.now() + '_' + Math.random().toString(36).slice(2,7) }
 
-let rlCreando = { nombre:'', formato:'liga', equipos:[], clasificadosPorGrupo:2, numGrupos:2 }
+let rlCreando = { nombre:'', formato:'liga', equipos:[], clasificadosPorGrupo:2, numGrupos:2, idaVuelta:false }
 let rlModalTorneoId, rlModalCruceId, rlModalRonda
 
 function renderRelampago() {
@@ -7612,7 +7612,7 @@ function renderListaTorneosRL(cont) {
 }
 
 function iniciarCrearTorneoRL() {
-  rlCreando = { nombre:'', formato:'liga', equipos:[], clasificadosPorGrupo:2, numGrupos:2 }
+  rlCreando = { nombre:'', formato:'liga', equipos:[], clasificadosPorGrupo:2, numGrupos:2, idaVuelta:false }
   const cont = document.getElementById('relampago-contenido')
   cont.dataset.creando = '1'
   delete cont.dataset.torneoActivo
@@ -7688,6 +7688,13 @@ function renderCrearTorneoRL(cont) {
         <div style="display:flex;gap:8px;flex-wrap:wrap;">${fmtBtns}</div>
         ${gruposConf}${parejasInfo}
       </div>
+      <div style="margin-top:14px;">
+        <label style="display:block;font-size:13px;font-weight:600;color:var(--gris);margin-bottom:8px;">Partidos</label>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;">
+          ${[[false, '1️⃣ Solo ida'], [true, '🔁 Ida y vuelta']].map(([v, l]) => { const on = !!d.idaVuelta === v; return `<button onclick="rlCreando.idaVuelta=${v};renderCrearTorneoRL(document.getElementById('relampago-contenido'))" style="padding:8px 14px;border-radius:8px;border:2px solid ${on?'var(--dorado2)':'var(--border)'};background:${on?'rgba(245,166,35,0.1)':'var(--azul2)'};color:${on?'var(--dorado2)':'var(--gris)'};cursor:pointer;font-weight:${on?700:400};font-size:13px;">${l}</button>` }).join('')}
+        </div>
+        ${d.idaVuelta ? `<p class="text-gris" style="font-size:12px;margin-top:6px;">${{ liga: 'Todos contra todos dos veces, cambiando de local.', grupos: 'En los grupos se juega dos veces contra cada rival, y las llaves son a ida y vuelta (la final a partido único).', eliminatorias: 'Cada llave a ida y vuelta con marcador global; la final a partido único. Si empatan en el global, se elige el ganador (penales).', parejas: 'Se juega dos veces la rotación completa de parejas.' }[d.formato] || ''}</p>` : ''}
+      </div>
     </div>
     <div class="card" style="margin-bottom:12px;">
       <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
@@ -7716,15 +7723,19 @@ async function confirmarCrearTorneoRL() {
   if (d.equipos.some(e=>!e.nombre.trim())) { toast('Todos los equipos necesitan nombre',true); return }
   const equipos = d.equipos.map(e=>({...e, nombre:e.nombre.trim(), dueno:e.dueno.trim()}))
   if (d.formato !== 'parejas') cargarLogosIntl(equipos.map(e => e.nombre)).then(n => { if (n) renderSiQuieto() })
-  const torneo = { id:rlId(), nombre:d.nombre.trim(), formato:d.formato, equipos, creadoEn:new Date().toISOString(), campeon:null }
-  if (d.formato==='parejas') { equipos.forEach(e => e.dueno = ''); torneo.partidos = rlGenerarParejas(equipos) }
-  else if (d.formato==='liga') torneo.partidos = rlGenerarLiga(equipos)
+  const torneo = { id:rlId(), nombre:d.nombre.trim(), formato:d.formato, equipos, creadoEn:new Date().toISOString(), campeon:null, idaVuelta:!!d.idaVuelta }
+  if (d.formato==='parejas') {
+    equipos.forEach(e => e.dueno = '')
+    torneo.partidos = rlGenerarParejas(equipos)
+    if (d.idaVuelta) { const ult = Math.max(...torneo.partidos.map(p => p.jornada)); torneo.partidos.slice().forEach(p => torneo.partidos.push({ ...p, id: rlId(), jornada: p.jornada + ult, a: p.b, b: p.a, golesA: null, golesB: null, clubA: '', clubB: '' })) }
+  }
+  else if (d.formato==='liga') torneo.partidos = rlGenerarLiga(equipos, d.idaVuelta)
   else if (d.formato==='eliminatorias') torneo.rondas = rlGenerarBracket(equipos)
-  else { torneo.numGrupos=d.numGrupos; torneo.clasificadosPorGrupo=d.clasificadosPorGrupo; torneo.grupos=rlGenerarGrupos(equipos,d.numGrupos); torneo.rondas=null; torneo.faseGrupos=true }
+  else { torneo.numGrupos=d.numGrupos; torneo.clasificadosPorGrupo=d.clasificadosPorGrupo; torneo.grupos=rlGenerarGrupos(equipos,d.numGrupos,d.idaVuelta); torneo.rondas=null; torneo.faseGrupos=true }
   if (!estado.torneosRelampago) estado.torneosRelampago=[]
   estado.torneosRelampago.push(torneo)
   await guardarEstado()
-  rlCreando = { nombre:'', formato:'liga', equipos:[], clasificadosPorGrupo:2, numGrupos:2 }
+  rlCreando = { nombre:'', formato:'liga', equipos:[], clasificadosPorGrupo:2, numGrupos:2, idaVuelta:false }
   const cont = document.getElementById('relampago-contenido')
   cont.dataset.torneoActivo = torneo.id
   delete cont.dataset.creando
@@ -7743,17 +7754,19 @@ async function eliminarTorneoRL(id) {
 
 // ─── Fixture generators ───────────────────────────
 
-function rlGenerarLiga(equipos) {
+function rlGenerarLiga(equipos, idaVuelta = false) {
   const lista = equipos.length%2===0 ? equipos.map(e=>e.id) : [...equipos.map(e=>e.id),'bye']
   const n = lista.length, rondas = n-1, partidos = []
-  let pid=1
   for (let r=0;r<rondas;r++) {
     for (let i=0;i<n/2;i++) {
-      const l=lista[i], v=lista[n-1-i]
-      if (l!=='bye'&&v!=='bye') partidos.push({id:`rlp_${pid++}`,jornada:r+1,local:l,visitante:v,golesLocal:null,golesVisitante:null})
+      // alternar localía para que nadie sea siempre local
+      let l=lista[i], v=lista[n-1-i]
+      if (i===0 && r%2===1) [l,v]=[v,l]
+      if (l!=='bye'&&v!=='bye') partidos.push({id:rlId(),jornada:r+1,local:l,visitante:v,golesLocal:null,golesVisitante:null})
     }
     lista.splice(1,0,lista.pop())
   }
+  if (idaVuelta) partidos.slice().forEach(p => partidos.push({id:rlId(),jornada:p.jornada+rondas,local:p.visitante,visitante:p.local,golesLocal:null,golesVisitante:null}))
   return partidos
 }
 
@@ -7761,6 +7774,7 @@ function rlLabelRonda(t, ronda) {
   const n = (t.rondas?.rondas?.[ronda] || []).length
   return { 1: 'Final', 2: 'Semis', 4: 'Cuartos', 8: 'Octavos', 16: '1/16' }[n] || ronda
 }
+function rlLlaveDoble(t, ronda) { return !!t.idaVuelta && ronda !== rlRondaFinal(t) }
 function rlRondaFinal(t) { const ns = t.rondas?.nombres || []; return ns[ns.length - 1] }
 function rlCampeonId(t) { return t.rondas?.rondas?.[rlRondaFinal(t)]?.[0]?.ganador || null }
 function rlNombresRondas(slots) {
@@ -7808,11 +7822,11 @@ function rlGenerarBracket(equipos) {
   return {rondas:bracket,nombres}
 }
 
-function rlGenerarGrupos(equipos, numGrupos) {
+function rlGenerarGrupos(equipos, numGrupos, idaVuelta = false) {
   const mezcla=[...equipos].sort(()=>Math.random()-0.5)
   const grupos=Array.from({length:numGrupos},(_,i)=>({id:rlId(),nombre:`Grupo ${String.fromCharCode(65+i)}`,equiposIds:[],partidos:[]}))
   mezcla.forEach((eq,i)=>grupos[i%numGrupos].equiposIds.push(eq.id))
-  grupos.forEach(g=>{ g.partidos=rlGenerarLiga(g.equiposIds.map(id=>({id}))) })
+  grupos.forEach(g=>{ g.partidos=rlGenerarLiga(g.equiposIds.map(id=>({id})), idaVuelta) })
   return grupos
 }
 
@@ -7904,8 +7918,9 @@ function rlBracketEspejoHTML(t, bracket, nombres) {
   previas.forEach((r, i) => {
     const m = bracket[r] || [], mitad = m.length / 2
     const ultima = i === previas.length - 1
-    izq += rlBracketColHTML(t, m.slice(0, mitad), r, rlLabelRonda(t, r)) + (ultima ? linea : connectorHTML(mitad / 2, 'right'))
-    der = (ultima ? linea : connectorHTML(mitad / 2, 'left')) + rlBracketColHTML(t, m.slice(mitad).reverse(), r, rlLabelRonda(t, r)) + der
+    const tit = rlLabelRonda(t, r) + (t.idaVuelta ? ' · i/v' : '')
+    izq += rlBracketColHTML(t, m.slice(0, mitad), r, tit) + (ultima ? linea : connectorHTML(mitad / 2, 'right'))
+    der = (ultima ? linea : connectorHTML(mitad / 2, 'left')) + rlBracketColHTML(t, m.slice(mitad).reverse(), r, tit) + der
   })
   const primera = (bracket[previas[0]] || []).length / 2
   const alto = Math.max(280, primera * 84 + 50)
@@ -7925,7 +7940,7 @@ function rlHeaderHTML(t) {
     <div style="min-width:0;">
       <div class="rl-hero-comp">⚡ ${c.nombre}</div>
       <div class="rl-hero-nom">${t.nombre}</div>
-      <span class="clasifica-badge">${fmt[t.formato]||t.formato}</span> <span class="text-gris" style="font-size:12px;">${t.equipos.length} ${t.formato === 'parejas' ? 'jugadores' : 'equipos'}</span>
+      <span class="clasifica-badge">${fmt[t.formato]||t.formato}</span>${t.idaVuelta ? ' <span class="clasifica-badge" style="background:rgba(245,166,35,.15);color:var(--dorado2);">🔁 Ida y vuelta</span>' : ''} <span class="text-gris" style="font-size:12px;">${t.equipos.length} ${t.formato === 'parejas' ? 'jugadores' : 'equipos'}</span>
     </div>
   </div>`
 }
@@ -8263,16 +8278,16 @@ function abrirModalRLElim(tid,cid,ronda) {
     <div style="position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.6);z-index:500;display:flex;align-items:center;justify-content:center;" onclick="cerrarModalRLElim()">
       <div class="card" style="width:300px;max-width:90vw;" onclick="event.stopPropagation()">
         <div class="card-titulo" style="margin-bottom:12px;">${rlLabelRonda(t, ronda)}</div>
-        <div style="display:flex;align-items:center;gap:8px;margin-bottom:12px;">
-          <span style="flex:1;font-weight:600;font-size:14px;text-align:right;display:flex;flex-direction:column;align-items:flex-end;gap:4px;">${rlEsc(t,c.local,34)}${lN}</span>
-          <div style="display:flex;gap:6px;align-items:center;">
-            <input id="rl_gl" type="number" min="0" max="99" value="${c.golesLocal??''}" style="width:44px;padding:6px;text-align:center;border-radius:6px;border:1px solid var(--border);background:var(--azul2);color:var(--texto);">
-            <span>-</span>
-            <input id="rl_gv" type="number" min="0" max="99" value="${c.golesVisitante??''}" style="width:44px;padding:6px;text-align:center;border-radius:6px;border:1px solid var(--border);background:var(--azul2);color:var(--texto);">
-          </div>
-          <span style="flex:1;font-weight:600;font-size:14px;display:flex;flex-direction:column;align-items:flex-start;gap:4px;">${rlEsc(t,c.visitante,34)}${vN}</span>
-        </div>
-        <div style="font-size:12px;color:var(--gris);margin-bottom:8px;">Empate → elegí el ganador:</div>
+        ${(() => {
+          const inp = (id, v) => `<input id="${id}" type="number" min="0" max="99" value="${v ?? ''}" style="width:44px;padding:6px;text-align:center;border-radius:6px;border:1px solid var(--border);background:var(--azul2);color:var(--texto);">`
+          const eq = (id, n, der) => `<span style="flex:1;font-weight:600;font-size:13px;${der ? '' : 'text-align:right;'}display:flex;flex-direction:column;align-items:${der ? 'flex-start' : 'flex-end'};gap:4px;">${rlEsc(t,id,30)}${n}</span>`
+          if (!rlLlaveDoble(t, ronda)) return `<div style="display:flex;align-items:center;gap:8px;margin-bottom:12px;">${eq(c.local,lN)}<div style="display:flex;gap:6px;align-items:center;">${inp('rl_gl', c.golesLocal)}<span>-</span>${inp('rl_gv', c.golesVisitante)}</div>${eq(c.visitante,vN,true)}</div>`
+          const fila = (tit, a, b, la, lb, va, vb) => `<div style="display:flex;align-items:center;gap:6px;margin-bottom:8px;"><span style="width:44px;font-size:11px;font-weight:800;color:var(--gris);text-transform:uppercase;">${tit}</span><span style="flex:1;text-align:right;font-size:12px;font-weight:700;">${la}</span>${inp(a, va)}<span>-</span>${inp(b, vb)}<span style="flex:1;font-size:12px;font-weight:700;">${lb}</span></div>`
+          return `<div style="display:flex;justify-content:space-between;margin-bottom:10px;">${eq(c.local,lN)}<span style="align-self:center;color:var(--dorado2);font-weight:900;padding:0 8px;">${c.golesLocal != null ? `${c.golesLocal} - ${c.golesVisitante}` : 'VS'}<br><small style="font-size:9px;color:var(--gris);">GLOBAL</small></span>${eq(c.visitante,vN,true)}</div>
+            ${fila('Ida', 'rl_i_l', 'rl_i_v', lN, vN, c.ida?.l, c.ida?.v)}
+            ${fila('Vuelta', 'rl_v_v', 'rl_v_l', vN, lN, c.vuelta?.v, c.vuelta?.l)}`
+        })()}
+        <div style="font-size:12px;color:var(--gris);margin-bottom:8px;">${rlLlaveDoble(t, ronda) ? 'Empate en el global' : 'Empate'} → elegí el ganador (penales):</div>
         <div style="display:flex;gap:8px;margin-bottom:14px;">
           <button onclick="rlSetGanManual('${c.local}')" style="flex:1;padding:7px;border-radius:6px;border:2px solid ${c.ganador===c.local?'#4a9eff':'var(--border)'};background:${c.ganador===c.local?'rgba(74,158,255,0.15)':'var(--azul2)'};color:var(--texto);cursor:pointer;font-size:12px;">${lN}</button>
           <button onclick="rlSetGanManual('${c.visitante}')" style="flex:1;padding:7px;border-radius:6px;border:2px solid ${c.ganador===c.visitante?'#ff6b6b':'var(--border)'};background:${c.ganador===c.visitante?'rgba(255,107,107,0.15)':'var(--azul2)'};color:var(--texto);cursor:pointer;font-size:12px;">${vN}</button>
@@ -8295,9 +8310,18 @@ function cerrarModalRLElim() { const el=document.getElementById('rl-elim-modal')
 async function guardarResultadoRLElim() {
   const t=estado.torneosRelampago.find(x=>x.id===rlModalTorneoId); if(!t)return
   const c=t.rondas.rondas[rlModalRonda]?.find(x=>x.id===rlModalCruceId); if(!c)return
-  const gl=document.getElementById('rl_gl').value, gv=document.getElementById('rl_gv').value
-  c.golesLocal=gl!==''?parseInt(gl):null; c.golesVisitante=gv!==''?parseInt(gv):null
-  if (c.golesLocal!==null&&c.golesVisitante!==null&&!c.ganador) {
+  const num = id => { const v = document.getElementById(id)?.value; return v !== undefined && v !== '' ? parseInt(v) : null }
+  if (rlLlaveDoble(t, rlModalRonda)) {
+    c.ida = { l: num('rl_i_l'), v: num('rl_i_v') }
+    c.vuelta = { l: num('rl_v_l'), v: num('rl_v_v') }
+    const completa = [c.ida.l, c.ida.v, c.vuelta.l, c.vuelta.v].every(x => x !== null)
+    c.golesLocal = completa ? c.ida.l + c.vuelta.l : null
+    c.golesVisitante = completa ? c.ida.v + c.vuelta.v : null
+  } else {
+    c.golesLocal = num('rl_gl'); c.golesVisitante = num('rl_gv')
+  }
+  // El ganador sale del marcador; solo si hay empate queda el elegido a mano (penales)
+  if (c.golesLocal!==null&&c.golesVisitante!==null) {
     if (c.golesLocal>c.golesVisitante) c.ganador=c.local
     else if (c.golesVisitante>c.golesLocal) c.ganador=c.visitante
   }
@@ -8310,7 +8334,7 @@ async function guardarResultadoRLElim() {
   if (!esFinal && c.golesLocal!==null && c.golesVisitante!==null) {
     const i = t.rondas.nombres.indexOf(rlModalRonda), sig = t.rondas.nombres[i+1]
     const lab = {Final:'¡Pasa a la FINAL!',Semis:'Pasa a semifinales',Cuartos:'Pasa a cuartos',Octavos:'Pasa a octavos'}[rlLabelRonda(t, sig)] || 'Pasa de ronda'
-    zoomResultado(eqRL(t,c.local),eqRL(t,c.visitante),c.golesLocal,c.golesVisitante,{titulo:`⚡ ${rlComp(t).nombre} · ${t.nombre}`,mensaje:c.ganador?`¡${rlNombre(t,c.ganador)} clasifica!`:null,pasa:c.ganador?lab:null})
+    zoomResultado(eqRL(t,c.local),eqRL(t,c.visitante),c.golesLocal,c.golesVisitante,{titulo:`⚡ ${rlComp(t).nombre} · ${t.nombre}${rlLlaveDoble(t, rlModalRonda) ? ' · Global' : ''}`,mensaje:c.ganador?`¡${rlNombre(t,c.ganador)} clasifica!`:null,pasa:c.ganador?lab:null})
   }
 }
 

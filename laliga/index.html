@@ -3098,6 +3098,7 @@ function getContadorPorComp() {
   const comps = {}
   const add = (k, nombre, logo, gl, gv, dl, dv) => {
     if (gl == null || gv == null) return
+    if (dl && dl === dv) return  // Santi vs Santi o Roberto vs Roberto: se define por escritorio, no es un partido real
     const c = comps[k] ||= { nombre, logo, santi: { pg: 0, pe: 0, goles: 0 }, roberto: { pg: 0, pe: 0, goles: 0 }, pj: 0 }
     c.pj++
     for (const [d, gf, gc] of [[dl, gl, gv], [dv, gv, gl]]) {

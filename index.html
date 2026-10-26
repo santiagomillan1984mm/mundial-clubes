@@ -3974,6 +3974,7 @@ function renderSorteo() {
       ${zonasCajasHTML({ modo: 'previa' })}
       ${esAdmin ? `
         <button class="btn btn-primary" onclick="hacerSorteo()">🎲 Iniciar bolillero</button>
+        <button class="btn btn-secondary" onclick="abrirAvisoSorteo('el Mundial de Clubes')">📣 Avisar a Luciano</button>
       ` : '<p class="text-gris">Solo Santi puede realizar el sorteo.</p>'}
     </div>
     <div id="bolillero-container" style="display:none;">
@@ -6719,6 +6720,7 @@ function renderCopaConfig(cont) {
   if (esAdmin) {
     html += `<div class="flex-gap mt">
       <button class="btn btn-primary" onclick="hacerSorteoCopa()" ${restoArg.length >= 10 ? '' : 'disabled style="opacity:0.5;cursor:default;"'}>🎲 Iniciar bolillero</button>
+      <button class="btn btn-secondary" onclick="abrirAvisoSorteo('la ' + COMPETENCIAS_LABEL.copa)">📣 Avisar a Luciano</button>
     </div>`
   } else {
     html += `<div class="card"><p class="text-gris">Esperando que Santi haga el sorteo.</p></div>`
@@ -9509,10 +9511,10 @@ function startPolling() {
 
 function solicitarNotificaciones() {
   if (!('Notification' in window)) { toast('Tu navegador no soporta notificaciones', true); return }
-  if (Notification.permission === 'granted') { toast('Las notificaciones ya están activas ✓'); return }
+  if (Notification.permission === 'granted') { pushSuscribir(false).then(ok => toast(ok ? '🔔 Avisos activados ✓ (te llegan aunque la app esté cerrada)' : 'Las notificaciones ya están activas ✓')); return }
   Notification.requestPermission().then(p => {
     if (p === 'granted') {
-      toast('🔔 Notificaciones activadas')
+      pushSuscribir(false).then(ok => toast(ok ? '🔔 Avisos activados: te llegan aunque la app esté cerrada' : '🔔 Notificaciones activadas'))
       actualizarBtnNotif()
     } else {
       toast('Permiso denegado', true)
@@ -9581,10 +9583,93 @@ const EV_RIVAL = 'Luciano'
 let evCanal = null, evListo = false, evConectados = []
 let evZonaCorriendo = false, evZonaPendiente = false
 function evQuien() { return esAdmin ? 'Santi' : EV_RIVAL }
+// ══════════════════════════════════════════════
+// AVISOS PUSH (llegan aunque la app esté cerrada). Se guardan en Supabase y los manda la función "notificar".
+// ══════════════════════════════════════════════
+const PUSH_VAPID = 'BGs66MrdcjgQ5CwF7cYZw4MXWhlVbYjXUpR22oisTh-8L0vM0F3Wn1R9jwSOuzabDtboqlEHwZZSnR5qsqUrvuY'
+const PUSH_APP = 'arg'
+const PUSH_ICON = 'https://santiagomillan1984mm.github.io/mundial-clubes/icon-lpf-192.png'
+const PUSH_URL = 'https://santiagomillan1984mm.github.io/mundial-clubes/'
+let evSb = null
+function evCliente() {
+  if (!evSb && window.supabase?.createClient) evSb = window.supabase.createClient(EV_URL, EV_KEY, { auth: { persistSession: false, autoRefreshToken: false }, realtime: { params: { eventsPerSecond: 20 } } })
+  return evSb
+}
+function pushB64(s) {
+  const p = '='.repeat((4 - s.length % 4) % 4), b = atob((s + p).replace(/-/g, '+').replace(/_/g, '/'))
+  return Uint8Array.from([...b].map(c => c.charCodeAt(0)))
+}
+const pushSoportado = () => 'serviceWorker' in navigator && 'PushManager' in window && 'Notification' in window
+async function pushSuscribir(silencioso) {
+  try {
+    if (!pushSoportado()) { if (!silencioso) toast('En iPhone: agrega la app a la pantalla de inicio y ábrela desde ahí para activar los avisos', true); return false }
+    if (Notification.permission !== 'granted') return false
+    const reg = await navigator.serviceWorker.register('sw.js')
+    await navigator.serviceWorker.ready
+    let sub = await reg.pushManager.getSubscription()
+    if (!sub) sub = await reg.pushManager.subscribe({ userVisibleOnly: true, applicationServerKey: pushB64(PUSH_VAPID) })
+    const j = sub.toJSON(), sb = evCliente()
+    if (!sb) throw new Error('sin conexión')
+    const { error } = await sb.from('suscripciones').upsert({ endpoint: j.endpoint, p256dh: j.keys.p256dh, auth: j.keys.auth, app: PUSH_APP, quien: evQuien(), actualizado: new Date().toISOString() }, { onConflict: 'endpoint,app' })
+    if (error) throw error
+    return true
+  } catch (e) { console.warn('push', e); if (!silencioso) toast('No se pudieron activar los avisos: ' + (e.message || e), true); return false }
+}
+async function pushEnviar(titulo, cuerpo, tag) {
+  try {
+    const r = await fetch(`${EV_URL}/functions/v1/notificar`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', apikey: EV_KEY, Authorization: `Bearer ${EV_KEY}` },
+      body: JSON.stringify({ token: getToken(), app: PUSH_APP, para: EV_RIVAL, titulo, cuerpo, url: PUSH_URL, icon: PUSH_ICON, tag })
+    })
+    const d = await r.json().catch(() => ({}))
+    if (!r.ok) throw new Error(d.error || r.status)
+    return d
+  } catch (e) { toast('No se pudo mandar el aviso: ' + (e.message || e), true); return null }
+}
+async function abrirAvisoSorteo(comp) {
+  let subs = null
+  try { const { data, error } = await evCliente().from('suscripciones').select('quien').eq('app', PUSH_APP).eq('quien', EV_RIVAL); if (!error) subs = data || [] } catch (e) {}
+  const d = new Date(); d.setMinutes(d.getMinutes() + 60, 0, 0); d.setMinutes(Math.ceil(d.getMinutes() / 15) * 15)
+  const hh = String(d.getHours()).padStart(2, '0') + ':' + String(d.getMinutes() % 60).padStart(2, '0')
+  const estadoAvisos = subs === null ? '⚠️ No pude revisar si tiene los avisos activados.'
+    : subs.length ? `🔔 ${EV_RIVAL} tiene los avisos activados${subs.length > 1 ? ` en ${subs.length} dispositivos` : ''}.`
+    : `🔕 ${EV_RIVAL} todavía no activó los avisos. Tiene que abrir la app desde la pantalla de inicio y tocar 🔕 arriba. Mientras tanto, mándaselo por WhatsApp.`
+  document.getElementById('aviso-ov')?.remove()
+  document.body.insertAdjacentHTML('beforeend', `<div id="aviso-ov" class="modal-overlay" onclick="if(event.target===this)this.remove()" style="z-index:9700;">
+    <div class="modal" style="max-width:420px;">
+      <h3>📣 Avisar el sorteo</h3>
+      <div class="text-gris" style="font-size:13px;margin:4px 0 12px;">${comp}</div>
+      <div style="font-size:13px;margin-bottom:12px;padding:9px 11px;border-radius:10px;background:var(--azul3);">${estadoAvisos}</div>
+      <label class="text-gris" style="font-size:12px;">¿A qué hora?</label>
+      <input type="time" id="aviso-hora" class="input" value="${hh}" style="width:100%;margin:4px 0 12px;font-size:18px;">
+      <div style="display:flex;flex-direction:column;gap:8px;">
+        <button class="btn btn-gold" onclick="avisoMandar('${comp.replace(/'/g, '')}', false)">📣 Mandar notificación con la hora</button>
+        <button class="btn btn-secondary" onclick="avisoMandar('${comp.replace(/'/g, '')}', true)">🔴 Avisar que ya empieza</button>
+        <button class="btn btn-secondary" onclick="avisoWhatsApp('${comp.replace(/'/g, '')}')">📲 Mandar por WhatsApp</button>
+        <button class="btn" onclick="document.getElementById('aviso-ov').remove()">Cerrar</button>
+      </div>
+    </div></div>`)
+}
+async function avisoMandar(comp, ya) {
+  const h = document.getElementById('aviso-hora')?.value || ''
+  const titulo = ya ? `🔴 ¡Empieza el sorteo en vivo!` : `🎲 Sorteo en vivo · ${comp}`
+  const cuerpo = ya ? `${comp}: entra ya a la app para verlo en vivo.` : `Hoy a las ${h}. Abre la app un minuto antes para verlo en vivo 😉`
+  const r = await pushEnviar(titulo, cuerpo, 'sorteo')
+  if (r) { toast(r.ok ? `✅ Aviso enviado (${r.ok} ${r.ok === 1 ? 'dispositivo' : 'dispositivos'})` : `⚠️ ${EV_RIVAL} no tiene avisos activados: mándalo por WhatsApp`, !r.ok); if (r.ok) document.getElementById('aviso-ov')?.remove() }
+}
+function avisoWhatsApp(comp) {
+  const h = document.getElementById('aviso-hora')?.value || ''
+  const txt = `🎲 Hoy a las ${h} es el sorteo en vivo de ${comp}. Abre la app un minuto antes para verlo 👉 ${PUSH_URL}`
+  window.open('https://wa.me/?text=' + encodeURIComponent(txt), '_blank')
+}
+
 function envivoIniciar() {
   if (evCanal || !window.supabase?.createClient) return
   try {
-    const sb = window.supabase.createClient(EV_URL, EV_KEY, { auth: { persistSession: false, autoRefreshToken: false }, realtime: { params: { eventsPerSecond: 20 } } })
+    const sb = evCliente()
+    // si ya dio permiso de notificaciones, se renueva la suscripción en silencio
+    try { if (pushSoportado() && Notification.permission === 'granted') pushSuscribir(true) } catch (e) {}
     const yo = evQuien() + '-' + Math.random().toString(36).slice(2, 7)
     evCanal = sb.channel(EV_CANAL, { config: { broadcast: { self: false, ack: false }, presence: { key: yo } } })
     evCanal.on('broadcast', { event: 'sorteo' }, ({ payload }) => { try { envivoRecibir(payload || {}) } catch (e) { console.warn('en vivo', e) } })

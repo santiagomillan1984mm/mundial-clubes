@@ -1608,6 +1608,8 @@ function quitarFondoBlanco(url) {
 const INTL_LOGO_KEY = 'tdl_logos_intl_v1'
 let logosIntl = {}
 try { logosIntl = JSON.parse(localStorage.getItem(INTL_LOGO_KEY) || '{}') || {} } catch(e) { logosIntl = {} }
+// fuera los que quedaron guardados como foto (.jpg): se vuelven a buscar
+for (const k of Object.keys(logosIntl)) if (/\.jpe?g($|[?\/])/i.test(String(logosIntl[k] || ''))) delete logosIntl[k]
 const intlBuscando = new Set()
 
 function logoPorNombre(nombre, deducir = true) {
@@ -1645,12 +1647,25 @@ function limpiarFondoSiHace(url) {
     img.src = url
   })
 }
+const esFoto = u => /\.jpe?g($|[?\/])/i.test(String(u || ''))  // los escudos son png/svg; un .jpg suele ser foto de la ciudad
 async function buscarLogoIntl(nombre) {
+  // 1) la página exacta del club (ej. "FC Volendam"), así no agarra la del pueblo
+  try {
+    const t = nombre.replace(/\s*\(.*?\)\s*/g, ' ').trim()
+    const r0 = await fetch('https://en.wikipedia.org/w/api.php?action=query&format=json&origin=*&redirects=1&prop=pageimages|categories&cllimit=50&piprop=thumbnail&pithumbsize=200&pilicense=any&titles=' + encodeURIComponent(t))
+    if (r0.ok) {
+      const p = Object.values((await r0.json()).query?.pages || {})[0]
+      const esClub = (p?.categories || []).some(c => /football club|soccer club|futsal|association football/i.test(c.title))
+      const u0 = p?.thumbnail?.source
+      if (u0 && esClub && !esFoto(u0)) return await limpiarFondoSiHace(u0)
+    }
+  } catch (e) {}
+  // 2) búsqueda general
   const u = 'https://en.wikipedia.org/w/api.php?action=query&format=json&origin=*&generator=search&gsrnamespace=0&gsrlimit=3' +
     '&gsrsearch=' + encodeURIComponent(nombre.replace(/\s*\(.*?\)\s*/g, ' ').trim() + ' football club') + '&prop=pageimages&piprop=thumbnail&pithumbsize=200&pilicense=any'
   const r = await fetch(u); if (!r.ok) return null
   const d = await r.json()
-  const pages = Object.values(d.query?.pages || {}).sort((a, b) => a.index - b.index).filter(p => p.thumbnail)
+  const pages = Object.values(d.query?.pages || {}).sort((a, b) => a.index - b.index).filter(p => p.thumbnail && !esFoto(p.thumbnail.source))
   const url = pages[0]?.thumbnail?.source
   return url ? await limpiarFondoSiHace(url) : null
 }

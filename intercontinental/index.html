@@ -226,6 +226,7 @@ let logos = {}
 function juntarLogos() {
   for (const f of Object.values(FUENTES)) { try { Object.assign(logos, JSON.parse(localStorage.getItem(f.logoKey) || '{}')) } catch (e) {} }
   for (const k of Object.keys(FUENTES)) Object.assign(logos, res(k)?.logos || {})
+  for (const k of Object.keys(logos)) if (/\.jpe?g($|[?\/])/i.test(String(logos[k] || ''))) delete logos[k]
 }
 function escudo(nombre, size, dueno) {
   const u = logos[nombre]

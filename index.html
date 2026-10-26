@@ -1953,7 +1953,7 @@ function renderHistorial() {
           <div style="flex:1;">
             <div style="font-size:11px;color:var(--gris);text-transform:uppercase;letter-spacing:1px;">${COMPETENCIAS_LABEL[h.competencia]||h.competencia}</div>
             <div style="font-size:16px;font-weight:700;color:${d==='santi'?'#4a9eff':'#ff6b6b'};">${h.campeon}</div>
-            <div style="font-size:11px;color:var(--gris);">de ${d==='santi'?'Santi':'Luciano'}</div>
+            <div style="font-size:11px;color:var(--gris);">${h.auto ? '<span title="Se anotó solo">⚡ automático · </span>' : ''}de ${d==='santi'?'Santi':'Luciano'}</div>
           </div>
           ${esAdmin ? `<button onclick="eliminarHistorial('${h.id}')" style="background:#fee2e2;color:#dc2626;border:none;border-radius:6px;padding:4px 8px;cursor:pointer;font-size:12px;">✕</button>` : ''}
         </div>`
@@ -1982,7 +1982,7 @@ const COMPS_HIST = [
 
 function tablaHistoricaHTML(historial) {
   if (!historial.length) return ''
-  const vacio = () => ({ liga: 0, copa: 0, mundial: 0, supercopa: 0, total: 0, pts: 0 })
+  const vacio = () => ({ liga: 0, copa: 0, mundial: 0, supercopa: 0, superfinal: 0, total: 0, pts: 0 })
   const jug = { santi: vacio(), luciano: vacio() }
   const clubes = {}
   for (const h of historial) {
@@ -7504,6 +7504,7 @@ function guardarResultadoSupercopa() {
   guardarEstado().then(() => {
     renderSupercopa()
     toast('¡Supercopa guardada!')
+    verificarCampeon()
     const key = `supercopa_${sc.ganador}`
     if (!campeonesYaCelebrados.has(key)) {
       campeonesYaCelebrados.add(key)
@@ -8981,7 +8982,64 @@ function getMundialDueno(id) {
   return ''
 }
 
+// ── Historial automático: cuando una competencia tiene campeón, se anota sola en el historial
+// Cada competencia se identifica por sus equipos/cruces; si se corrige un resultado y cambia el campeón, se actualiza la misma línea.
+function autoHistorial() {
+  if (!esAdmin || !estado) return false
+  if (!estado.historial) estado.historial = []
+  if (!estado.histAuto) estado.histAuto = {}
+  const anio = new Date().getFullYear()
+  const casos = []
+  const liga = estado.ligaAfa
+  if (liga?.configurado && (liga.partidos || []).length) {
+    const inst = (liga.equipos || []).map(e => e.id).sort().join(',')
+    const listo = liga.partidos.every(p => p.golesLocal !== null && p.golesVisitante !== null)
+    const c = listo ? calcularTablaLiga()[0] : null
+    casos.push({ comp: 'liga', inst, camp: c ? { nombre: getPoolNombre(c.id), dueno: c.dueno, id: c.id } : null })
+  }
+  const copa = estado.copaArgentina
+  if (copa?.configurado && (copa.bracket?.r1 || []).length) {
+    const inst = copa.bracket.r1.map(x => `${x.local}-${x.visitante}`).join(',')
+    const g = copa.bracket.final?.[0]?.ganador
+    casos.push({ comp: 'copa', inst, camp: g ? { nombre: getCopaNombre(g), dueno: getCopaDueno(g), id: g } : null })
+  }
+  if ((estado.bracket?.dieciseisavos || []).length) {
+    const inst = estado.bracket.dieciseisavos.map(x => `${x.local}-${x.visitante}`).join(',')
+    const g = estado.bracket.final?.[0]?.ganador
+    casos.push({ comp: 'mundial', inst, camp: g ? { nombre: getMundialNombre(g), dueno: getMundialDueno(g), id: g } : null })
+  }
+  const sc = estado.supercopa
+  if (sc?.localId && sc?.visitanteId) {
+    const inst = `${sc.localId}-${sc.visitanteId}`
+    casos.push({ comp: 'supercopa', inst, camp: sc.ganador ? { nombre: getSupercopaNombre(sc.ganador), dueno: getSupercopaDueno(sc.ganador), id: sc.ganador } : null })
+  }
+  let cambio = false
+  for (const { comp, inst, camp } of casos) {
+    const prev = estado.histAuto[comp]
+    const linea = prev && prev.inst === inst ? estado.historial.find(h => h.id === prev.entryId) : null
+    if (!camp) {
+      // se borró el resultado que daba el título: se quita la línea automática
+      if (linea) { estado.historial = estado.historial.filter(h => h !== linea); delete estado.histAuto[comp]; cambio = true }
+      continue
+    }
+    if (linea) {
+      if (linea.campeon !== camp.nombre || linea.dueno !== camp.dueno) { linea.campeon = camp.nombre; linea.dueno = camp.dueno; linea.campeonId = camp.id; cambio = true }
+      continue
+    }
+    if (prev && prev.inst === inst) continue  // ya registrado y borrado a mano: no se vuelve a agregar
+    // si ya estaba anotado a mano, se usa esa línea en vez de duplicarla
+    const manual = estado.historial.find(h => h.competencia === comp && h.campeon === camp.nombre && h.temporada === anio)
+    if (manual) { estado.histAuto[comp] = { inst, entryId: manual.id }; cambio = true; continue }
+    const id = 'auto_' + comp + '_' + Date.now().toString(36)
+    estado.historial.push({ id, temporada: anio, competencia: comp, campeon: camp.nombre, dueno: camp.dueno, campeonId: camp.id, auto: true })
+    estado.histAuto[comp] = { inst, entryId: id }
+    cambio = true
+  }
+  return cambio
+}
+
 function verificarCampeon() {
+  if (autoHistorial()) { guardarEstado(); try { renderHistorial() } catch (e) {} }
   // Liga AFA
   const liga = estado?.ligaAfa
   if (liga?.configurado && liga.partidos) {

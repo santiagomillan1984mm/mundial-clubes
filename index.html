@@ -1296,6 +1296,7 @@
 
 <nav>
   <button class="nav-btn active" onclick="mostrarSeccion('inicio')">Inicio</button>
+  <button class="nav-btn" onclick="mostrarSeccion('avisos')">📢 Avisos</button>
   <button class="nav-btn" onclick="mostrarSeccion('promocion')">🔃 Promoción</button>
   <button class="nav-btn" onclick="mostrarSeccion('liga')"><span class="comp-ic" data-comp="liga">🇦🇷</span> Liga AFA</button>
   <button class="nav-btn" onclick="mostrarSeccion('copa')"><span class="comp-ic" data-comp="copa">🏆</span> Copa Arg.</button>
@@ -1392,6 +1393,12 @@
   <div id="sec-relampago" class="seccion">
     <div class="sec-titulo">⚡ Torneos Relámpago</div>
     <div id="relampago-contenido"></div>
+  </div>
+
+  <!-- AVISOS -->
+  <div id="sec-avisos" class="seccion">
+    <div class="sec-titulo">📢 Avisos</div>
+    <div id="avisos-contenido"></div>
   </div>
 
   <!-- PERFILES -->
@@ -2450,6 +2457,7 @@ function renderTodo() {
   renderPromocion()
   renderRelampago()
   renderPremios()
+  if (document.getElementById('sec-avisos')?.classList.contains('activa') && !document.activeElement?.matches?.('#aviso-txt')) renderAvisos()
   renderAlbum()
   renderPerfiles()
 }
@@ -7408,6 +7416,7 @@ function mostrarSeccion(id) {
   if (btn) btn.classList.add('active')
   if (id === 'superfinal') renderSuperFinal()
   if (id === 'admin') renderHimnos()
+  if (id === 'avisos') renderAvisos()
   try { envivoPintar() } catch (e) {}
 }
 
@@ -9615,18 +9624,137 @@ async function pushSuscribir(silencioso) {
     return true
   } catch (e) { console.warn('push', e); if (!silencioso) toast('No se pudieron activar los avisos: ' + (e.message || e), true); return false }
 }
-async function pushEnviar(titulo, cuerpo, tag) {
+async function pushEnviar(titulo, cuerpo, tag, url) {
   try {
     const r = await fetch(`${EV_URL}/functions/v1/notificar`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', apikey: EV_KEY, Authorization: `Bearer ${EV_KEY}` },
-      body: JSON.stringify({ token: getToken(), app: PUSH_APP, para: EV_RIVAL, titulo, cuerpo, url: PUSH_URL, icon: PUSH_ICON, tag })
+      body: JSON.stringify({ token: getToken(), app: PUSH_APP, para: EV_RIVAL, titulo, cuerpo, url: url || PUSH_URL, icon: PUSH_ICON, tag })
     })
     const d = await r.json().catch(() => ({}))
     if (!r.ok) throw new Error(d.error || r.status)
     return d
   } catch (e) { toast('No se pudo mandar el aviso: ' + (e.message || e), true); return null }
 }
+// ══════════════════════════════════════════════
+// AVISOS: mensajes libres de Santi a Luciano (le llegan como notificación y quedan en el tablón)
+// ══════════════════════════════════════════════
+const AVISOS_CATS = {
+  jugar: { t: '🎮 Para jugar', m: ['⚽ ¿Jugamos hoy?', '🎮 Hoy a las 21:00 jugamos la próxima fecha', '⏰ En 10 minutos me conecto', '📆 ¿Te queda bien jugar mañana?', '🕹️ Prende la consola que ya estoy', '🍕 Hoy hay FIFA, ¿a qué hora puedes?'] },
+  como: { t: '📊 Cómo va', m: null },
+  animo: { t: '💪 Ánimo', m: ['👏 Buen partido el de hoy, crack', '💪 Tranquilo, la liga es larga', '🔥 Se viene la remontada, no aflojes', '⚽ Qué golazo metiste, te lo reconozco', '🙌 Estás jugando muy bien últimamente', '🤝 Gran partido, así da gusto jugar'] },
+  pique: { t: '😂 Pique', m: ['🔥 Te espero para la revancha', '😈 Prepárate que hoy no hay piedad', '😂 ¿Ya practicaste? Lo vas a necesitar', '🤭 Ve preparando las excusas', '👀 Hoy te toca perder, avisado estás', '🏆 Ese trofeo ya tiene mi nombre'] },
+  alertas: { t: '🚨 Alertas', m: ['📅 Tenemos partidos pendientes, ¡a ponernos al día!', '🏆 Se viene la Copa Argentina, prepárate', '🌍 Se viene el sorteo del Mundial de Clubes', '⚠️ No te olvides de pasarme el resultado', '🎲 Pronto hacemos un sorteo en vivo, ten la app a mano', '🔄 Actualicé la app, ciérrala y vuelve a abrirla'] },
+}
+let avisoCat = 'jugar'
+// Mensajes armados con los datos reales de la liga y la copa
+function avisosDinamicos() {
+  const out = []
+  try {
+    const liga = estado.ligaAfa
+    if (liga?.configurado && (liga.partidos || []).length) {
+      const tabla = calcularTablaLiga(), N = n => getPoolNombre(n.id)
+      const jug = liga.partidos.filter(p => p.golesLocal !== null && p.golesVisitante !== null)
+      const pend = liga.partidos.filter(p => p.golesLocal === null || p.golesVisitante === null)
+      const lider = tabla[0]
+      if (lider && jug.length) out.push(lider.dueno === 'luciano' ? `👑 Tu ${N(lider)} es líder de la Liga Argentina con ${lider.pts} pts. ¡A sostenerlo!` : `👀 Mi ${N(lider)} es líder con ${lider.pts} pts. ¿Lo vas a dejar así?`)
+      const mejor = tabla.findIndex(t => t.dueno === 'luciano')
+      if (mejor > 0 && jug.length) out.push(`📊 Tu mejor equipo, ${N(tabla[mejor])}, va ${mejor + 1}° con ${tabla[mejor].pts} pts`)
+      const suma = d => tabla.filter(t => t.dueno === d).reduce((n, t) => n + t.pts, 0)
+      const dif = suma('santi') - suma('luciano')
+      if (jug.length) out.push(dif > 0 ? `🏁 En la suma de puntos de la liga te llevo ${dif}. ¡Ponte las pilas!` : dif < 0 ? `😤 Me llevas ${-dif} puntos en la suma de la liga, pero voy por ti` : `⚖️ Estamos empatados en la suma de puntos de la liga. ¡Esto está que arde!`)
+      const ultimo = tabla[tabla.length - 1]
+      if (ultimo?.dueno === 'luciano' && jug.length) out.push(`🆘 Tu ${N(ultimo)} está último en la Liga Argentina. ¡Hay que reaccionar!`)
+      if (pend.length) {
+        out.push(`⏳ Quedan ${pend.length} partidos por jugar en la Liga Argentina`)
+        const p = [...pend].sort((a, b) => (a.jornada || 0) - (b.jornada || 0))[0]
+        out.push(`📅 Próximo partido: ${getPoolNombre(p.local)} vs ${getPoolNombre(p.visitante)}${p.jornada ? ` (fecha ${p.jornada})` : ''}`)
+      } else if (jug.length) out.push('🏁 ¡Terminó la Liga Argentina! Ya se juega todo en las copas')
+      // rachas de los equipos de Luciano
+      for (const t of tabla.filter(t => t.dueno === 'luciano')) {
+        const ps = jug.filter(p => p.local === t.id || p.visitante === t.id).sort((a, b) => (a.jornada || 0) - (b.jornada || 0))
+        const res = ps.map(p => { const gf = p.local === t.id ? p.golesLocal : p.golesVisitante, gc = p.local === t.id ? p.golesVisitante : p.golesLocal; return gf > gc ? 'G' : gf < gc ? 'P' : 'E' })
+        let n = 0; const u = res[res.length - 1]; for (let i = res.length - 1; i >= 0 && res[i] === u; i--) n++
+        if (u === 'P' && n >= 3) out.push(`🚨 Alerta: tu ${N(t)} lleva ${n} derrotas seguidas`)
+        if (u === 'G' && n >= 3) out.push(`🔥 Tu ${N(t)} viene con ${n} victorias seguidas, ¡qué nivel!`)
+      }
+    }
+    const b = estado.copaArgentina?.bracket
+    if (estado.copaArgentina?.configurado && b) {
+      const rondas = [['r1', 'la primera ronda'], ['r2', 'octavos'], ['cuartos', 'cuartos'], ['semis', 'semis'], ['final', 'la final']]
+      const act = rondas.find(([k]) => (b[k] || []).some(c => !c.ganador))
+      if (act) { const vivos = (b[act[0]] || []).filter(c => !c.ganador).length; out.push(`🏆 La Copa Argentina va en ${act[1]}: quedan ${vivos} ${vivos === 1 ? 'partido' : 'partidos'}`) }
+      const rob = new Set((b[act?.[0]] || []).flatMap(c => [c.local, c.visitante]).filter(id => getCopaDueno(id) === 'luciano'))
+      if (act && rob.size) out.push(`🏆 Te quedan ${rob.size} ${rob.size === 1 ? 'equipo vivo' : 'equipos vivos'} en la Copa Argentina`)
+    }
+  } catch (e) { console.warn('avisos', e) }
+  return out.length ? out : ['📊 Todavía no hay datos de la liga para armar mensajes']
+}
+function avisoMensajes() { return avisoCat === 'como' ? avisosDinamicos() : AVISOS_CATS[avisoCat].m }
+const escAv = t => String(t || '').replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]))
+function avisoFecha(iso) {
+  const d = new Date(iso), hoy = new Date(), ayer = new Date(Date.now() - 864e5)
+  const hh = d.toLocaleTimeString('es-MX', { hour: '2-digit', minute: '2-digit' })
+  if (d.toDateString() === hoy.toDateString()) return `Hoy ${hh}`
+  if (d.toDateString() === ayer.toDateString()) return `Ayer ${hh}`
+  return `${d.toLocaleDateString('es-MX', { day: 'numeric', month: 'short' })} ${hh}`
+}
+async function renderAvisos() {
+  const cont = document.getElementById('avisos-contenido'); if (!cont || !estado) return
+  const lista = [...(estado.avisos || [])].reverse()
+  let html = ''
+  if (esAdmin) {
+    const borrador = document.getElementById('aviso-txt')?.value || ''
+    html += `<div class="card">
+      <div class="card-titulo">✍️ Escribirle a Luciano</div>
+      <textarea id="aviso-txt" class="input" rows="3" maxlength="300" placeholder="Escribe lo que quieras… (le llega como notificación)" style="width:100%;resize:vertical;font-size:15px;">${escAv(borrador)}</textarea>
+      <div style="display:flex;gap:6px;overflow-x:auto;margin:10px 0 8px;padding-bottom:2px;">${Object.entries(AVISOS_CATS).map(([k, c]) => `<button class="btn btn-sm ${k === avisoCat ? 'btn-gold' : 'btn-secondary'}" style="font-size:12px;white-space:nowrap;flex-shrink:0;" onclick="avisoCat='${k}';renderAvisos()">${c.t}</button>`).join('')}</div>
+      <div style="display:flex;flex-direction:column;gap:6px;margin-bottom:12px;">${avisoMensajes().map((t, i) => `<button class="btn btn-secondary btn-sm" style="font-size:12.5px;text-align:left;white-space:normal;line-height:1.35;" onclick="avisoRapido(${i})">${escAv(t)}</button>`).join('')}</div>
+      <div id="aviso-estado-rob" class="text-gris" style="font-size:12px;margin-bottom:10px;">Revisando si Luciano tiene los avisos activados…</div>
+      <button class="btn btn-gold" style="width:100%;" onclick="avisoEnviarLibre()">📣 Enviar a Luciano</button>
+    </div>`
+  } else {
+    html += `<div class="card" style="text-align:center;">
+      <div class="text-gris" style="font-size:13px;">Acá aparecen los mensajes de Santi.${typeof Notification !== 'undefined' && Notification.permission === 'granted' ? '' : ' Toca la 🔕 de arriba para que te lleguen como notificación.'}</div></div>`
+  }
+  html += `<div class="card"><div class="card-titulo">📋 Mensajes</div>${lista.length ? lista.map(a => `
+      <div style="display:flex;gap:10px;padding:10px 0;border-top:1px solid var(--border);align-items:flex-start;">
+        <img src="santi-avatar.png" alt="" style="width:34px;height:34px;border-radius:50%;object-fit:cover;border:2px solid #4a9eff;flex-shrink:0;">
+        <div style="flex:1;min-width:0;"><div style="font-size:14.5px;white-space:pre-wrap;word-wrap:break-word;">${escAv(a.texto)}</div>
+          <div class="text-gris" style="font-size:11px;margin-top:3px;">${avisoFecha(a.fecha)}${a.enviados != null ? ` · ${a.enviados ? '🔔 notificado' : '🔕 sin notificación'}` : ''}</div></div>
+        ${esAdmin ? `<button onclick="avisoBorrar('${a.id}')" style="background:none;border:none;color:var(--gris);font-size:16px;">🗑️</button>` : ''}
+      </div>`).join('') : '<div class="text-gris" style="padding:8px 0;">Todavía no hay mensajes.</div>'}</div>`
+  cont.innerHTML = html
+  if (esAdmin) {
+    try {
+      const { data, error } = await evCliente().from('suscripciones').select('quien').eq('app', PUSH_APP).eq('quien', EV_RIVAL)
+      const el = document.getElementById('aviso-estado-rob')
+      if (el) el.textContent = error ? '⚠️ No pude revisar los avisos de Luciano.' : data.length ? '🔔 Luciano tiene los avisos activados: le llega al teléfono.' : '🔕 Luciano todavía no activó los avisos: lo va a ver solo cuando entre a la app.'
+    } catch (e) {}
+  }
+}
+function avisoRapido(i) {
+  const t = document.getElementById('aviso-txt'); if (!t) return
+  t.value = avisoMensajes()[i] || ''; t.focus()
+}
+async function avisoEnviarLibre() {
+  const t = document.getElementById('aviso-txt'); const texto = (t?.value || '').trim()
+  if (!texto) { toast('Escribe un mensaje', true); return }
+  const r = await pushEnviar('📢 Santi', texto, 'aviso-' + Date.now(), PUSH_URL + '#avisos')
+  if (!estado.avisos) estado.avisos = []
+  estado.avisos.push({ id: 'av' + Date.now().toString(36), texto, fecha: new Date().toISOString(), enviados: r ? r.ok : 0 })
+  if (estado.avisos.length > 40) estado.avisos = estado.avisos.slice(-40)
+  if (t) t.value = ''
+  await guardarEstado()
+  renderAvisos()
+  toast(r?.ok ? '✅ Mensaje enviado a Luciano' : '📋 Mensaje guardado (Luciano no tiene los avisos activados)')
+}
+async function avisoBorrar(id) {
+  if (!confirm('¿Borrar este mensaje?')) return
+  estado.avisos = (estado.avisos || []).filter(a => a.id !== id)
+  await guardarEstado(); renderAvisos()
+}
+
 async function abrirAvisoSorteo(comp) {
   let subs = null
   try { const { data, error } = await evCliente().from('suscripciones').select('quien').eq('app', PUSH_APP).eq('quien', EV_RIVAL); if (!error) subs = data || [] } catch (e) {}
@@ -9751,6 +9879,10 @@ async function init() {
   actualizarBtnNotif()
   startPolling()
   envivoIniciar()
+  // al tocar una notificación de mensaje se abre en Avisos
+  const abrirDesdeAviso = sec => { if (sec && document.getElementById('sec-' + sec)) { mostrarSeccion(sec); window.scrollTo({ top: 0 }) } }
+  if (location.hash.length > 1) abrirDesdeAviso(location.hash.slice(1))
+  try { navigator.serviceWorker?.addEventListener('message', ev => { if (ev.data?.abrir) { cargarEstado().then(() => abrirDesdeAviso(ev.data.abrir)) } }) } catch (e) {}
   // Cargar logos en segundo plano; re-renderizar cuando terminen
   renderTodo()
   ocultarSplash()

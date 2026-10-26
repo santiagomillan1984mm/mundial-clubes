@@ -12,8 +12,12 @@ self.addEventListener('push', e => {
 self.addEventListener('notificationclick', e => {
   e.notification.close()
   const url = (e.notification.data && e.notification.data.url) || self.registration.scope
+  const seccion = (url.split('#')[1] || '')
   e.waitUntil(self.clients.matchAll({ type: 'window', includeUncontrolled: true }).then(ws => {
-    for (const w of ws) if (w.url.startsWith(self.registration.scope) && 'focus' in w) return w.focus()
+    for (const w of ws) if (w.url.startsWith(self.registration.scope) && 'focus' in w) {
+      if (seccion) w.postMessage({ abrir: seccion })
+      return w.focus()
+    }
     return self.clients.openWindow(url)
   }))
 })

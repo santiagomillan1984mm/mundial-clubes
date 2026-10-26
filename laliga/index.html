@@ -9797,12 +9797,12 @@ async function pushSuscribir(silencioso) {
     return true
   } catch (e) { console.warn('push', e); if (!silencioso) toast('No se pudieron activar los avisos: ' + (e.message || e), true); return false }
 }
-async function pushEnviar(titulo, cuerpo, tag) {
+async function pushEnviar(titulo, cuerpo, tag, url) {
   try {
     const r = await fetch(`${EV_URL}/functions/v1/notificar`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', apikey: EV_KEY, Authorization: `Bearer ${EV_KEY}` },
-      body: JSON.stringify({ token: getToken(), app: PUSH_APP, para: EV_RIVAL, titulo, cuerpo, url: PUSH_URL, icon: PUSH_ICON, tag })
+      body: JSON.stringify({ token: getToken(), app: PUSH_APP, para: EV_RIVAL, titulo, cuerpo, url: url || PUSH_URL, icon: PUSH_ICON, tag })
     })
     const d = await r.json().catch(() => ({}))
     if (!r.ok) throw new Error(d.error || r.status)
@@ -9913,7 +9913,7 @@ function avisoRapido(i) {
 async function avisoEnviarLibre() {
   const t = document.getElementById('aviso-txt'); const texto = (t?.value || '').trim()
   if (!texto) { toast('Escribe un mensaje', true); return }
-  const r = await pushEnviar('📢 Santi', texto, 'aviso-' + Date.now())
+  const r = await pushEnviar('📢 Santi', texto, 'aviso-' + Date.now(), PUSH_URL + '#avisos')
   if (!estado.avisos) estado.avisos = []
   estado.avisos.push({ id: 'av' + Date.now().toString(36), texto, fecha: new Date().toISOString(), enviados: r ? r.ok : 0 })
   if (estado.avisos.length > 40) estado.avisos = estado.avisos.slice(-40)
@@ -10058,6 +10058,10 @@ async function init() {
   actualizarBtnNotif()
   startPolling()
   envivoIniciar()
+  // al tocar una notificación de mensaje se abre en Avisos
+  const abrirDesdeAviso = sec => { if (sec && document.getElementById('sec-' + sec)) { mostrarSeccion(sec); window.scrollTo({ top: 0 }) } }
+  if (location.hash.length > 1) abrirDesdeAviso(location.hash.slice(1))
+  try { navigator.serviceWorker?.addEventListener('message', ev => { if (ev.data?.abrir) { cargarEstado().then(() => abrirDesdeAviso(ev.data.abrir)) } }) } catch (e) {}
   // Cargar logos en segundo plano; re-renderizar cuando terminen
   renderTodo()
   ocultarSplash()

@@ -3976,6 +3976,7 @@ function renderSorteo() {
           <div class="mt flex-gap">
             <button class="btn btn-gold" onclick="confirmarSorteo()">✅ Confirmar sorteo</button>
             <button class="btn btn-secondary" onclick="hacerSorteo()">🔀 Sortear de nuevo</button>
+            <button class="btn btn-secondary" onclick="borrarSorteoPendiente()">🗑️ Borrar sorteo</button>
           </div>
         ` : '<p class="text-gris mt">Esperando confirmación del sorteo.</p>'}
       </div>
@@ -4211,8 +4212,13 @@ function hacerSorteo() {
 }
 // Animación del bolillero del Mundial (la usan el admin y, en vivo, el que mira)
 function mostrarSorteoMundial(elegidos) {
-  const contBol = document.getElementById('bolillero-container')
-  if (!contBol) { renderSorteo(); return }
+  let contBol = document.getElementById('bolillero-container')
+  if (!contBol) {
+    // desde la vista "pendiente de confirmación" no está el bolillero: se arma la vista inicial un momento
+    const r = estado.sorteo.realizado; estado.sorteo.realizado = false; renderSorteo(); estado.sorteo.realizado = r
+    contBol = document.getElementById('bolillero-container')
+    if (!contBol) return
+  }
   contBol.style.display = 'block'
   contBol.classList.add('bp-full'); contBol.scrollTop = 0
   document.body.classList.add('bp-bloqueo')
@@ -4880,6 +4886,17 @@ function archivarMundialActual() {
   estado.archivo.push({ id: 'mundial_' + Date.now(), competencia: 'mundial', nombre: `Mundial de Clubes (archivado ${new Date().toLocaleDateString('es-MX')})`, campeon: camp?.nombre || null, dueno: camp?.dueno || null, partidos })
 }
 
+async function borrarSorteoPendiente() {
+  if (!confirm('¿Borrar este sorteo? Queda como si no se hubiera sorteado.')) return
+  ++sorteoAnimId
+  estado.sorteo.realizado = false
+  estado.sorteo.confirmado = false
+  estado.sorteo.internacionales = []
+  sorteoZonasCola = []; sorteoSlotsPlan = null
+  await guardarEstado()
+  renderTodo()
+  toast('🗑️ Sorteo borrado')
+}
 async function resetSorteo() {
   if (!confirm('¿Rehacer el sorteo? El Mundial actual se archiva: sus goles y victorias siguen contando en el historial.')) return
   archivarMundialActual()

@@ -1243,7 +1243,7 @@
       50% { opacity: 0.35; transform: scale(0.7); }
     }
   </style>
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.117.2/dist/umd/supabase.js" async onload="window.envivoIniciar && envivoIniciar()"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.117.2/dist/umd/supabase.js" async onload="window.__initListo && window.envivoIniciar && envivoIniciar()"></script>
 </head>
 <body>
 
@@ -9730,7 +9730,9 @@ async function renderAvisos() {
       <div style="display:flex;flex-direction:column;gap:6px;margin-bottom:12px;">${avisoMensajes().map((t, i) => `<button class="btn btn-secondary btn-sm" style="font-size:12.5px;text-align:left;white-space:normal;line-height:1.35;" onclick="avisoRapido(${i})">${escAv(t)}</button>`).join('')}</div>
       <div id="aviso-estado-rob" class="text-gris" style="font-size:12px;margin-bottom:10px;">Revisando si Luciano tiene los avisos activados…</div>
       <button class="btn btn-gold" style="width:100%;" onclick="avisoEnviarLibre()">📣 Enviar a Luciano</button>
-    </div>`
+    </div>
+    <div class="card"><div class="card-titulo">📱 Teléfonos con avisos</div><div id="aviso-telefonos" class="text-gris" style="font-size:12px;">Cargando…</div>
+      <div class="text-gris" style="font-size:11px;margin-top:8px;">Los mensajes le llegan solo a los teléfonos de Luciano. Si alguno está mal anotado, cámbialo acá.</div></div>`
   } else {
     html += `<div class="card" style="text-align:center;">
       <div class="text-gris" style="font-size:13px;">Acá aparecen los mensajes de Santi.${typeof Notification !== 'undefined' && Notification.permission === 'granted' ? '' : ' Toca la 🔕 de arriba para que te lleguen como notificación.'}</div></div>`
@@ -9747,9 +9749,32 @@ async function renderAvisos() {
     try {
       const { data, error } = await evCliente().from('suscripciones').select('quien').eq('app', PUSH_APP).eq('quien', EV_RIVAL)
       const el = document.getElementById('aviso-estado-rob')
+      pintarTelefonos()
       if (el) el.textContent = error ? '⚠️ No pude revisar los avisos de Luciano.' : data.length ? '🔔 Luciano tiene los avisos activados: le llega al teléfono.' : '🔕 Luciano todavía no activó los avisos: lo va a ver solo cuando entre a la app.'
     } catch (e) {}
   }
+}
+async function pintarTelefonos() {
+  const box = document.getElementById('aviso-telefonos'); if (!box) return
+  try {
+    const { data, error } = await evCliente().from('suscripciones').select('endpoint,quien,actualizado').eq('app', PUSH_APP)
+    if (error) throw error
+    let mio = null
+    try { const reg = await navigator.serviceWorker?.getRegistration('sw.js'); mio = (await reg?.pushManager.getSubscription())?.endpoint || null } catch (e) {}
+    const tipo = ep => /apple/.test(ep) ? '📱 iPhone' : /fcm|google/.test(ep) ? '🤖 Android / Chrome' : /mozilla/.test(ep) ? '🦊 Firefox' : '💻 Otro'
+    box.innerHTML = (data || []).length ? data.map((t, i) => `<div style="display:flex;align-items:center;gap:8px;padding:7px 0;border-top:1px solid var(--border);font-size:13px;">
+        <span style="flex:1;">${tipo(t.endpoint)} · <b style="color:${t.quien === 'Santi' ? '#4a9eff' : '#ff6b6b'}">${escAv(t.quien || '?')}</b>${t.endpoint === mio ? ' <span class="text-gris">(este teléfono)</span>' : ''}</span>
+        <button class="btn btn-secondary btn-sm" style="font-size:11px;" onclick="cambiarDuenoTel(${i})">Es de ${t.quien === 'Santi' ? EV_RIVAL : 'Santi'}</button></div>`).join('')
+      : '<div class="text-gris" style="font-size:12px;">Ningún teléfono activó los avisos todavía.</div>'
+    window.__telefonos = data || []
+  } catch (e) { box.innerHTML = '<div class="text-gris" style="font-size:12px;">No pude cargar la lista.</div>' }
+}
+async function cambiarDuenoTel(i) {
+  const t = (window.__telefonos || [])[i]; if (!t) return
+  const nuevo = t.quien === 'Santi' ? EV_RIVAL : 'Santi'
+  const { error } = await evCliente().from('suscripciones').update({ quien: nuevo }).eq('endpoint', t.endpoint).eq('app', PUSH_APP)
+  if (error) { toast('No se pudo cambiar: ' + error.message, true); return }
+  toast(`✓ Ahora ese teléfono es de ${nuevo}`); pintarTelefonos()
 }
 function avisoRapido(i) {
   const t = document.getElementById('aviso-txt'); if (!t) return
@@ -9896,6 +9921,7 @@ async function init() {
   actualizarUIAdmin()
   actualizarBtnNotif()
   startPolling()
+  window.__initListo = true
   envivoIniciar()
   // al tocar una notificación de mensaje se abre en Avisos
   const abrirDesdeAviso = sec => { if (sec && document.getElementById('sec-' + sec)) { mostrarSeccion(sec); window.scrollTo({ top: 0 }) } }

@@ -348,10 +348,10 @@
     .pf-sel button.on { border-color: var(--c); box-shadow: 0 0 16px color-mix(in srgb, var(--c) 35%, transparent); }
     .pf-hero { text-align: center; padding: 22px 14px 16px; border-radius: 18px; margin-bottom: 12px; border: 1px solid var(--border);
       background: radial-gradient(circle at 50% 0%, color-mix(in srgb, var(--c) 30%, transparent), transparent 70%), var(--card); }
-    .pf-foto { width: 132px; height: 132px; border-radius: 50%; object-fit: cover; border: 4px solid var(--c); box-shadow: 0 0 0 6px rgba(0,0,0,.25), 0 10px 30px color-mix(in srgb, var(--c) 45%, transparent); }
+    .pf-foto { width: 210px; height: 210px; cursor: zoom-in; border-radius: 50%; object-fit: cover; border: 4px solid var(--c); box-shadow: 0 0 0 6px rgba(0,0,0,.25), 0 10px 30px color-mix(in srgb, var(--c) 45%, transparent); }
     .pf-foto-wrap { position: relative; display: inline-block; }
-    .pf-club { position: absolute; right: -6px; bottom: -2px; width: 54px; height: 54px; border-radius: 50%; background: #fff; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 12px rgba(0,0,0,.45); border: 3px solid var(--c); }
-    .pf-club img { width: 40px !important; height: 40px !important; object-fit: contain; }
+    .pf-club { position: absolute; right: 2px; bottom: 4px; width: 66px; height: 66px; border-radius: 50%; background: #fff; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 12px rgba(0,0,0,.45); border: 3px solid var(--c); }
+    .pf-club img { width: 50px !important; height: 50px !important; object-fit: contain; }
     .pf-datos { font-size: 12px; color: var(--gris); margin-top: 4px; }
     .pf-datos b { color: var(--texto); }
     .pf-nom { font-size: 26px; font-weight: 900; letter-spacing: 2px; color: var(--c); margin-top: 10px; text-transform: uppercase; }
@@ -7788,6 +7788,13 @@ const PF_JUG = {
 }
 let pfLogosPedidos = false
 let pfActual = 'santi'
+// Foto en pantalla completa
+function pfFotoGrande(k) {
+  const J = PF_JUG[k]; if (!J) return
+  fxMostrar(`<div style="text-align:center;"><img src="${J.foto}" alt="" style="width:min(86vw,420px);height:min(86vw,420px);border-radius:50%;object-fit:cover;border:6px solid ${J.color};box-shadow:0 0 40px ${J.color}88;">
+    <div style="font-size:28px;font-weight:900;letter-spacing:3px;color:${J.color};margin-top:14px;text-transform:uppercase;">${J.nombre}</div>
+    <div style="color:#ddd;margin-top:4px;">${escudoNombre(J.club, 26)} ${J.club} · ${J.bandera} ${J.ciudad}</div></div>`, J.color, 0)
+}
 function abrirPerfil(k) { if (!PF_JUG[k]) return; pfActual = k; mostrarSeccion('perfiles'); renderPerfiles(); window.scrollTo({ top: 0, behavior: 'smooth' }) }
 // Partidos en orden aproximado de juego: temporadas archivadas primero, después las actuales
 function pfPartidos() {
@@ -7878,7 +7885,7 @@ function renderPerfiles() {
   cont.innerHTML = `
     <div class="pf-sel">${sel}</div>
     <div class="pf-hero" style="--c:${J.color}">
-      <div class="pf-foto-wrap"><img class="pf-foto" src="${J.foto}" alt="${J.nombre}">${escClub ? `<span class="pf-club">${escClub}</span>` : ''}</div>
+      <div class="pf-foto-wrap"><img class="pf-foto" src="${J.foto}" alt="${J.nombre}" onclick="pfFotoGrande('${k}')">${escClub ? `<span class="pf-club">${escClub}</span>` : ''}</div>
       <div class="pf-nom">${J.nombre}</div>
       <div class="pf-datos">💙 Hincha de <b>${J.club}</b> · 📍 ${J.bandera} ${J.ciudad}</div>
       <div class="pf-apodo">${apodo ? `“${apodo}”` : ''}${esAdmin ? ` <button onclick="editarApodo('${k}')" style="background:none;border:none;cursor:pointer;font-size:13px;opacity:.7;">✏️</button>` : ''}</div>

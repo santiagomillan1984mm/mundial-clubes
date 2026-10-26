@@ -342,6 +342,27 @@
     .alb-lb-cerrar { position: absolute; top: 14px; right: 14px; background: rgba(255,255,255,.12); border: none; color: #fff; font-size: 18px; width: 38px; height: 38px; border-radius: 10px; cursor: pointer; }
     .alb-subiendo { font-size: 12px; color: var(--gris); margin-top: 8px; }
     /* Perfiles */
+    /* Carta de jugador (estilo FUT) */
+    .pf-carta { position: relative; width: 250px; margin: 0 auto; padding: 16px 16px 14px; border-radius: 22px 22px 60px 60px / 22px 22px 34px 34px; overflow: hidden;
+      background: linear-gradient(160deg, #f7e7b0 0%, #d9b45a 30%, #a8792a 62%, #6e4a14 100%); color: #2a1a05;
+      box-shadow: 0 0 0 3px rgba(255,255,255,.25) inset, 0 0 0 2px #6e4a14, 0 14px 34px rgba(0,0,0,.5), 0 0 30px color-mix(in srgb, var(--c) 30%, transparent); }
+    .pf-carta::before { content: ''; position: absolute; inset: 7px; border-radius: 17px 17px 54px 54px / 17px 17px 30px 30px; border: 1.5px solid rgba(255,255,255,.45); pointer-events: none; }
+    .pf-carta-brillo { position: absolute; inset: -40%; background: linear-gradient(115deg, transparent 42%, rgba(255,255,255,.45) 50%, transparent 58%); animation: pf-brillo 5s ease-in-out infinite; pointer-events: none; z-index: 3; }
+    @keyframes pf-brillo { 0%, 60% { transform: translateX(-60%); } 100% { transform: translateX(60%); } }
+    .pf-carta-izq { position: absolute; left: 18px; top: 22px; z-index: 2; display: flex; flex-direction: column; align-items: center; gap: 2px; width: 46px; }
+    .pf-carta-izq b { font-size: 34px; font-weight: 900; line-height: 1; }
+    .pf-carta-izq small { font-size: 10px; font-weight: 900; letter-spacing: .5px; }
+    .pf-carta-sep { width: 28px; height: 2px; background: rgba(42,26,5,.45); margin: 5px 0; }
+    .pf-carta-flag { font-size: 24px; line-height: 1; }
+    .pf-carta-esc { width: 38px; height: 38px; display: flex; align-items: center; justify-content: center; margin-top: 4px; }
+    .pf-carta-esc img { width: 34px !important; height: 34px !important; object-fit: contain; filter: drop-shadow(0 2px 3px rgba(0,0,0,.35)); }
+    .pf-carta-foto { display: block; width: 150px; height: 150px; margin: 0 0 0 auto; object-fit: cover; border-radius: 18px; cursor: zoom-in; position: relative; z-index: 1;
+      -webkit-mask-image: linear-gradient(to bottom, #000 72%, transparent 100%); mask-image: linear-gradient(to bottom, #000 72%, transparent 100%); }
+    .pf-carta-nom { position: relative; z-index: 2; text-align: center; font-size: 24px; font-weight: 900; letter-spacing: 2px; text-transform: uppercase; margin-top: -6px; border-bottom: 2px solid rgba(42,26,5,.35); padding-bottom: 4px; }
+    .pf-carta-stats { position: relative; z-index: 2; display: grid; grid-template-columns: repeat(4, 1fr); text-align: center; margin-top: 6px; }
+    .pf-carta-stats b { display: block; font-size: 18px; font-weight: 900; line-height: 1.1; }
+    .pf-carta-stats small { font-size: 9px; font-weight: 900; letter-spacing: .5px; }
+    .pf-hero .pf-datos { margin-top: 14px; display: flex; align-items: center; justify-content: center; gap: 5px; flex-wrap: wrap; }
     .pf-sel { display: flex; gap: 10px; margin-bottom: 12px; }
     .pf-sel button { flex: 1; display: flex; align-items: center; gap: 8px; padding: 8px 10px; border-radius: 14px; border: 2px solid var(--border); background: var(--card); color: var(--texto); font-weight: 800; cursor: pointer; }
     .pf-sel button img { width: 34px; height: 34px; border-radius: 50%; object-fit: cover; }
@@ -352,10 +373,6 @@
     .pf-foto-wrap { position: relative; display: inline-block; padding: 10px 46px 0; isolation: isolate; }
     .pf-foto-wrap .pf-foto { position: relative; z-index: 2; }
     .pf-foto-wrap .pf-club { z-index: 3; right: 48px; }
-    /* escudo gigante detrás de la foto, como carta de jugador */
-    .pf-club-fondo { position: absolute; z-index: 1; left: 50%; top: 50%; width: 290px; height: 290px; object-fit: contain; transform: translate(-50%, -48%) rotate(-8deg);
-      opacity: .32; filter: drop-shadow(0 0 24px var(--c)) saturate(1.2); pointer-events: none; animation: pf-latido 4s ease-in-out infinite alternate; }
-    @keyframes pf-latido { from { transform: translate(-50%, -48%) rotate(-8deg) scale(1); opacity: .26; } to { transform: translate(-50%, -48%) rotate(-5deg) scale(1.05); opacity: .38; } }
     .pf-hero { overflow: hidden; position: relative; }
     .pf-hero::after { content: ''; position: absolute; inset: 0; background: linear-gradient(115deg, transparent 40%, rgba(255,255,255,.07) 50%, transparent 60%); pointer-events: none; }
     .pf-club { position: absolute; right: 2px; bottom: 4px; width: 66px; height: 66px; border-radius: 50%; background: #fff; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 12px rgba(0,0,0,.45); border: 3px solid var(--c); }
@@ -7800,7 +7817,7 @@ let pfActual = 'santi'
 function pfFotoGrande(k) {
   const J = PF_JUG[k]; if (!J) return
   const fondo = J.club && logoPorNombre(J.club)
-  fxMostrar(`<div style="text-align:center;position:relative;">${fondo ? `<img src="${fondo}" alt="" style="position:absolute;left:50%;top:44%;width:min(110vw,560px);transform:translate(-50%,-50%) rotate(-8deg);opacity:.25;filter:drop-shadow(0 0 30px ${J.color});pointer-events:none;">` : ''}<img src="${J.foto}" alt="" style="position:relative;width:min(86vw,420px);height:min(86vw,420px);border-radius:50%;object-fit:cover;border:6px solid ${J.color};box-shadow:0 0 40px ${J.color}88;">
+  fxMostrar(`<div style="text-align:center;position:relative;"><img src="${J.foto}" alt="" style="position:relative;width:min(86vw,420px);height:min(86vw,420px);border-radius:50%;object-fit:cover;border:6px solid ${J.color};box-shadow:0 0 40px ${J.color}88;">
     <div style="font-size:28px;font-weight:900;letter-spacing:3px;color:${J.color};margin-top:14px;text-transform:uppercase;">${J.nombre}</div>
     <div style="color:#ddd;margin-top:4px;">${escudoNombre(J.club, 26)} ${J.club} · ${J.bandera} ${J.ciudad}</div></div>`, J.color, 0)
 }
@@ -7894,11 +7911,21 @@ function renderPerfiles() {
   cont.innerHTML = `
     <div class="pf-sel">${sel}</div>
     <div class="pf-hero" style="--c:${J.color}">
-      <div class="pf-foto-wrap">${J.club && logoPorNombre(J.club) ? `<img class="pf-club-fondo" src="${logoPorNombre(J.club)}" alt="">` : ''}<img class="pf-foto" src="${J.foto}" alt="${J.nombre}" onclick="pfFotoGrande('${k}')">${escClub ? `<span class="pf-club">${escClub}</span>` : ''}</div>
-      <div class="pf-nom">${J.nombre}</div>
-      <div class="pf-datos">💙 Hincha de <b>${J.club}</b> · 📍 ${J.bandera} ${J.ciudad}</div>
+      <div class="pf-carta" style="--c:${J.color}">
+        <div class="pf-carta-brillo"></div>
+        <div class="pf-carta-izq">
+          <b>${pct}</b><small>% VIC</small>
+          <span class="pf-carta-sep"></span>
+          <span class="pf-carta-flag">${J.bandera}</span>
+          ${J.club ? `<span class="pf-carta-esc">${escudoNombre(J.club, 34) || '⚽'}</span>` : ''}
+        </div>
+        <img class="pf-carta-foto" src="${J.foto}" alt="${J.nombre}" onclick="pfFotoGrande('${k}')">
+        <div class="pf-carta-nom">${J.nombre}</div>
+        <div class="pf-carta-stats"><div><b>${st.pj}</b><small>PJ</small></div><div><b>${st.pg}</b><small>PG</small></div><div><b>${st.gf}</b><small>GOL</small></div><div><b>${ti.total}</b><small>TÍT</small></div></div>
+      </div>
+      <div class="pf-datos">${J.club ? `${escudoNombre(J.club, 18)} Hincha de <b>${J.club}</b> · ` : ''}📍 ${J.bandera} ${J.ciudad}</div>
       <div class="pf-apodo">${apodo ? `“${apodo}”` : ''}${esAdmin ? ` <button onclick="editarApodo('${k}')" style="background:none;border:none;cursor:pointer;font-size:13px;opacity:.7;">✏️</button>` : ''}</div>
-      <div class="pf-chips"><span>🏆 ${ti.total} título${ti.total === 1 ? '' : 's'}</span><span>⚽ ${st.pj} partidos</span><span>📈 ${pct}% victorias</span>${ti.club ? `<span>⭐ ${ti.club[0]}</span>` : ''}</div>
+      ${ti.club ? `<div class="pf-chips"><span>⭐ Su club más ganador: ${ti.club[0]}</span></div>` : ''}
     </div>
     <div class="card"><div class="card-titulo">🏆 Vitrina</div>
       <div class="pf-vitrina">${trof.map(([c, e, n]) => `<div class="${ti.por[c] ? '' : 'cero'}"><div class="t-ico">${icoComp(c, e)}</div><b>${ti.por[c]}</b><small>${n}</small></div>`).join('')}</div>

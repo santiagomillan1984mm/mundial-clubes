@@ -150,7 +150,7 @@ td.pts { font-weight: 900; color: var(--oro2); font-size: 14px; }
 <main>
   <section class="sec on" id="s-finales">
     <h2>🏆 Las Finales</h2>
-    <div class="sub">Los campeones de las dos apps, frente a frente. Partido único: si empatan, se definen por penales.</div>
+    <div class="sub">Los campeones de las dos apps, frente a frente. Partido único: si empatan, se definen por penales. Si el campeón de las dos apps es el mismo jugador, es campeón automático.</div>
     <div id="finales"></div>
   </section>
   <section class="sec" id="s-temporada">
@@ -303,9 +303,11 @@ function ladoFinal(k, app) {
 function resultadoFinal(k) {
   const f = est.finales[k] || {}
   const A = ladoFinal(k, 'arg'), B = ladoFinal(k, 'esp')
+  if (A && B && A.dueno && A.dueno === B.dueno)
+    return { A, B, jugado: true, auto: true, gan: 'auto', w: { nombre: `${A.nombre} / ${B.nombre}`, dueno: A.dueno }, l: { nombre: '—', dueno: '' }, f: {} }
   if (!A || !B || f.gl == null || f.gv == null) return { A, B, jugado: false }
   let gan = f.gl > f.gv ? 'arg' : f.gv > f.gl ? 'esp' : (f.pl != null && f.pv != null && f.pl !== f.pv ? (f.pl > f.pv ? 'arg' : 'esp') : null)
-  return { A, B, jugado: !!gan, gan, f }
+  return { A, B, jugado: !!gan, gan, f, w: gan === 'arg' ? A : B, l: gan === 'arg' ? B : A }
 }
 // Candidatos para elegir a mano (campeón, subcampeón, punteros de la liga)
 function candidatos(app, comp) {
@@ -324,7 +326,7 @@ function partidosFinalesHist() {
 }
 function partidosFinalesActuales() {
   const out = []
-  for (const F of FINALES) { const r = resultadoFinal(F.k); if (r.jugado) out.push(['Intercontinental', r.A.nombre, r.A.dueno, r.B.nombre, r.B.dueno, r.f.gl, r.f.gv]) }
+  for (const F of FINALES) { const r = resultadoFinal(F.k); if (r.jugado && !r.auto) out.push(['Intercontinental', r.A.nombre, r.A.dueno, r.B.nombre, r.B.dueno, r.f.gl, r.f.gv]) }
   return out
 }
 function statsDe(partidos) {
@@ -361,7 +363,7 @@ function rankingGlobal() {
   const st = statsDe(ps)
   const tit = todosLosTitulos()
   // Finales de esta temporada ya jugadas (todavía no están en el historial)
-  for (const F of FINALES) { const r = resultadoFinal(F.k); if (r.jugado) { const w = r.gan === 'arg' ? r.A : r.B; tit.push({ dueno: w.dueno, tipo: 'inter-' + F.k }) } }
+  for (const F of FINALES) { const r = resultadoFinal(F.k); if (r.jugado) { const w = r.w; tit.push({ dueno: w.dueno, tipo: 'inter-' + F.k }) } }
   const filas = Object.keys(JUG).map(d => {
     const s = st[d] || { pj: 0, pg: 0, pe: 0, pp: 0, gf: 0, gc: 0 }
     const mis = tit.filter(t => t.dueno === d)
@@ -382,7 +384,7 @@ function balonDeOro() {
     for (const comp of ['liga', 'copa', 'mundial']) { const c = campeonDe(app, comp); if (c?.dueno) tit.push({ dueno: c.dueno, tipo: comp, nombre: `${r.labels?.[comp] || comp}`, club: c.nombre }) }
     if (r.camp?.supercopa?.dueno) tit.push({ dueno: r.camp.supercopa.dueno, tipo: 'supercopa', nombre: r.labels?.supercopa || 'Supercopa', club: r.camp.supercopa.nombre })
   }
-  for (const F of FINALES) { const r = resultadoFinal(F.k); if (r.jugado) { const w = r.gan === 'arg' ? r.A : r.B; tit.push({ dueno: w.dueno, tipo: 'inter-' + F.k, nombre: F.nombre, club: w.nombre }) } }
+  for (const F of FINALES) { const r = resultadoFinal(F.k); if (r.jugado) { const w = r.w; tit.push({ dueno: w.dueno, tipo: 'inter-' + F.k, nombre: F.nombre, club: w.nombre }) } }
   return Object.keys(JUG).map(d => {
     const s = st[d] || { pj: 0, pg: 0, pe: 0, pp: 0, gf: 0, gc: 0 }
     const mis = tit.filter(t => t.dueno === d)
@@ -437,18 +439,17 @@ function renderFinales() {
   for (const F of FINALES) {
     const f = est.finales[F.k] || {}
     const r = resultadoFinal(F.k), A = r.A, B = r.B
-    const mismo = A && B && A.dueno && A.dueno === B.dueno
     let medio = `<div class="vs">VS</div>`
-    if (A && B && f.gl != null && f.gv != null) medio = `<div class="marcador">${f.gl} - ${f.gv}${f.gl === f.gv && f.pl != null ? `<small>Penales ${f.pl}-${f.pv}</small>` : ''}</div>`
+    if (r.auto) medio = `<div class="marcador" style="font-size:30px;">👑<small>Automático</small></div>`
+    else if (A && B && f.gl != null && f.gv != null) medio = `<div class="marcador">${f.gl} - ${f.gv}${f.gl === f.gv && f.pl != null ? `<small>Penales ${f.pl}-${f.pv}</small>` : ''}</div>`
     html += `<div class="card final"><div class="top"><span class="ic">${F.ic}</span><div><b>${F.nombre}</b><small>${F.desc}</small></div></div>
       <div class="duelo">${ladoHTML(A, 'arg', F.k)}${medio}${ladoHTML(B, 'esp', F.k)}</div>`
     if (r.jugado) {
-      const w = r.gan === 'arg' ? A : B
-      html += `<div class="campeon-banda">👑 ${esc(w.nombre)} (${esc(nomJ(w.dueno))}) campeón ${FUENTES[r.gan].bandera}</div>`
+      html += r.auto
+        ? `<div class="campeon-banda">👑 ${esc(nomJ(r.w.dueno))} campeón automático: ganó en las dos apps</div>`
+        : `<div class="campeon-banda">👑 ${esc(r.w.nombre)} (${esc(nomJ(r.w.dueno))}) campeón ${FUENTES[r.gan].bandera}</div>`
     }
-    if (mismo && !r.jugado) html += `<div class="aviso">⚠️ Los dos campeones son de <b>${esc(nomJ(A.dueno))}</b>. ${esAdmin ? 'Cambia uno por el subcampeón para que la final sea entre dos jugadores distintos:' : 'El admin puede cambiar uno por el subcampeón.'}
-      ${esAdmin ? `<div>${['arg', 'esp'].map(app => { const s = res(app)?.sub?.[F.k]; return s ? `<button class="btn sec2" style="padding:7px 10px;font-size:12px;" onclick="usarSub('${F.k}','${app}')">${FUENTES[app].bandera} Usar a ${esc(s.nombre)}</button>` : '' }).join('')}</div>` : ''}</div>`
-    if (A && B && esAdmin) {
+    if (A && B && esAdmin && !r.auto) {
       const emp = f.gl != null && f.gl === f.gv
       html += `<div class="carga">
         <input type="number" inputmode="numeric" min="0" id="gl-${F.k}" value="${f.gl ?? ''}" placeholder="-">
@@ -461,7 +462,7 @@ function renderFinales() {
     } else if (!A || !B) {
       html += `<div class="lock">🔒 Se desbloquea cuando haya campeón en las dos apps</div>`
     }
-    if (esAdmin) html += `<div style="text-align:center;padding:0 0 10px;"><button class="mini" onclick="elegirEquipos('${F.k}')">✏️ Elegir equipos a mano</button>${f.gl != null ? ` <button class="mini" onclick="borrarResultado('${F.k}')">🗑️ Borrar resultado</button>` : ''}</div>`
+    if (esAdmin) html += `<div style="text-align:center;padding:0 0 10px;"><button class="mini" onclick="elegirEquipos('${F.k}')">✏️ Elegir equipos a mano</button>${f.gl != null && !r.auto ? ` <button class="mini" onclick="borrarResultado('${F.k}')">🗑️ Borrar resultado</button>` : ''}</div>`
     html += `</div>`
   }
   cont.innerHTML = html
@@ -504,7 +505,7 @@ function renderTemporada() {
     const hs = (est.historial || []).filter(h => h.temporada === t)
     return `<div class="card"><div class="lbl" style="margin-bottom:8px;">Temporada ${t}</div>${hs.map(h => h.tipo === 'balon'
       ? `<div class="row" style="padding:5px 0;">⚽ ${foto(h.dueno, 26)}<span style="font-size:13px;"><b>Balón de Oro:</b> <b style="color:${colorDe(h.dueno)}">${esc(nomJ(h.dueno))}</b></span></div>`
-      : `<div class="row" style="padding:5px 0;">${CUP['inter-' + h.tipo] || '🏆'} ${escudo(h.campeon, 26, h.dueno)}<span style="font-size:13px;min-width:0;"><b>${esc(FINALES.find(f => f.k === h.tipo)?.nombre || h.tipo)}:</b> <b style="color:${colorDe(h.dueno)}">${esc(h.campeon)}</b> <span style="color:var(--gris)">${h.gl}-${h.gv}${h.pl != null && h.gl === h.gv ? ` (pen. ${h.pl}-${h.pv})` : ''} vs ${esc(h.rival)}</span></span></div>`).join('')}</div>`
+      : `<div class="row" style="padding:5px 0;">${CUP['inter-' + h.tipo] || '🏆'} ${escudo(h.campeon, 26, h.dueno)}<span style="font-size:13px;min-width:0;"><b>${esc(FINALES.find(f => f.k === h.tipo)?.nombre || h.tipo)}:</b> <b style="color:${colorDe(h.dueno)}">${esc(h.campeon)}</b> <span style="color:var(--gris)">${h.auto ? 'automático (ganó en las dos apps)' : `${h.gl}-${h.gv}`}${h.auto ? '' : ''}${!h.auto && h.pl != null && h.gl === h.gv ? ` (pen. ${h.pl}-${h.pv})` : ''}${h.auto ? '' : ` vs ${esc(h.rival)}`}</span></span></div>`).join('')}</div>`
   }).join('') : ''
   cont.innerHTML = banner + pasos + `<div class="cols">${col('arg')}${col('esp')}</div>` + histHTML
 }
@@ -584,7 +585,7 @@ async function guardarFinal(k) {
   const r = resultadoFinal(k)
   if (await guardar()) {
     render()
-    if (r.jugado) { const w = r.gan === 'arg' ? r.A : r.B; festejo(FINALES.find(F => F.k === k), w) }
+    if (r.jugado) festejo(FINALES.find(F => F.k === k), r.w)
   }
 }
 async function borrarResultado(k) {
@@ -623,8 +624,8 @@ async function cerrarTemporada() {
   const t = est.temporada
   for (const F of FINALES) {
     const r = resultadoFinal(F.k)
-    const w = r.gan === 'arg' ? r.A : r.B, l = r.gan === 'arg' ? r.B : r.A
-    est.historial.push({ temporada: t, tipo: F.k, campeon: w.nombre, dueno: w.dueno, app: r.gan, rival: l.nombre, rivalDueno: l.dueno, a: { nombre: r.A.nombre, dueno: r.A.dueno }, b: { nombre: r.B.nombre, dueno: r.B.dueno }, gl: r.f.gl, gv: r.f.gv, pl: r.f.pl, pv: r.f.pv })
+    const w = r.w, l = r.l
+    est.historial.push({ temporada: t, tipo: F.k, campeon: w.nombre, dueno: w.dueno, app: r.gan, rival: l.nombre, rivalDueno: l.dueno, a: { nombre: r.A.nombre, dueno: r.A.dueno }, b: { nombre: r.B.nombre, dueno: r.B.dueno }, gl: r.auto ? null : r.f.gl, gv: r.auto ? null : r.f.gv, pl: r.f.pl ?? null, pv: r.f.pv ?? null, auto: !!r.auto })
   }
   const b = balonDeOro()[0]
   est.historial.push({ temporada: t, tipo: 'balon', dueno: b.d, total: b.total })

@@ -5,8 +5,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Torneo de Campeones · LaLiga</title>
   <link rel="manifest" href="manifest.json" />
-  <link rel="icon" href="icon-192.png" />
-  <link rel="apple-touch-icon" href="icon-192.png" />
+  <link rel="icon" href="icon-laliga-192.png" />
+  <link rel="apple-touch-icon" href="icon-laliga-192.png" />
   <meta name="theme-color" content="#1a1a2e" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
@@ -1194,7 +1194,7 @@
 <div id="splash-screen">
   <div class="sp-rayos"></div>
   <div class="sp-brillo"></div>
-  <img src="logo-transparente.png" alt="Torneo de Campeones" onload="splashListo()" onerror="splashListo()" />
+  <img src="logo-transparente.png?v=2" alt="Torneo de Campeones" onload="splashListo()" onerror="splashListo()" />
   <div class="splash-sub">Cargando…</div>
 </div>
 <script>
@@ -9070,7 +9070,7 @@ function startPolling() {
         toast('🔔 ¡Nuevo resultado disponible!')
         verificarCampeon()
         if (Notification.permission === 'granted') {
-          new Notification('Torneo de Campeones', { body: '¡Se cargó un nuevo resultado!', icon: '/mundial-clubes/laliga/icon-192.png' })
+          new Notification('Torneo de Campeones', { body: '¡Se cargó un nuevo resultado!', icon: '/mundial-clubes/laliga/icon-laliga-192.png' })
         }
       }
     } catch(e) {}

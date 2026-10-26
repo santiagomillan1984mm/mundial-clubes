@@ -2957,6 +2957,7 @@ function getContadorGeneral() {
   const conteo = { santi: { pg: 0, goles: 0 }, luciano: { pg: 0, goles: 0 } }
   function sumar(golesLocal, golesVisitante, duenoLocal, duenoVisitante) {
     if (golesLocal === null || golesLocal === undefined || golesVisitante === null || golesVisitante === undefined) return
+    if (duenoLocal && duenoLocal === duenoVisitante) return  // mismo dueño: se define por escritorio, no cuenta
     if (duenoLocal === 'santi' || duenoLocal === 'luciano') {
       conteo[duenoLocal].goles += golesLocal
       if (golesLocal > golesVisitante) conteo[duenoLocal].pg++

@@ -72,6 +72,8 @@
       gap: 8px;
     }
     .header-title span { font-size: 22px; }
+    header { gap: 8px; padding: 0 12px !important; }
+    .head-btns button { padding: 4px 3px !important; font-size: 17px !important; }
     .ll-head img { height: 30px; width: auto; flex-shrink: 0; filter: drop-shadow(0 0 6px rgba(0,212,216,.35)); }
     .ll-head > div { display: flex; flex-direction: column; line-height: 1.05; min-width: 0; }
     .ll-head { min-width: 0; flex: 1; overflow: hidden; }
@@ -1282,7 +1284,7 @@
     <img src="laliga-marca.png" alt="LaLiga">
     <div><b>LaLiga</b><small>Santi vs Roberto</small></div>
   </div>
-  <div style="display:flex;align-items:center;gap:10px;">
+  <div class="head-btns" style="display:flex;align-items:center;gap:4px;flex-shrink:0;">
     <button id="btn-tema" onclick="toggleTema()" title="Cambiar tema"
       style="background:none;border:none;font-size:18px;cursor:pointer;color:var(--gris);padding:4px;">🌙</button>
     <button id="btn-sonido" onclick="toggleSonido()" title="Sonido"

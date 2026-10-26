@@ -1,6 +1,6 @@
 {
-  "name": "Torneo de Campeones",
-  "short_name": "TdC",
+  "name": "Liga Argentina · Santi vs Luciano",
+  "short_name": "Liga Argentina",
   "description": "Liga AFA, Copa Argentina y Mundial de Clubes — Santi vs Luciano",
   "start_url": "/mundial-clubes/",
   "scope": "/mundial-clubes/",
@@ -8,7 +8,15 @@
   "background_color": "#1a1a2e",
   "theme_color": "#1a1a2e",
   "icons": [
-    { "src": "icon-lpf-192.png", "sizes": "192x192", "type": "image/png" },
-    { "src": "icon-lpf-512.png", "sizes": "512x512", "type": "image/png" }
+    {
+      "src": "icon-lpf-192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "icon-lpf-512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
   ]
 }

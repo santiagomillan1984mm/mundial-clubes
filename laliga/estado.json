@@ -1,0 +1,367 @@
+{
+  "version": "2.0",
+  "ultimaActualizacion": "2026-10-26T20:28:22.562Z",
+  "poolArgentino": [
+    {
+      "id": "pa1",
+      "nombre": "Deportivo Alavés",
+      "liga": "España · LaLiga"
+    },
+    {
+      "id": "pa2",
+      "nombre": "Athletic Club",
+      "liga": "España · LaLiga"
+    },
+    {
+      "id": "pa3",
+      "nombre": "Atlético de Madrid",
+      "liga": "España · LaLiga"
+    },
+    {
+      "id": "pa4",
+      "nombre": "Celta de Vigo",
+      "liga": "España · LaLiga"
+    },
+    {
+      "id": "pa5",
+      "nombre": "Deportivo de La Coruña",
+      "liga": "España · LaLiga"
+    },
+    {
+      "id": "pa6",
+      "nombre": "Elche CF",
+      "liga": "España · LaLiga"
+    },
+    {
+      "id": "pa7",
+      "nombre": "RCD Espanyol",
+      "liga": "España · LaLiga"
+    },
+    {
+      "id": "pa8",
+      "nombre": "FC Barcelona",
+      "liga": "España · LaLiga"
+    },
+    {
+      "id": "pa9",
+      "nombre": "Getafe CF",
+      "liga": "España · LaLiga"
+    },
+    {
+      "id": "pa10",
+      "nombre": "Levante UD",
+      "liga": "España · LaLiga"
+    },
+    {
+      "id": "pa11",
+      "nombre": "Málaga CF",
+      "liga": "España · LaLiga"
+    },
+    {
+      "id": "pa12",
+      "nombre": "Racing de Santander",
+      "liga": "España · LaLiga"
+    },
+    {
+      "id": "pa13",
+      "nombre": "CA Osasuna",
+      "liga": "España · LaLiga"
+    },
+    {
+      "id": "pa14",
+      "nombre": "Rayo Vallecano",
+      "liga": "España · LaLiga"
+    },
+    {
+      "id": "pa15",
+      "nombre": "Real Betis",
+      "liga": "España · LaLiga"
+    },
+    {
+      "id": "pa16",
+      "nombre": "Real Madrid",
+      "liga": "España · LaLiga"
+    },
+    {
+      "id": "pa17",
+      "nombre": "Real Sociedad",
+      "liga": "España · LaLiga"
+    },
+    {
+      "id": "pa18",
+      "nombre": "Sevilla FC",
+      "liga": "España · LaLiga"
+    },
+    {
+      "id": "pa19",
+      "nombre": "Valencia CF",
+      "liga": "España · LaLiga"
+    },
+    {
+      "id": "pa20",
+      "nombre": "Villarreal CF",
+      "liga": "España · LaLiga"
+    },
+    {
+      "id": "pa21",
+      "nombre": "Albacete BP",
+      "liga": "España · LaLiga Hypermotion"
+    },
+    {
+      "id": "pa22",
+      "nombre": "UD Almería",
+      "liga": "España · LaLiga Hypermotion"
+    },
+    {
+      "id": "pa23",
+      "nombre": "FC Andorra",
+      "liga": "España · LaLiga Hypermotion"
+    },
+    {
+      "id": "pa24",
+      "nombre": "Burgos CF",
+      "liga": "España · LaLiga Hypermotion"
+    },
+    {
+      "id": "pa25",
+      "nombre": "Cádiz CF",
+      "liga": "España · LaLiga Hypermotion"
+    },
+    {
+      "id": "pa26",
+      "nombre": "CD Castellón",
+      "liga": "España · LaLiga Hypermotion"
+    },
+    {
+      "id": "pa27",
+      "nombre": "AD Ceuta FC",
+      "liga": "España · LaLiga Hypermotion"
+    },
+    {
+      "id": "pa28",
+      "nombre": "Córdoba CF",
+      "liga": "España · LaLiga Hypermotion"
+    },
+    {
+      "id": "pa29",
+      "nombre": "Cultural Leonesa",
+      "liga": "España · LaLiga Hypermotion"
+    },
+    {
+      "id": "pa30",
+      "nombre": "SD Eibar",
+      "liga": "España · LaLiga Hypermotion"
+    },
+    {
+      "id": "pa31",
+      "nombre": "Granada CF",
+      "liga": "España · LaLiga Hypermotion"
+    },
+    {
+      "id": "pa32",
+      "nombre": "Girona FC",
+      "liga": "España · LaLiga Hypermotion"
+    },
+    {
+      "id": "pa33",
+      "nombre": "SD Huesca",
+      "liga": "España · LaLiga Hypermotion"
+    },
+    {
+      "id": "pa34",
+      "nombre": "UD Las Palmas",
+      "liga": "España · LaLiga Hypermotion"
+    },
+    {
+      "id": "pa35",
+      "nombre": "CD Leganés",
+      "liga": "España · LaLiga Hypermotion"
+    },
+    {
+      "id": "pa36",
+      "nombre": "RCD Mallorca",
+      "liga": "España · LaLiga Hypermotion"
+    },
+    {
+      "id": "pa37",
+      "nombre": "CD Mirandés",
+      "liga": "España · LaLiga Hypermotion"
+    },
+    {
+      "id": "pa38",
+      "nombre": "Real Oviedo",
+      "liga": "España · LaLiga Hypermotion"
+    },
+    {
+      "id": "pa39",
+      "nombre": "Real Sociedad B",
+      "liga": "España · LaLiga Hypermotion"
+    },
+    {
+      "id": "pa40",
+      "nombre": "Sporting de Gijón",
+      "liga": "España · LaLiga Hypermotion"
+    },
+    {
+      "id": "pa41",
+      "nombre": "Real Valladolid",
+      "liga": "España · LaLiga Hypermotion"
+    },
+    {
+      "id": "pa42",
+      "nombre": "Real Zaragoza",
+      "liga": "España · LaLiga Hypermotion"
+    }
+  ],
+  "ligaAfa": {
+    "configurado": false,
+    "equipos": [],
+    "partidos": []
+  },
+  "copaArgentina": {
+    "configurado": false,
+    "equipos": [],
+    "bracket": {
+      "r1": [],
+      "r2": [],
+      "cuartos": [],
+      "semis": [],
+      "final": []
+    }
+  },
+  "equiposArgentinos": [
+    {
+      "id": "arg1",
+      "nombre": "Equipo 1",
+      "dueno": "roberto"
+    },
+    {
+      "id": "arg2",
+      "nombre": "Equipo 2",
+      "dueno": "roberto"
+    },
+    {
+      "id": "arg3",
+      "nombre": "Equipo 3",
+      "dueno": "roberto"
+    },
+    {
+      "id": "arg4",
+      "nombre": "Equipo 4",
+      "dueno": "roberto"
+    },
+    {
+      "id": "arg5",
+      "nombre": "Equipo 5",
+      "dueno": "santi"
+    },
+    {
+      "id": "arg6",
+      "nombre": "Equipo 6",
+      "dueno": "santi"
+    },
+    {
+      "id": "arg7",
+      "nombre": "Equipo 7",
+      "dueno": "santi"
+    },
+    {
+      "id": "arg8",
+      "nombre": "Equipo 8",
+      "dueno": "santi"
+    }
+  ],
+  "sorteo": {
+    "realizado": false,
+    "confirmado": false,
+    "internacionales": []
+  },
+  "bracket": {
+    "dieciseisavos": [],
+    "octavos": [],
+    "cuartos": [],
+    "semis": [],
+    "final": []
+  },
+  "supercopa": {
+    "localId": null,
+    "visitanteId": null,
+    "golesLocal": null,
+    "golesVisitante": null,
+    "ganador": null
+  },
+  "historial": [],
+  "torneosRelampago": [],
+  "promocion": {
+    "partidos": [
+      {
+        "id": "prom1",
+        "dueno": "santi",
+        "descendidoId": null,
+        "rivalId": null,
+        "golesDescendido": null,
+        "golesRival": null,
+        "decision": null
+      },
+      {
+        "id": "prom2",
+        "dueno": "santi",
+        "descendidoId": null,
+        "rivalId": null,
+        "golesDescendido": null,
+        "golesRival": null,
+        "decision": null
+      },
+      {
+        "id": "prom3",
+        "dueno": "roberto",
+        "descendidoId": null,
+        "rivalId": null,
+        "golesDescendido": null,
+        "golesRival": null,
+        "decision": null
+      },
+      {
+        "id": "prom4",
+        "dueno": "roberto",
+        "descendidoId": null,
+        "rivalId": null,
+        "golesDescendido": null,
+        "golesRival": null,
+        "decision": null
+      }
+    ]
+  },
+  "superFinal": {
+    "legs": [],
+    "equipos": null,
+    "registrado": false
+  },
+  "avisos": [
+    {
+      "id": "avmvpplbxd",
+      "texto": "Esto es tecnología pura , Racano",
+      "fecha": "2026-10-26T20:28:22.561Z",
+      "enviados": 1
+    }
+  ],
+  "resumen": {
+    "at": "2026-10-26T20:28:22.563Z",
+    "labels": {
+      "liga": "LaLiga",
+      "copa": "Copa del Rey",
+      "mundial": "Mundial de Clubes",
+      "supercopa": "Supercopa de España",
+      "superfinal": "Súper Final"
+    },
+    "camp": {},
+    "sub": {},
+    "prog": {},
+    "inst": {},
+    "act": [],
+    "arch": [],
+    "historial": [],
+    "rl": [],
+    "logos": {}
+  }
+}

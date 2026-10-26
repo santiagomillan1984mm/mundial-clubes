@@ -388,11 +388,14 @@ function balonDeOro() {
   return Object.keys(JUG).map(d => {
     const s = st[d] || { pj: 0, pg: 0, pe: 0, pp: 0, gf: 0, gc: 0 }
     const mis = tit.filter(t => t.dueno === d)
-    const ptsT = mis.reduce((n, t) => n + ptsTitulo(t), 0)
+    // En cuántas apps juega esta temporada: Santi juega en las dos, así que sus puntos por títulos se dividen
+    const apps = Object.keys(FUENTES).filter(app => { const r = res(app); return r && ((r.act || []).some(m => m[2] === d || m[4] === d) || Object.values(r.camp || {}).some(c => c?.dueno === d) || (r.prog?.liga?.top || []).some(x => x?.dueno === d)) }).length || 1
+    const ptsBruto = mis.reduce((n, t) => n + ptsTitulo(t), 0)
+    const ptsT = Math.round(ptsBruto / apps * 10) / 10
     const ppp = s.pj ? (s.pg * 3 + s.pe) / s.pj : 0
     const rend = Math.round(ppp / 3 * 20 * 10) / 10
     const golesBonus = s.pj ? Math.round((s.gf - s.gc) / s.pj * 2 * 10) / 10 : 0
-    return { d, s, mis, ptsT, rend, golesBonus, total: Math.round((ptsT + rend + golesBonus) * 10) / 10 }
+    return { d, s, mis, ptsT, ptsBruto, apps, rend, golesBonus, total: Math.round((ptsT + rend + golesBonus) * 10) / 10 }
   }).sort((a, b) => b.total - a.total)
 }
 function estadoTemporada() {
@@ -535,12 +538,13 @@ function renderBalon() {
   const cab = `<div class="banner"><div style="font-size:54px;">⚽</div><div class="t">${T.completa ? '¡Listo para entregar!' : 'Carrera al Balón de Oro'}</div>
       <div class="d">Temporada ${est.temporada}${b[0]?.total ? ` · Favorito: <b style="color:${colorDe(b[0].d)}">${esc(nomJ(b[0].d))}</b>` : ''}</div>${podio}</div>`
   const det = b.map((x, i) => `<div class="card"><div class="row">${foto(x.d, 44)}<div style="flex:1;min-width:0;"><b style="color:${colorDe(x.d)}">${i + 1}. ${esc(nomJ(x.d))}</b>
-      <div class="desglose">🏆 Pts por títulos: <b>${x.ptsT}</b> · 📈 Rendimiento: <b>${x.rend}</b> · ⚽ Goles: <b>${x.golesBonus}</b><br>
+      <div class="desglose">🏆 Pts por títulos: <b>${x.ptsT}</b>${x.apps > 1 ? ` <span style="opacity:.8">(${x.ptsBruto} ÷ ${x.apps} apps)</span>` : ''} · 📈 Rendimiento: <b>${x.rend}</b> · ⚽ Goles: <b>${x.golesBonus}</b><br>
       ${x.s.pj} partidos · ${x.s.pg}G ${x.s.pe}E ${x.s.pp}P · ${x.s.gf}-${x.s.gc}
       <div style="margin-top:6px;"><b style="color:var(--txt)">Títulos de esta temporada:</b> ${listaTitulos(x.mis)}</div>
       <div><b style="color:var(--txt)">En su carrera (${carrera.filter(t => t.dueno === x.d).length}):</b> ${listaTitulos(carrera.filter(t => t.dueno === x.d))}</div></div></div>
       <div style="font-family:Oswald;font-size:24px;color:var(--oro2);">${x.total}</div></div></div>`).join('')
   const reglas = `<div class="card"><div class="lbl" style="margin-bottom:6px;">Cómo se calcula</div><div class="desglose">
+      <b>Justo para todos:</b> como Santi juega en las dos apps puede ganar el doble de títulos, así que sus puntos por títulos se dividen entre 2. El rendimiento y los goles ya son promedios, así que no importa cuántos partidos juegue cada uno.<br>
       Títulos de esta temporada: Liga ${PTS_TITULO.liga} · Copa ${PTS_TITULO.copa} · Mundial ${PTS_TITULO.mundial} · Supercopa ${PTS_TITULO.supercopa} · cada final Intercontinental ${PTS_TITULO.inter}<br>
       Rendimiento: hasta 20 según el promedio de puntos por partido (ganar todo = 20)<br>Goles: diferencia de gol promedio × 2<br>Solo cuentan los partidos entre jugadores distintos.<br>
       Para el Balón de Oro solo cuentan los títulos de <b>esta temporada</b> (las competiciones que se están jugando ahora). Los de temporadas anteriores están en "En su carrera" y suman en el Ranking Global.</div></div>`

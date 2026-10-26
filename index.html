@@ -1853,10 +1853,58 @@ async function obtenerSha() {
 // ══════════════════════════════════════════════
 // GITHUB — GUARDAR
 // ══════════════════════════════════════════════
+// ══════════════════════════════════════════════
+// RESUMEN para la app Intercontinental (se guarda junto con el estado)
+// ══════════════════════════════════════════════
+function resHash(s) { let h = 5381; for (let i = 0; i < s.length; i++) h = ((h << 5) + h + s.charCodeAt(i)) | 0; return (h >>> 0).toString(36) }
+function exportResumen() {
+  const r = { at: new Date().toISOString(), labels: COMPETENCIAS_LABEL, camp: {}, sub: {}, prog: {}, inst: {}, act: [], arch: [], historial: estado.historial || [], rl: [], logos: {} }
+  const archNombres = new Set((estado.archivo || []).map(a => a.nombre))
+  try { for (const m of todosLosPartidos()) (archNombres.has(m.comp) ? r.arch : r.act).push([m.comp, m.l.nombre, m.l.dueno || '', m.v.nombre, m.v.dueno || '', m.gl, m.gv]) } catch (e) {}
+  try {
+    const liga = estado.ligaAfa
+    if (liga?.configurado && (liga.partidos || []).length) {
+      const t = calcularTablaLiga(), jug = liga.partidos.filter(p => p.golesLocal !== null && p.golesVisitante !== null).length
+      const eq = x => x ? { nombre: getPoolNombre(x.id), dueno: x.dueno || '', pts: x.pts, pj: x.pj } : null
+      r.inst.liga = resHash((liga.equipos || []).map(e => e.id).sort().join(','))
+      r.prog.liga = { jug, total: liga.partidos.length, top: t.slice(0, 4).map(eq) }
+      if (jug === liga.partidos.length) { r.camp.liga = eq(t[0]); r.sub.liga = eq(t[1]) }
+    }
+  } catch (e) {}
+  const ko = (fin, nom, due) => { if (!fin?.ganador) return null; const p = fin.ganador === fin.local ? fin.visitante : fin.local; return [{ nombre: nom(fin.ganador), dueno: due(fin.ganador) || '' }, { nombre: nom(p), dueno: due(p) || '' }] }
+  try {
+    const c = estado.copaArgentina, r1 = c?.bracket?.r1 || []
+    if (c?.configurado && r1.length) {
+      r.inst.copa = resHash(r1.map(x => `${x.local}-${x.visitante}`).join(','))
+      r.prog.copa = { activo: true }
+      const k = ko(c.bracket?.final?.[0], getCopaNombre, getCopaDueno); if (k) { r.camp.copa = k[0]; r.sub.copa = k[1] }
+    }
+  } catch (e) {}
+  try {
+    const d = estado.bracket?.dieciseisavos || []
+    if (d.length) {
+      r.inst.mundial = resHash(d.map(x => `${x.local}-${x.visitante}`).join(','))
+      r.prog.mundial = { activo: true }
+      const k = ko(estado.bracket?.final?.[0], getMundialNombre, getMundialDueno); if (k) { r.camp.mundial = k[0]; r.sub.mundial = k[1] }
+    }
+  } catch (e) {}
+  try { const sc = estado.supercopa; if (sc?.ganador) r.camp.supercopa = { nombre: getSupercopaNombre(sc.ganador), dueno: getSupercopaDueno(sc.ganador) || '' } } catch (e) {}
+  try { for (const t of estado.torneosRelampago || []) if (t.campeon) r.rl.push({ torneo: t.nombre, comp: rlComp(t).nombre, campeon: t.campeon, dueno: (t.equipos || []).find(e => e.nombre === t.campeon)?.dueno || '' }) } catch (e) {}
+  try {
+    const noms = new Set()
+    for (const g of [r.camp, r.sub]) Object.values(g).forEach(x => x && noms.add(x.nombre))
+    ;(r.prog.liga?.top || []).forEach(x => x && noms.add(x.nombre))
+    r.historial.forEach(h => h.campeon && noms.add(h.campeon))
+    noms.forEach(n => { const u = logoPorNombre(n); if (u) r.logos[n] = u })
+  } catch (e) {}
+  return r
+}
+
 async function guardarEstado() {
   if (!esAdmin) { toast('No sos admin', true); return }
   const token = getToken()
   estado.ultimaActualizacion = new Date().toISOString()
+  try { estado.resumen = exportResumen() } catch (e) { console.warn('resumen', e) }
   const contenido = btoa(unescape(encodeURIComponent(JSON.stringify(estado, null, 2))))
 
   // Siempre obtener SHA fresco

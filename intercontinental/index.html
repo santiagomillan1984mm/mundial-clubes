@@ -1,0 +1,705 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Intercontinental · Argentina vs España</title>
+<meta name="theme-color" content="#0a0f1f">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Intercontinental">
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="icon-192.png">
+<link rel="icon" href="icon-192.png">
+<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@500;700&family=Inter:wght@400;600;800;900&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #0a0f1f; --bg2: #121a33; --card: #161f3d; --border: #26315a;
+  --txt: #eef1ff; --gris: #8f9bc4; --oro: #e8c15a; --oro2: #ffd970;
+  --arg: #74acdf; --esp: #e0303e; --esp2: #ffc400; --ok: #2ecc71; --mal: #e74c3c;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+html, body { background: var(--bg); color: var(--txt); font-family: Inter, system-ui, sans-serif; }
+body { min-height: 100vh; padding-bottom: calc(76px + env(safe-area-inset-bottom)); overflow-x: hidden; }
+header { position: sticky; top: 0; z-index: 50; display: flex; align-items: center; justify-content: space-between; gap: 8px;
+  padding: calc(8px + env(safe-area-inset-top)) 14px 8px; background: linear-gradient(90deg, #0d2340 0%, #0a0f1f 50%, #3a0c12 100%); border-bottom: 1px solid var(--border); }
+.marca { display: flex; align-items: center; gap: 10px; min-width: 0; }
+.marca img { width: 40px; height: 40px; border-radius: 10px; }
+.marca b { font-family: Oswald, sans-serif; font-size: 19px; letter-spacing: 2px; text-transform: uppercase; display: block; line-height: 1;
+  background: linear-gradient(90deg, var(--arg), #fff 45%, #fff 55%, var(--esp2)); -webkit-background-clip: text; background-clip: text; color: transparent; }
+.marca small { color: var(--gris); font-size: 11px; letter-spacing: 1px; }
+#admin-btn { background: none; border: 1px solid var(--border); color: var(--gris); border-radius: 20px; padding: 6px 10px; font-size: 12px; font-weight: 700; flex-shrink: 0; }
+#admin-btn.on { color: var(--ok); border-color: var(--ok); }
+main { max-width: 720px; margin: 0 auto; padding: 14px; }
+.sec { display: none; } .sec.on { display: block; animation: ap .25s ease; }
+@keyframes ap { from { opacity: 0; transform: translateY(6px) } to { opacity: 1 } }
+h2 { font-family: Oswald, sans-serif; font-size: 22px; letter-spacing: 1.5px; text-transform: uppercase; margin: 4px 0 4px; }
+.sub { color: var(--gris); font-size: 13px; margin-bottom: 14px; }
+.card { background: var(--card); border: 1px solid var(--border); border-radius: 16px; padding: 14px; margin-bottom: 12px; }
+.lbl { font-size: 10.5px; color: var(--gris); text-transform: uppercase; letter-spacing: 1.5px; font-weight: 800; }
+nav { position: fixed; bottom: 0; left: 0; right: 0; z-index: 60; display: flex; background: rgba(10,15,31,.96); backdrop-filter: blur(10px);
+  border-top: 1px solid var(--border); padding-bottom: env(safe-area-inset-bottom); }
+nav button { flex: 1; background: none; border: none; color: var(--gris); padding: 8px 2px 9px; font-size: 10px; font-weight: 700; display: flex; flex-direction: column; align-items: center; gap: 2px; }
+nav button span { font-size: 21px; }
+nav button.on { color: var(--oro2); }
+.btn { background: linear-gradient(180deg, var(--oro2), var(--oro)); color: #1a1300; border: none; border-radius: 12px; padding: 11px 16px; font-weight: 900; font-size: 14px; }
+.btn.sec2 { background: var(--bg2); color: var(--txt); border: 1px solid var(--border); }
+.btn:disabled { opacity: .45; }
+.row { display: flex; align-items: center; gap: 10px; }
+.esc { display: inline-flex; align-items: center; justify-content: center; border-radius: 50%; flex-shrink: 0; overflow: hidden; font-weight: 900; color: #fff; }
+.esc img { width: 100%; height: 100%; object-fit: contain; }
+.esc.ini { border: 2px solid; background: #0e1530; }
+.dueno { font-size: 11px; font-weight: 800; }
+/* finales */
+.final { position: relative; overflow: hidden; padding: 0; }
+.final .top { padding: 12px 14px 10px; display: flex; align-items: center; gap: 10px; border-bottom: 1px solid var(--border);
+  background: linear-gradient(90deg, rgba(116,172,223,.14), transparent 50%, rgba(224,48,62,.14)); }
+.final .top .ic { font-size: 26px; }
+.final .top b { font-family: Oswald, sans-serif; font-size: 17px; letter-spacing: 1px; text-transform: uppercase; display: block; }
+.final .top small { color: var(--gris); font-size: 11.5px; }
+.duelo { display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; gap: 8px; padding: 16px 12px 12px; }
+.lado { text-align: center; min-width: 0; }
+.lado .nom { font-weight: 900; font-size: 14px; margin-top: 6px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.lado .pais { font-size: 10.5px; color: var(--gris); margin-top: 2px; }
+.marcador { font-family: Oswald, sans-serif; font-size: 34px; font-weight: 700; text-align: center; min-width: 86px; }
+.marcador small { display: block; font-family: Inter; font-size: 11px; color: var(--gris); font-weight: 700; }
+.vs { font-family: Oswald; font-size: 22px; color: var(--gris); }
+.espera { color: var(--gris); font-size: 12px; font-style: italic; }
+.carga { display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 8px; padding: 0 12px 14px; }
+.carga input { width: 54px; height: 44px; text-align: center; font-size: 20px; font-weight: 900; background: var(--bg); color: var(--txt); border: 1px solid var(--border); border-radius: 10px; }
+.carga .pen { width: 100%; text-align: center; font-size: 12px; color: var(--gris); }
+.carga .pen input { width: 44px; height: 36px; font-size: 16px; }
+.lock { text-align: center; padding: 6px 14px 16px; color: var(--gris); font-size: 12.5px; }
+.campeon-banda { text-align: center; padding: 10px; background: linear-gradient(90deg, transparent, rgba(232,193,90,.2), transparent); font-weight: 900; color: var(--oro2); font-size: 13px; letter-spacing: .5px; }
+.mini { font-size: 11.5px; color: var(--gris); text-decoration: underline; background: none; border: none; padding: 4px; }
+.aviso { background: rgba(232,193,90,.1); border: 1px solid rgba(232,193,90,.35); color: var(--oro2); border-radius: 12px; padding: 10px 12px; font-size: 12.5px; margin: 0 12px 12px; }
+.aviso button { margin-top: 8px; margin-right: 6px; }
+/* temporada */
+.banner { border-radius: 18px; padding: 18px 16px; text-align: center; margin-bottom: 14px; border: 1px solid var(--border);
+  background: radial-gradient(circle at 50% -20%, rgba(232,193,90,.35), transparent 60%), var(--card); }
+.banner .t { font-family: Oswald; font-size: 24px; letter-spacing: 2px; text-transform: uppercase; color: var(--oro2); }
+.banner .d { color: var(--gris); font-size: 13px; margin-top: 4px; }
+.barra { height: 8px; background: var(--bg); border-radius: 8px; overflow: hidden; margin-top: 6px; }
+.barra i { display: block; height: 100%; background: linear-gradient(90deg, var(--oro), var(--oro2)); border-radius: 8px; }
+.cols { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.estado-comp { padding: 9px 0; border-top: 1px solid var(--border); }
+.estado-comp:first-of-type { border-top: none; }
+.estado-comp .n { font-size: 12px; font-weight: 800; }
+.estado-comp .v { font-size: 12px; color: var(--gris); margin-top: 3px; display: flex; align-items: center; gap: 6px; min-width: 0; }
+.estado-comp .v span { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.pasos { display: flex; gap: 6px; margin-bottom: 14px; }
+.paso { flex: 1; text-align: center; font-size: 10.5px; font-weight: 800; color: var(--gris); padding: 8px 4px; border-radius: 10px; background: var(--card); border: 1px solid var(--border); }
+.paso.ok { color: var(--ok); border-color: rgba(46,204,113,.5); }
+.paso.ya { color: var(--oro2); border-color: var(--oro); }
+/* jugadores */
+.foto { border-radius: 50%; object-fit: cover; flex-shrink: 0; border: 3px solid; }
+.podio { display: flex; align-items: flex-end; justify-content: center; gap: 10px; margin: 8px 0 4px; }
+.podio .p { text-align: center; flex: 1; max-width: 140px; }
+.podio .p .base { margin-top: 6px; border-radius: 12px 12px 0 0; background: var(--bg2); border: 1px solid var(--border); border-bottom: none; padding: 8px 4px; font-family: Oswald; font-size: 22px; }
+.podio .p .nm { font-weight: 900; margin-top: 4px; }
+.podio .p .sc { color: var(--oro2); font-weight: 900; font-size: 13px; }
+table { width: 100%; border-collapse: collapse; font-size: 12.5px; }
+th { color: var(--gris); font-size: 10px; text-transform: uppercase; letter-spacing: 1px; font-weight: 800; padding: 6px 3px; text-align: center; }
+td { padding: 9px 3px; text-align: center; border-top: 1px solid var(--border); }
+td.j { text-align: left; }
+td.pts { font-weight: 900; color: var(--oro2); font-size: 14px; }
+.chips { display: flex; gap: 8px; margin-bottom: 14px; }
+.chip { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 5px; background: var(--card); border: 2px solid var(--border); border-radius: 14px; padding: 10px 4px; font-weight: 800; font-size: 12px; color: var(--gris); }
+.chip.on { color: var(--txt); }
+.troph { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 10px; }
+.tr { background: var(--bg2); border: 1px solid var(--border); border-radius: 14px; padding: 12px 8px; text-align: center; position: relative; }
+.tr .cup { font-size: 30px; line-height: 1; }
+.tr .cn { font-size: 11px; font-weight: 900; text-transform: uppercase; letter-spacing: .5px; margin-top: 6px; color: var(--oro2); }
+.tr .cl { font-size: 12px; font-weight: 700; margin-top: 6px; display: flex; align-items: center; justify-content: center; gap: 5px; }
+.tr .cl span { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 110px; }
+.tr .tp { font-size: 10.5px; color: var(--gris); margin-top: 3px; }
+.tr .x { position: absolute; top: 6px; right: 8px; font-size: 13px; }
+.grupo-t { font-size: 11px; color: var(--gris); text-transform: uppercase; letter-spacing: 2px; margin: 16px 0 8px; font-weight: 800; }
+.desglose { font-size: 11.5px; color: var(--gris); margin-top: 6px; line-height: 1.6; }
+.toast { position: fixed; left: 50%; bottom: calc(92px + env(safe-area-inset-bottom)); transform: translateX(-50%); background: #1e2a52; border: 1px solid var(--border); padding: 10px 16px; border-radius: 12px; font-size: 13px; font-weight: 700; z-index: 200; transition: opacity .3s; }
+.toast.mal { border-color: var(--mal); color: #ffb3ab; }
+#splash { position: fixed; inset: 0; z-index: 500; background: radial-gradient(circle at 50% 40%, #1b2650, #070a16 70%); display: flex; flex-direction: column; align-items: center; justify-content: center; transition: opacity .5s; }
+#splash img { width: 150px; height: 150px; border-radius: 34px; animation: pop 1s ease; box-shadow: 0 0 60px rgba(232,193,90,.35); }
+#splash b { font-family: Oswald; font-size: 26px; letter-spacing: 5px; margin-top: 20px; color: var(--oro2); }
+#splash small { color: var(--gris); letter-spacing: 3px; font-size: 12px; margin-top: 4px; }
+@keyframes pop { from { transform: scale(.6); opacity: 0 } 70% { transform: scale(1.06) } to { transform: scale(1); opacity: 1 } }
+.modal { position: fixed; inset: 0; z-index: 300; background: rgba(0,0,0,.7); display: none; align-items: flex-end; justify-content: center; }
+.modal.on { display: flex; }
+.modal .box { background: var(--bg2); border: 1px solid var(--border); border-radius: 20px 20px 0 0; width: 100%; max-width: 560px; padding: 18px 16px calc(18px + env(safe-area-inset-bottom)); max-height: 85vh; overflow: auto; }
+.modal input[type=password], .modal input[type=text] { width: 100%; padding: 12px; border-radius: 12px; border: 1px solid var(--border); background: var(--bg); color: var(--txt); font-size: 15px; margin: 10px 0; }
+.opc { display: flex; align-items: center; gap: 10px; width: 100%; background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 10px; margin-top: 8px; color: var(--txt); text-align: left; font-size: 13.5px; }
+.opc small { color: var(--gris); display: block; font-size: 11px; }
+#festejo { position: fixed; inset: 0; z-index: 400; display: none; align-items: center; justify-content: center; flex-direction: column; background: radial-gradient(circle, rgba(40,30,0,.92), rgba(0,0,0,.95)); text-align: center; padding: 20px; }
+#festejo.on { display: flex; }
+#festejo .cup { font-size: 90px; animation: pop .8s ease; }
+#festejo .t { font-family: Oswald; color: var(--oro2); font-size: 15px; letter-spacing: 3px; text-transform: uppercase; margin-top: 10px; }
+#festejo .n { font-family: Oswald; font-size: 32px; font-weight: 700; margin-top: 6px; }
+#festejo .d { color: var(--gris); margin-top: 6px; }
+.conf { position: fixed; top: -10px; width: 8px; height: 14px; z-index: 401; animation: cae linear forwards; }
+@keyframes cae { to { transform: translateY(110vh) rotate(720deg); } }
+</style>
+</head>
+<body>
+<div id="splash"><img src="icon-512.png" alt=""><b>INTERCONTINENTAL</b><small>🇦🇷 ARGENTINA · ESPAÑA 🇪🇸</small></div>
+
+<header>
+  <div class="marca"><img src="icon-192.png" alt=""><div><b>Intercontinental</b><small>🇦🇷 Liga Argentina × LaLiga 🇪🇸</small></div></div>
+  <button id="admin-btn" onclick="abrirAdmin()">🔐 Admin</button>
+</header>
+
+<main>
+  <section class="sec on" id="s-finales">
+    <h2>🏆 Las Finales</h2>
+    <div class="sub">Los campeones de las dos apps, frente a frente. Partido único: si empatan, se definen por penales.</div>
+    <div id="finales"></div>
+  </section>
+  <section class="sec" id="s-temporada">
+    <h2>📅 Temporada</h2>
+    <div class="sub">Cuando terminen las ligas, las copas y los Mundiales de las dos apps se abre la <b>Semana de Finales</b>.</div>
+    <div id="temporada"></div>
+  </section>
+  <section class="sec" id="s-balon">
+    <h2>⚽ Balón de Oro</h2>
+    <div class="sub">El mejor de la temporada, sumando las dos apps: títulos + rendimiento (promedio de puntos, para que no gane solo el que juega más).</div>
+    <div id="balon"></div>
+  </section>
+  <section class="sec" id="s-ranking">
+    <h2>📊 Ranking Global</h2>
+    <div class="sub">Todo lo jugado en la historia de las dos apps y la Intercontinental.</div>
+    <div id="ranking"></div>
+  </section>
+  <section class="sec" id="s-vitrina">
+    <h2>🏛️ Vitrina</h2>
+    <div class="sub">Todos los trofeos de cada uno, de las dos apps juntas.</div>
+    <div id="vitrina"></div>
+  </section>
+</main>
+
+<nav>
+  <button class="on" data-s="finales" onclick="ir('finales')"><span>🏆</span>Finales</button>
+  <button data-s="temporada" onclick="ir('temporada')"><span>📅</span>Temporada</button>
+  <button data-s="balon" onclick="ir('balon')"><span>⚽</span>Balón de Oro</button>
+  <button data-s="ranking" onclick="ir('ranking')"><span>📊</span>Ranking</button>
+  <button data-s="vitrina" onclick="ir('vitrina')"><span>🏛️</span>Vitrina</button>
+</nav>
+
+<div class="modal" id="modal" onclick="if(event.target===this)cerrarModal()"><div class="box" id="modal-box"></div></div>
+<div id="festejo" onclick="this.classList.remove('on')"></div>
+
+<script>
+// ══════════════════════════════════════════════
+// CONFIG
+// ══════════════════════════════════════════════
+const GH_USER = 'santiagomillan1984mm', GH_REPO = 'mundial-clubes'
+const FUENTES = {
+  arg: { file: 'estado.json', nombre: 'Liga Argentina', corto: 'Argentina', bandera: '🇦🇷', color: '#74acdf', logoKey: 'tdc_logos_intl_v1' },
+  esp: { file: 'laliga/estado.json', nombre: 'LaLiga', corto: 'España', bandera: '🇪🇸', color: '#e0303e', logoKey: 'tdl_logos_intl_v1' },
+}
+const MI_FILE = 'intercontinental/estado.json'
+const JUG = {
+  santi: { nombre: 'Santi', foto: '../santi-avatar.png', color: '#4a9eff', club: 'Boca Juniors', bandera: '🇦🇷' },
+  luciano: { nombre: 'Luciano', foto: '../luciano-avatar.png', color: '#ff6b6b', club: 'River Plate', bandera: '🇦🇷' },
+  roberto: { nombre: 'Roberto', foto: '../laliga/roberto-avatar.png', color: '#ffb703', club: 'FC Barcelona', bandera: '🇪🇸' },
+}
+const FINALES = [
+  { k: 'liga', nombre: 'Supercopa Intercontinental', ic: '🏆', desc: 'Campeón de la Liga Argentina vs campeón de LaLiga', comp: { arg: 'Liga Argentina', esp: 'LaLiga' } },
+  { k: 'copa', nombre: 'Copa de Campeones de Copas', ic: '🏅', desc: 'Campeón de la Copa Argentina vs campeón de la Copa del Rey', comp: { arg: 'Copa Argentina', esp: 'Copa del Rey' } },
+  { k: 'mundial', nombre: 'Final de Mundiales', ic: '🌍', desc: 'El campeón del Mundial de cada app, por el título de campeón de campeones', comp: { arg: 'Mundial (app argentina)', esp: 'Mundial (app LaLiga)' } },
+]
+// Puntos por título para el Ranking Global y el Balón de Oro
+const PTS_TITULO = { liga: 10, copa: 7, mundial: 12, supercopa: 4, superfinal: 8, inter: 8, rl: 2, balon: 15 }
+const CUP = { liga: '🏆', copa: '🏅', mundial: '🌍', supercopa: '🥇', superfinal: '💎', rl: '⚡', balon: '⚽', 'inter-liga': '🏆', 'inter-copa': '🏅', 'inter-mundial': '🌍' }
+
+let datos = { arg: null, esp: null }
+let est = null, fileSha = null, esAdmin = false
+const getToken = () => { try { return localStorage.getItem('mc_token') || '' } catch (e) { return '' } }
+const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]))
+const res = k => datos[k]?.resumen || null
+const colorDe = d => JUG[d]?.color || '#9aa4c8'
+const nomJ = d => JUG[d]?.nombre || (d ? d[0].toUpperCase() + d.slice(1) : '—')
+const VACIO = () => ({ version: 1, temporada: 1, finales: { liga: {}, copa: {}, mundial: {} }, usados: {}, historial: [] })
+
+// ══════════════════════════════════════════════
+// ESCUDOS (de los resúmenes y de la caché que ya tienen las otras apps)
+// ══════════════════════════════════════════════
+let logos = {}
+function juntarLogos() {
+  for (const f of Object.values(FUENTES)) { try { Object.assign(logos, JSON.parse(localStorage.getItem(f.logoKey) || '{}')) } catch (e) {} }
+  for (const k of Object.keys(FUENTES)) Object.assign(logos, res(k)?.logos || {})
+}
+function escudo(nombre, size, dueno) {
+  const u = logos[nombre]
+  const c = colorDe(dueno)
+  if (u) return `<span class="esc" style="width:${size}px;height:${size}px;"><img src="${esc(u)}" alt="" onerror="this.parentNode.outerHTML=iniciales('${esc(String(nombre).replace(/'/g, ''))}',${size},'${c}')"></span>`
+  return iniciales(nombre, size, c)
+}
+function iniciales(nombre, size, c) {
+  const ini = String(nombre || '?').replace(/^(CA|CD|FC|CF|RC|RCD|UD|SD|CR|Club)\s+/i, '').split(/\s+/).filter(Boolean).slice(0, 2).map(w => w[0]).join('').toUpperCase()
+  return `<span class="esc ini" style="width:${size}px;height:${size}px;border-color:${c};font-size:${Math.round(size * .34)}px;color:${c};">${esc(ini)}</span>`
+}
+const foto = (d, size) => JUG[d] ? `<img class="foto" src="${JUG[d].foto}" style="width:${size}px;height:${size}px;border-color:${colorDe(d)};" alt="">` : `<span class="esc ini" style="width:${size}px;height:${size}px;border-color:#666;">?</span>`
+
+// ══════════════════════════════════════════════
+// GITHUB
+// ══════════════════════════════════════════════
+const apiUrl = f => `https://api.github.com/repos/${GH_USER}/${GH_REPO}/contents/${f}`
+const rawUrl = f => `https://raw.githubusercontent.com/${GH_USER}/${GH_REPO}/main/${f}`
+async function leer(f) {
+  const t = getToken()
+  try {
+    const r = t ? await fetch(apiUrl(f) + '?t=' + Date.now(), { cache: 'no-store', headers: { Authorization: `token ${t}`, Accept: 'application/vnd.github.v3.raw' } })
+                : await fetch(rawUrl(f) + '?t=' + Date.now(), { cache: 'no-store' })
+    if (!r.ok) return null
+    return await r.json()
+  } catch (e) { return null }
+}
+async function obtenerSha() {
+  try { const r = await fetch(apiUrl(MI_FILE), { cache: 'no-store', headers: { Authorization: `token ${getToken()}` } }); fileSha = r.ok ? (await r.json()).sha : null } catch (e) {}
+}
+async function guardar() {
+  if (!esAdmin) { toast('Activa el modo admin para guardar', true); return false }
+  est.ultimaActualizacion = new Date().toISOString()
+  const content = btoa(unescape(encodeURIComponent(JSON.stringify(est, null, 2))))
+  for (let intento = 0; intento < 2; intento++) {
+    await obtenerSha()
+    const body = { message: 'Actualizar Intercontinental', content }
+    if (fileSha) body.sha = fileSha
+    try {
+      const r = await fetch(apiUrl(MI_FILE), { method: 'PUT', headers: { Authorization: `token ${getToken()}`, 'Content-Type': 'application/json' }, body: JSON.stringify(body) })
+      if (r.ok) { fileSha = (await r.json()).content.sha; ultimaConocida = est.ultimaActualizacion; toast('¡Guardado!'); return true }
+      if (r.status !== 409) { const e = await r.json().catch(() => ({})); toast('Error al guardar: ' + (e.message || r.status), true); return false }
+    } catch (e) { toast('Error de conexión', true); return false }
+  }
+  toast('Error al guardar', true); return false
+}
+let ultimaConocida = null
+async function cargarTodo(silencioso) {
+  const [a, e, m] = await Promise.all([leer(FUENTES.arg.file), leer(FUENTES.esp.file), leer(MI_FILE)])
+  const cambio = JSON.stringify([a?.ultimaActualizacion, e?.ultimaActualizacion, m?.ultimaActualizacion]) !== cargarTodo.ult
+  cargarTodo.ult = JSON.stringify([a?.ultimaActualizacion, e?.ultimaActualizacion, m?.ultimaActualizacion])
+  datos.arg = a; datos.esp = e
+  if (m) { if (!silencioso || m.ultimaActualizacion !== ultimaConocida) { est = Object.assign(VACIO(), m); ultimaConocida = m.ultimaActualizacion } }
+  else if (!est) est = VACIO()
+  if (!silencioso || cambio) { juntarLogos(); render() }
+}
+
+// ══════════════════════════════════════════════
+// CÁLCULOS
+// ══════════════════════════════════════════════
+// Equipo de cada lado de una final: lo elegido a mano, o el campeón de esa app (si es de esta temporada)
+function campeonDe(app, comp) {
+  const r = res(app); if (!r) return null
+  const c = r.camp?.[comp]; if (!c) return null
+  const inst = r.inst?.[comp] || `${c.nombre}|${c.dueno}`
+  if (est.usados?.[comp]?.[app] && est.usados[comp][app] === inst) return null  // ya se usó en una temporada anterior
+  return { ...c, app, inst }
+}
+function ladoFinal(k, app) {
+  const f = est.finales[k] || {}
+  const manual = f[app]
+  if (manual) return { ...manual, app, manual: true }
+  return campeonDe(app, k)
+}
+function resultadoFinal(k) {
+  const f = est.finales[k] || {}
+  const A = ladoFinal(k, 'arg'), B = ladoFinal(k, 'esp')
+  if (!A || !B || f.gl == null || f.gv == null) return { A, B, jugado: false }
+  let gan = f.gl > f.gv ? 'arg' : f.gv > f.gl ? 'esp' : (f.pl != null && f.pv != null && f.pl !== f.pv ? (f.pl > f.pv ? 'arg' : 'esp') : null)
+  return { A, B, jugado: !!gan, gan, f }
+}
+// Candidatos para elegir a mano (campeón, subcampeón, punteros de la liga)
+function candidatos(app, comp) {
+  const r = res(app); if (!r) return []
+  const out = [], vistos = new Set()
+  const add = (x, et) => { if (x?.nombre && !vistos.has(x.nombre)) { vistos.add(x.nombre); out.push({ nombre: x.nombre, dueno: x.dueno || '', et }) } }
+  add(r.camp?.[comp], 'Campeón'); add(r.sub?.[comp], 'Subcampeón')
+  if (comp === 'liga') (r.prog?.liga?.top || []).forEach((x, i) => add(x, `${i + 1}° en la tabla`))
+  if (comp === 'mundial' || comp === 'copa') (r.prog?.liga?.top || []).forEach((x, i) => add(x, `${i + 1}° de la liga`))
+  return out
+}
+
+// Partidos de todo (los dos resúmenes + finales intercontinentales)
+function partidosFinalesHist() {
+  return (est.historial || []).filter(h => h.tipo !== 'balon' && h.gl != null).map(h => ['Intercontinental', h.a.nombre, h.a.dueno, h.b.nombre, h.b.dueno, h.gl, h.gv])
+}
+function partidosFinalesActuales() {
+  const out = []
+  for (const F of FINALES) { const r = resultadoFinal(F.k); if (r.jugado) out.push(['Intercontinental', r.A.nombre, r.A.dueno, r.B.nombre, r.B.dueno, r.f.gl, r.f.gv]) }
+  return out
+}
+function statsDe(partidos) {
+  const st = {}
+  const base = d => st[d] ||= { pj: 0, pg: 0, pe: 0, pp: 0, gf: 0, gc: 0 }
+  for (const [, , ld, , vd, gl, gv] of partidos) {
+    if (!ld || !vd || ld === vd || gl == null || gv == null) continue
+    for (const [d, gf, gc] of [[ld, gl, gv], [vd, gv, gl]]) {
+      const s = base(d); s.pj++; s.gf += gf; s.gc += gc
+      if (gf > gc) s.pg++; else if (gf < gc) s.pp++; else s.pe++
+    }
+  }
+  return st
+}
+// Lista de todos los títulos de cada jugador
+function todosLosTitulos() {
+  const out = []
+  for (const app of Object.keys(FUENTES)) {
+    const r = res(app); if (!r) continue
+    for (const h of r.historial || []) if (h.dueno) out.push({ dueno: h.dueno, tipo: h.competencia, nombre: r.labels?.[h.competencia] || h.competencia, club: h.campeon, temporada: h.temporada, app })
+    for (const t of r.rl || []) if (t.dueno) out.push({ dueno: t.dueno, tipo: 'rl', nombre: `${t.comp}`, club: t.campeon, temporada: t.torneo, app })
+  }
+  for (const h of est.historial || []) {
+    if (h.tipo === 'balon') out.push({ dueno: h.dueno, tipo: 'balon', nombre: 'Balón de Oro', club: null, temporada: `Temporada ${h.temporada}`, app: 'inter' })
+    else out.push({ dueno: h.dueno, tipo: 'inter-' + h.tipo, nombre: FINALES.find(f => f.k === h.tipo)?.nombre || h.tipo, club: h.campeon, temporada: `Temporada ${h.temporada}`, app: 'inter' })
+  }
+  return out
+}
+const ptsTitulo = t => t.tipo === 'balon' ? PTS_TITULO.balon : t.tipo.startsWith('inter-') ? PTS_TITULO.inter : (PTS_TITULO[t.tipo] || 3)
+function rankingGlobal() {
+  const ps = []
+  for (const app of Object.keys(FUENTES)) { const r = res(app); if (r) ps.push(...(r.arch || []), ...(r.act || [])) }
+  ps.push(...partidosFinalesHist(), ...partidosFinalesActuales())
+  const st = statsDe(ps)
+  const tit = todosLosTitulos()
+  // Finales de esta temporada ya jugadas (todavía no están en el historial)
+  for (const F of FINALES) { const r = resultadoFinal(F.k); if (r.jugado) { const w = r.gan === 'arg' ? r.A : r.B; tit.push({ dueno: w.dueno, tipo: 'inter-' + F.k }) } }
+  const filas = Object.keys(JUG).map(d => {
+    const s = st[d] || { pj: 0, pg: 0, pe: 0, pp: 0, gf: 0, gc: 0 }
+    const mis = tit.filter(t => t.dueno === d)
+    const ptsP = s.pg * 3 + s.pe, ptsT = mis.reduce((n, t) => n + ptsTitulo(t), 0)
+    return { d, ...s, titulos: mis.length, ptsP, ptsT, pts: ptsP + ptsT, ef: s.pj ? Math.round((s.pg * 3 + s.pe) / (s.pj * 3) * 100) : 0 }
+  })
+  return filas.sort((a, b) => b.pts - a.pts || b.ef - a.ef)
+}
+// Balón de Oro: títulos de la temporada actual + rendimiento (promedio de puntos)
+function balonDeOro() {
+  const ps = []
+  for (const app of Object.keys(FUENTES)) { const r = res(app); if (r) ps.push(...(r.act || [])) }
+  ps.push(...partidosFinalesActuales())
+  const st = statsDe(ps)
+  const tit = []
+  for (const app of Object.keys(FUENTES)) {
+    const r = res(app); if (!r) continue
+    for (const comp of ['liga', 'copa', 'mundial']) { const c = campeonDe(app, comp); if (c?.dueno) tit.push({ dueno: c.dueno, tipo: comp, nombre: `${r.labels?.[comp] || comp}`, club: c.nombre }) }
+    if (r.camp?.supercopa?.dueno) tit.push({ dueno: r.camp.supercopa.dueno, tipo: 'supercopa', nombre: r.labels?.supercopa || 'Supercopa', club: r.camp.supercopa.nombre })
+  }
+  for (const F of FINALES) { const r = resultadoFinal(F.k); if (r.jugado) { const w = r.gan === 'arg' ? r.A : r.B; tit.push({ dueno: w.dueno, tipo: 'inter-' + F.k, nombre: F.nombre, club: w.nombre }) } }
+  return Object.keys(JUG).map(d => {
+    const s = st[d] || { pj: 0, pg: 0, pe: 0, pp: 0, gf: 0, gc: 0 }
+    const mis = tit.filter(t => t.dueno === d)
+    const ptsT = mis.reduce((n, t) => n + ptsTitulo(t), 0)
+    const ppp = s.pj ? (s.pg * 3 + s.pe) / s.pj : 0
+    const rend = Math.round(ppp / 3 * 20 * 10) / 10
+    const golesBonus = s.pj ? Math.round((s.gf - s.gc) / s.pj * 2 * 10) / 10 : 0
+    return { d, s, mis, ptsT, rend, golesBonus, total: Math.round((ptsT + rend + golesBonus) * 10) / 10 }
+  }).sort((a, b) => b.total - a.total)
+}
+function estadoTemporada() {
+  const comps = ['liga', 'copa', 'mundial']
+  const listos = {}
+  for (const app of Object.keys(FUENTES)) for (const c of comps) listos[app + c] = !!campeonDe(app, c)
+  const todosListos = Object.values(listos).every(Boolean)
+  const jugadas = FINALES.filter(F => resultadoFinal(F.k).jugado).length
+  return { listos, todosListos, jugadas, completa: jugadas === FINALES.length }
+}
+
+// ══════════════════════════════════════════════
+// RENDER
+// ══════════════════════════════════════════════
+function render() {
+  actualizarAdmin()
+  renderFinales(); renderTemporada(); renderBalon(); renderRanking(); renderVitrina()
+}
+function ir(s) {
+  document.querySelectorAll('.sec').forEach(e => e.classList.toggle('on', e.id === 's-' + s))
+  document.querySelectorAll('nav button').forEach(b => b.classList.toggle('on', b.dataset.s === s))
+  window.scrollTo({ top: 0 })
+  try { localStorage.setItem('ic_tab', s) } catch (e) {}
+}
+function ladoHTML(x, app, comp) {
+  const F = FUENTES[app]
+  if (!x) {
+    const r = res(app)
+    let txt = r ? 'Esperando campeón' : 'Sin datos todavía'
+    if (r && comp === 'liga' && r.prog?.liga) { const p = r.prog.liga, l = p.top?.[0]; txt = `Fecha ${p.jug}/${p.total}${l ? `<br>Líder: <b style="color:${colorDe(l.dueno)}">${esc(l.nombre)}</b>` : ''}` }
+    else if (r && comp !== 'liga' && !r.prog?.[comp]) txt = 'Todavía no empieza'
+    else if (r && r.camp?.[comp] && !campeonDe(app, comp)) txt = 'Esperando la nueva edición'
+    return `<div class="lado"><div style="display:flex;justify-content:center;"><span class="esc ini" style="width:62px;height:62px;border-color:${F.color};color:${F.color};font-size:24px;border-style:dashed;">?</span></div>
+      <div class="pais">${F.bandera} ${F.corto}</div><div class="espera" style="margin-top:4px;">${txt}</div></div>`
+  }
+  return `<div class="lado"><div style="display:flex;justify-content:center;">${escudo(x.nombre, 62, x.dueno)}</div>
+    <div class="nom">${esc(x.nombre)}</div><div class="dueno" style="color:${colorDe(x.dueno)}">${esc(nomJ(x.dueno))}</div>
+    <div class="pais">${F.bandera} ${F.corto}${x.manual ? ' · elegido a mano' : ''}</div></div>`
+}
+function renderFinales() {
+  const cont = document.getElementById('finales'); if (!cont || !est) return
+  const T = estadoTemporada()
+  let html = `<div class="row" style="justify-content:space-between;margin-bottom:10px;"><span class="lbl">Temporada ${est.temporada}</span><span class="lbl" style="color:var(--oro2)">${T.jugadas}/3 finales jugadas</span></div>`
+  for (const F of FINALES) {
+    const f = est.finales[F.k] || {}
+    const r = resultadoFinal(F.k), A = r.A, B = r.B
+    const mismo = A && B && A.dueno && A.dueno === B.dueno
+    let medio = `<div class="vs">VS</div>`
+    if (A && B && f.gl != null && f.gv != null) medio = `<div class="marcador">${f.gl} - ${f.gv}${f.gl === f.gv && f.pl != null ? `<small>Penales ${f.pl}-${f.pv}</small>` : ''}</div>`
+    html += `<div class="card final"><div class="top"><span class="ic">${F.ic}</span><div><b>${F.nombre}</b><small>${F.desc}</small></div></div>
+      <div class="duelo">${ladoHTML(A, 'arg', F.k)}${medio}${ladoHTML(B, 'esp', F.k)}</div>`
+    if (r.jugado) {
+      const w = r.gan === 'arg' ? A : B
+      html += `<div class="campeon-banda">👑 ${esc(w.nombre)} (${esc(nomJ(w.dueno))}) campeón ${FUENTES[r.gan].bandera}</div>`
+    }
+    if (mismo && !r.jugado) html += `<div class="aviso">⚠️ Los dos campeones son de <b>${esc(nomJ(A.dueno))}</b>. ${esAdmin ? 'Cambia uno por el subcampeón para que la final sea entre dos jugadores distintos:' : 'El admin puede cambiar uno por el subcampeón.'}
+      ${esAdmin ? `<div>${['arg', 'esp'].map(app => { const s = res(app)?.sub?.[F.k]; return s ? `<button class="btn sec2" style="padding:7px 10px;font-size:12px;" onclick="usarSub('${F.k}','${app}')">${FUENTES[app].bandera} Usar a ${esc(s.nombre)}</button>` : '' }).join('')}</div>` : ''}</div>`
+    if (A && B && esAdmin) {
+      const emp = f.gl != null && f.gl === f.gv
+      html += `<div class="carga">
+        <input type="number" inputmode="numeric" min="0" id="gl-${F.k}" value="${f.gl ?? ''}" placeholder="-">
+        <b style="color:var(--gris)">-</b>
+        <input type="number" inputmode="numeric" min="0" id="gv-${F.k}" value="${f.gv ?? ''}" placeholder="-">
+        <button class="btn" onclick="guardarFinal('${F.k}')">Guardar</button>
+        <div class="pen" id="pen-${F.k}" style="display:${emp ? '' : 'none'}">Penales:
+          <input type="number" inputmode="numeric" min="0" id="pl-${F.k}" value="${f.pl ?? ''}"> - <input type="number" inputmode="numeric" min="0" id="pv-${F.k}" value="${f.pv ?? ''}"></div>
+      </div>`
+    } else if (!A || !B) {
+      html += `<div class="lock">🔒 Se desbloquea cuando haya campeón en las dos apps</div>`
+    }
+    if (esAdmin) html += `<div style="text-align:center;padding:0 0 10px;"><button class="mini" onclick="elegirEquipos('${F.k}')">✏️ Elegir equipos a mano</button>${f.gl != null ? ` <button class="mini" onclick="borrarResultado('${F.k}')">🗑️ Borrar resultado</button>` : ''}</div>`
+    html += `</div>`
+  }
+  cont.innerHTML = html
+  for (const F of FINALES) {
+    const a = document.getElementById('gl-' + F.k), b = document.getElementById('gv-' + F.k)
+    if (a && b) { const chk = () => { document.getElementById('pen-' + F.k).style.display = a.value !== '' && a.value === b.value ? '' : 'none' }; a.oninput = chk; b.oninput = chk }
+  }
+}
+function estadoCompHTML(app, comp, nombre) {
+  const r = res(app)
+  const c = campeonDe(app, comp)
+  let v
+  if (!r) v = '<span>Sin datos todavía</span>'
+  else if (c) v = `${escudo(c.nombre, 22, c.dueno)}<span>✅ <b style="color:${colorDe(c.dueno)}">${esc(c.nombre)}</b></span>`
+  else if (r.camp?.[comp]) v = '<span>⏳ Esperando la nueva edición</span>'
+  else if (comp === 'liga' && r.prog?.liga) {
+    const p = r.prog.liga
+    return `<div class="estado-comp"><div class="n">${nombre}</div><div class="v"><span>Fecha ${p.jug} de ${p.total}</span></div><div class="barra"><i style="width:${Math.round(p.jug / p.total * 100)}%"></i></div></div>`
+  }
+  else if (r.prog?.[comp]) v = '<span>⚽ En juego</span>'
+  else v = '<span>Todavía no empieza</span>'
+  return `<div class="estado-comp"><div class="n">${nombre}</div><div class="v">${v}</div></div>`
+}
+function renderTemporada() {
+  const cont = document.getElementById('temporada'); if (!cont || !est) return
+  const T = estadoTemporada()
+  const nListos = Object.values(T.listos).filter(Boolean).length
+  let banner
+  if (T.completa) banner = `<div class="banner"><div class="t">🏁 Temporada completa</div><div class="d">Se jugaron las 3 finales. ¡Ya se puede entregar el Balón de Oro!</div>
+      ${esAdmin ? `<button class="btn" style="margin-top:12px;" onclick="cerrarTemporada()">🏁 Cerrar temporada y entregar el Balón de Oro</button>` : ''}</div>`
+  else if (T.todosListos) banner = `<div class="banner"><div class="t">🔓 Semana de Finales</div><div class="d">¡Ya están todos los campeones! A jugar las 3 finales.</div><button class="btn" style="margin-top:12px;" onclick="ir('finales')">Ver las finales</button></div>`
+  else banner = `<div class="banner"><div class="t">⏳ Temporada ${est.temporada} en juego</div><div class="d">${nListos} de 6 campeones definidos</div><div class="barra" style="margin-top:10px;"><i style="width:${Math.round(nListos / 6 * 100)}%"></i></div></div>`
+  const paso = (txt, ok, ya) => `<div class="paso ${ok ? 'ok' : ''} ${ya ? 'ya' : ''}">${ok ? '✅' : ya ? '▶️' : '•'} ${txt}</div>`
+  const pasos = `<div class="pasos">${paso('Ligas y copas', T.todosListos, !T.todosListos)}${paso('Semana de Finales', T.completa, T.todosListos && !T.completa)}${paso('Balón de Oro', false, T.completa)}</div>`
+  const col = app => `<div class="card"><div class="lbl" style="color:${FUENTES[app].color};margin-bottom:6px;">${FUENTES[app].bandera} ${FUENTES[app].nombre}</div>
+      ${estadoCompHTML(app, 'liga', res(app)?.labels?.liga || 'Liga')}${estadoCompHTML(app, 'copa', res(app)?.labels?.copa || 'Copa')}${estadoCompHTML(app, 'mundial', 'Mundial de Clubes')}</div>`
+  const hist = (est.historial || []).filter(h => h.tipo !== 'balon')
+  const temps = [...new Set((est.historial || []).map(h => h.temporada))].sort((a, b) => b - a)
+  const histHTML = temps.length ? `<div class="grupo-t">📜 Temporadas anteriores</div>` + temps.map(t => {
+    const hs = (est.historial || []).filter(h => h.temporada === t)
+    return `<div class="card"><div class="lbl" style="margin-bottom:8px;">Temporada ${t}</div>${hs.map(h => h.tipo === 'balon'
+      ? `<div class="row" style="padding:5px 0;">⚽ ${foto(h.dueno, 26)}<span style="font-size:13px;"><b>Balón de Oro:</b> <b style="color:${colorDe(h.dueno)}">${esc(nomJ(h.dueno))}</b></span></div>`
+      : `<div class="row" style="padding:5px 0;">${CUP['inter-' + h.tipo] || '🏆'} ${escudo(h.campeon, 26, h.dueno)}<span style="font-size:13px;min-width:0;"><b>${esc(FINALES.find(f => f.k === h.tipo)?.nombre || h.tipo)}:</b> <b style="color:${colorDe(h.dueno)}">${esc(h.campeon)}</b> <span style="color:var(--gris)">${h.gl}-${h.gv}${h.pl != null && h.gl === h.gv ? ` (pen. ${h.pl}-${h.pv})` : ''} vs ${esc(h.rival)}</span></span></div>`).join('')}</div>`
+  }).join('') : ''
+  cont.innerHTML = banner + pasos + `<div class="cols">${col('arg')}${col('esp')}</div>` + histHTML
+}
+function renderBalon() {
+  const cont = document.getElementById('balon'); if (!cont || !est) return
+  const b = balonDeOro()
+  const T = estadoTemporada()
+  const orden = [b[1], b[0], b[2]].filter(Boolean)
+  const alto = { 0: 70, 1: 100, 2: 50 }
+  const podio = `<div class="podio">${orden.map(x => { const pos = b.indexOf(x); return `<div class="p">
+      ${foto(x.d, pos === 0 ? 86 : 64)}<div class="nm" style="color:${colorDe(x.d)}">${esc(nomJ(x.d))}</div><div class="sc">${x.total} pts</div>
+      <div class="base" style="height:${alto[pos]}px;">${['🥇', '🥈', '🥉'][pos]}</div></div>` }).join('')}</div>`
+  const ultimo = [...(est.historial || [])].reverse().find(h => h.tipo === 'balon')
+  const cab = `<div class="banner"><div style="font-size:54px;">⚽</div><div class="t">${T.completa ? '¡Listo para entregar!' : 'Carrera al Balón de Oro'}</div>
+      <div class="d">Temporada ${est.temporada}${b[0]?.total ? ` · Favorito: <b style="color:${colorDe(b[0].d)}">${esc(nomJ(b[0].d))}</b>` : ''}</div>${podio}</div>`
+  const det = b.map((x, i) => `<div class="card"><div class="row">${foto(x.d, 44)}<div style="flex:1;min-width:0;"><b style="color:${colorDe(x.d)}">${i + 1}. ${esc(nomJ(x.d))}</b>
+      <div class="desglose">🏆 Títulos: <b>${x.ptsT}</b> · 📈 Rendimiento: <b>${x.rend}</b> · ⚽ Goles: <b>${x.golesBonus}</b><br>
+      ${x.s.pj} partidos · ${x.s.pg}G ${x.s.pe}E ${x.s.pp}P · ${x.s.gf}-${x.s.gc}${x.mis.length ? '<br>' + x.mis.map(t => `${CUP[t.tipo] || '🏆'} ${esc(t.nombre)}`).join(' · ') : ''}</div></div>
+      <div style="font-family:Oswald;font-size:24px;color:var(--oro2);">${x.total}</div></div></div>`).join('')
+  const reglas = `<div class="card"><div class="lbl" style="margin-bottom:6px;">Cómo se calcula</div><div class="desglose">
+      Títulos de esta temporada: Liga ${PTS_TITULO.liga} · Copa ${PTS_TITULO.copa} · Mundial ${PTS_TITULO.mundial} · Supercopa ${PTS_TITULO.supercopa} · cada final Intercontinental ${PTS_TITULO.inter}<br>
+      Rendimiento: hasta 20 según el promedio de puntos por partido (ganar todo = 20)<br>Goles: diferencia de gol promedio × 2<br>Solo cuentan los partidos entre jugadores distintos.</div></div>`
+  const ant = (est.historial || []).filter(h => h.tipo === 'balon')
+  const palm = ant.length ? `<div class="grupo-t">🏅 Palmarés</div><div class="card">${ant.map(h => `<div class="row" style="padding:5px 0;">${foto(h.dueno, 30)}<span><b style="color:${colorDe(h.dueno)}">${esc(nomJ(h.dueno))}</b> <span style="color:var(--gris);font-size:12px;">· Temporada ${h.temporada} · ${h.total} pts</span></span></div>`).join('')}</div>` : ''
+  cont.innerHTML = cab + det + reglas + palm
+}
+function renderRanking() {
+  const cont = document.getElementById('ranking'); if (!cont || !est) return
+  const r = rankingGlobal()
+  const lider = r[0]
+  const cab = lider && lider.pts ? `<div class="banner"><div class="row" style="justify-content:center;">${foto(lider.d, 70)}</div><div class="t" style="margin-top:8px;">👑 ${esc(nomJ(lider.d))}</div><div class="d">${lider.pts} puntos · ${lider.titulos} títulos · ${lider.ef}% de efectividad</div></div>` : ''
+  const tabla = `<div class="card" style="padding:8px 10px;"><table><thead><tr><th></th><th style="text-align:left">Jugador</th><th>PJ</th><th>G</th><th>E</th><th>P</th><th>DG</th><th>🏆</th><th>%</th><th>PTS</th></tr></thead><tbody>
+      ${r.map((x, i) => `<tr><td>${['🥇', '🥈', '🥉'][i] || i + 1}</td><td class="j"><div class="row" style="gap:7px;">${foto(x.d, 28)}<b style="color:${colorDe(x.d)}">${esc(nomJ(x.d))}</b></div></td>
+        <td>${x.pj}</td><td>${x.pg}</td><td>${x.pe}</td><td>${x.pp}</td><td>${x.gf - x.gc > 0 ? '+' : ''}${x.gf - x.gc}</td><td>${x.titulos}</td><td>${x.ef}</td><td class="pts">${x.pts}</td></tr>`).join('')}
+      </tbody></table></div>`
+  const det = r.map(x => `<div class="desglose">${foto(x.d, 18)} <b style="color:${colorDe(x.d)}">${esc(nomJ(x.d))}</b>: ${x.ptsP} por partidos + ${x.ptsT} por títulos · ${x.gf} goles a favor, ${x.gc} en contra</div>`).join('')
+  const reglas = `<div class="card"><div class="lbl" style="margin-bottom:6px;">Cómo se suma</div>${det}<div class="desglose" style="margin-top:8px;">
+      Partidos: 3 por victoria y 1 por empate (solo entre jugadores distintos).<br>Títulos: Liga ${PTS_TITULO.liga} · Copa ${PTS_TITULO.copa} · Mundial ${PTS_TITULO.mundial} · Supercopa ${PTS_TITULO.supercopa} · Súper Final ${PTS_TITULO.superfinal} · Final Intercontinental ${PTS_TITULO.inter} · Relámpago ${PTS_TITULO.rl} · Balón de Oro ${PTS_TITULO.balon}.<br>
+      Santi juega en las dos apps, por eso tiene más partidos: la columna % muestra la efectividad.</div></div>`
+  cont.innerHTML = cab + tabla + reglas
+}
+let vitJug = 'santi'
+function renderVitrina() {
+  const cont = document.getElementById('vitrina'); if (!cont || !est) return
+  const tit = todosLosTitulos()
+  const chips = `<div class="chips">${Object.keys(JUG).map(d => { const n = tit.filter(t => t.dueno === d).length; return `<button class="chip ${d === vitJug ? 'on' : ''}" style="${d === vitJug ? `border-color:${colorDe(d)}` : ''}" onclick="vitJug='${d}';renderVitrina()">${foto(d, 46)}${esc(nomJ(d))}<span style="color:var(--oro2)">🏆 ${n}</span></button>` }).join('')}</div>`
+  const mis = tit.filter(t => t.dueno === vitJug)
+  const J = JUG[vitJug]
+  const cab = `<div class="card"><div class="row">${foto(vitJug, 64)}<div style="flex:1;"><div style="font-family:Oswald;font-size:22px;letter-spacing:1px;color:${J.color};text-transform:uppercase;">${J.nombre}</div>
+      <div class="desglose" style="margin-top:2px;">${J.bandera} ${escudo(J.club, 18, vitJug)} ${J.club}</div></div><div style="text-align:center;"><div style="font-family:Oswald;font-size:34px;color:var(--oro2);line-height:1;">${mis.length}</div><div class="lbl">títulos</div></div></div></div>`
+  const grupo = (titulo, lista) => lista.length ? `<div class="grupo-t">${titulo} · ${lista.length}</div><div class="troph">${lista.map(t => `<div class="tr"><div class="cup">${CUP[t.tipo] || '🏆'}</div><div class="cn">${esc(t.nombre)}</div>
+      ${t.club ? `<div class="cl">${escudo(t.club, 20, t.dueno)}<span>${esc(t.club)}</span></div>` : ''}<div class="tp">${esc(t.temporada ?? '')}</div></div>`).join('')}</div>` : ''
+  const sinRL = x => x.tipo !== 'rl'
+  let html = chips + cab
+  html += grupo('🌎 Intercontinental', mis.filter(t => t.app === 'inter'))
+  html += grupo('🇦🇷 App Liga Argentina', mis.filter(t => t.app === 'arg' && sinRL(t)))
+  html += grupo('🇪🇸 App LaLiga', mis.filter(t => t.app === 'esp' && sinRL(t)))
+  html += grupo('⚡ Torneos Relámpago', mis.filter(t => t.tipo === 'rl'))
+  if (!mis.length) html += `<div class="card" style="text-align:center;color:var(--gris);">Todavía no hay trofeos en la vitrina de ${esc(J.nombre)}.</div>`
+  cont.innerHTML = html
+}
+
+// ══════════════════════════════════════════════
+// ACCIONES (admin)
+// ══════════════════════════════════════════════
+async function guardarFinal(k) {
+  const v = id => { const x = document.getElementById(id)?.value; return x === '' || x == null ? null : Math.max(0, parseInt(x, 10)) }
+  const gl = v('gl-' + k), gv = v('gv-' + k)
+  if (gl == null || gv == null || isNaN(gl) || isNaN(gv)) { toast('Pon los goles de los dos', true); return }
+  let pl = null, pv = null
+  if (gl === gv) {
+    pl = v('pl-' + k); pv = v('pv-' + k)
+    if (pl == null || pv == null || pl === pv) { document.getElementById('pen-' + k).style.display = ''; toast('Empate: pon el resultado de los penales', true); return }
+  }
+  const f = est.finales[k] ||= {}
+  Object.assign(f, { gl, gv, pl, pv })
+  const r = resultadoFinal(k)
+  if (await guardar()) {
+    render()
+    if (r.jugado) { const w = r.gan === 'arg' ? r.A : r.B; festejo(FINALES.find(F => F.k === k), w) }
+  }
+}
+async function borrarResultado(k) {
+  if (!confirm('¿Borrar el resultado de esta final?')) return
+  const f = est.finales[k] ||= {}
+  delete f.gl; delete f.gv; delete f.pl; delete f.pv
+  if (await guardar()) render()
+}
+async function usarSub(k, app) {
+  const s = res(app)?.sub?.[k]; if (!s) return
+  const f = est.finales[k] ||= {}
+  f[app] = { nombre: s.nombre, dueno: s.dueno }
+  if (await guardar()) render()
+}
+function elegirEquipos(k) {
+  const F = FINALES.find(x => x.k === k)
+  const f = est.finales[k] || {}
+  const sec = app => {
+    const c = candidatos(app, k)
+    return `<div class="lbl" style="margin-top:14px;color:${FUENTES[app].color}">${FUENTES[app].bandera} ${FUENTES[app].nombre}</div>
+      <button class="opc" onclick="fijarLado('${k}','${app}',null)">🔄 <div><b>Automático</b><small>El campeón cuando se defina</small></div>${!f[app] ? ' ✅' : ''}</button>
+      ${c.map((x, i) => `<button class="opc" onclick="fijarLado('${k}','${app}',${i})">${escudo(x.nombre, 30, x.dueno)}<div style="flex:1;"><b>${esc(x.nombre)}</b><small>${esc(x.et)} · <span style="color:${colorDe(x.dueno)}">${esc(nomJ(x.dueno))}</span></small></div>${f[app]?.nombre === x.nombre ? ' ✅' : ''}</button>`).join('') || '<div class="desglose">No hay equipos para elegir todavía.</div>'}`
+  }
+  abrirModal(`<h2 style="font-size:18px;">${F.ic} ${F.nombre}</h2><div class="sub" style="margin:0;">Elige quién juega de cada lado. Sirve, por ejemplo, para jugar la final antes de que termine todo, o para cambiar un campeón por el subcampeón.</div>${sec('arg')}${sec('esp')}
+    <button class="btn sec2" style="width:100%;margin-top:16px;" onclick="cerrarModal()">Listo</button>`)
+}
+async function fijarLado(k, app, i) {
+  const f = est.finales[k] ||= {}
+  if (i == null) delete f[app]
+  else { const x = candidatos(app, k)[i]; f[app] = { nombre: x.nombre, dueno: x.dueno } }
+  if (await guardar()) { render(); elegirEquipos(k) }
+}
+async function cerrarTemporada() {
+  const T = estadoTemporada(); if (!T.completa) return
+  if (!confirm(`¿Cerrar la Temporada ${est.temporada}? Se guardan las 3 finales y el Balón de Oro en el historial, y se empieza una temporada nueva.`)) return
+  const t = est.temporada
+  for (const F of FINALES) {
+    const r = resultadoFinal(F.k)
+    const w = r.gan === 'arg' ? r.A : r.B, l = r.gan === 'arg' ? r.B : r.A
+    est.historial.push({ temporada: t, tipo: F.k, campeon: w.nombre, dueno: w.dueno, app: r.gan, rival: l.nombre, rivalDueno: l.dueno, a: { nombre: r.A.nombre, dueno: r.A.dueno }, b: { nombre: r.B.nombre, dueno: r.B.dueno }, gl: r.f.gl, gv: r.f.gv, pl: r.f.pl, pv: r.f.pv })
+  }
+  const b = balonDeOro()[0]
+  est.historial.push({ temporada: t, tipo: 'balon', dueno: b.d, total: b.total })
+  // marcar qué ediciones ya se usaron, para que la temporada nueva espere a los campeones nuevos
+  est.usados = {}
+  for (const comp of ['liga', 'copa', 'mundial']) { est.usados[comp] = {}; for (const app of Object.keys(FUENTES)) est.usados[comp][app] = campeonDe(app, comp)?.inst || res(app)?.inst?.[comp] || '' }
+  est.finales = { liga: {}, copa: {}, mundial: {} }
+  est.temporada = t + 1
+  if (await guardar()) {
+    render()
+    festejo({ ic: '⚽', nombre: `Balón de Oro · Temporada ${t}` }, { nombre: nomJ(b.d), dueno: b.d }, true)
+  }
+}
+
+// ══════════════════════════════════════════════
+// ADMIN / UI
+// ══════════════════════════════════════════════
+function actualizarAdmin() {
+  esAdmin = !!getToken()
+  const b = document.getElementById('admin-btn')
+  b.textContent = esAdmin ? '⚡ Admin' : '🔐 Admin'
+  b.classList.toggle('on', esAdmin)
+}
+function abrirAdmin() {
+  if (esAdmin) {
+    abrirModal(`<h2 style="font-size:18px;">⚡ Modo admin activo</h2><div class="sub">Usa el mismo token que las otras dos apps.</div>
+      <button class="btn sec2" style="width:100%;" onclick="salirAdmin()">Cerrar sesión de admin</button><button class="btn" style="width:100%;margin-top:8px;" onclick="cerrarModal()">Listo</button>`)
+    return
+  }
+  abrirModal(`<h2 style="font-size:18px;">🔐 Modo admin</h2><div class="sub" style="margin:0;">Pega el mismo token de GitHub que usas en las otras apps.</div>
+    <input type="password" id="tok" placeholder="ghp_… o github_pat_…" autocomplete="off"><div id="tok-msg" class="desglose"></div>
+    <button class="btn" style="width:100%;" onclick="activarAdmin()">Activar</button>`)
+}
+function activarAdmin() {
+  const t = document.getElementById('tok').value.trim()
+  if (!t.startsWith('ghp_') && !t.startsWith('github_pat_')) { document.getElementById('tok-msg').innerHTML = '<span style="color:var(--mal)">Token inválido.</span>'; return }
+  try { localStorage.setItem('mc_token', t) } catch (e) {}
+  cerrarModal(); toast('Modo admin activado'); cargarTodo()
+}
+function salirAdmin() { try { localStorage.removeItem('mc_token') } catch (e) {} cerrarModal(); toast('Sesión cerrada'); render() }
+function abrirModal(h) { document.getElementById('modal-box').innerHTML = h; document.getElementById('modal').classList.add('on') }
+function cerrarModal() { document.getElementById('modal').classList.remove('on') }
+let toastT
+function toast(m, mal) {
+  document.querySelectorAll('.toast').forEach(e => e.remove())
+  const d = document.createElement('div'); d.className = 'toast' + (mal ? ' mal' : ''); d.textContent = m; document.body.appendChild(d)
+  clearTimeout(toastT); toastT = setTimeout(() => { d.style.opacity = 0; setTimeout(() => d.remove(), 300) }, 2200)
+}
+function festejo(F, w, jugador) {
+  const el = document.getElementById('festejo')
+  el.innerHTML = `<div class="cup">${F.ic}</div><div class="t">${esc(F.nombre)}</div>
+    <div style="margin-top:14px;">${jugador ? foto(w.dueno, 110) : escudo(w.nombre, 110, w.dueno)}</div>
+    <div class="n" style="color:${colorDe(w.dueno)}">${esc(w.nombre)}</div>${jugador ? '' : `<div class="d">${esc(nomJ(w.dueno))} · ¡Campeón!</div>`}<div class="d" style="margin-top:20px;font-size:12px;">Toca para cerrar</div>`
+  el.classList.add('on')
+  const cols = ['#e8c15a', '#74acdf', '#ffffff', '#e0303e', '#ffc400']
+  for (let i = 0; i < 90; i++) {
+    const c = document.createElement('div'); c.className = 'conf'
+    c.style.left = Math.random() * 100 + 'vw'; c.style.background = cols[i % cols.length]
+    c.style.animationDuration = 2 + Math.random() * 2.5 + 's'; c.style.animationDelay = Math.random() * .8 + 's'
+    document.body.appendChild(c); setTimeout(() => c.remove(), 5500)
+  }
+}
+
+// ══════════════════════════════════════════════
+// INICIO
+// ══════════════════════════════════════════════
+;(async () => {
+  let tab = 'finales'; try { tab = localStorage.getItem('ic_tab') || 'finales' } catch (e) {}
+  est = VACIO(); juntarLogos()
+  await cargarTodo()
+  if (document.getElementById('s-' + tab)) ir(tab)
+  const sp = document.getElementById('splash'); setTimeout(() => { sp.style.opacity = 0; setTimeout(() => sp.remove(), 500) }, 900)
+  setInterval(() => { if (!document.hidden && !document.getElementById('modal').classList.contains('on') && !document.activeElement?.matches?.('input')) cargarTodo(true) }, 30000)
+  document.addEventListener('visibilitychange', () => { if (!document.hidden) cargarTodo(true) })
+})()
+</script>
+</body>
+</html>

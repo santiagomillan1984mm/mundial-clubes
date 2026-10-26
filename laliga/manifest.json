@@ -1,12 +1,12 @@
 {
   "name": "Torneo de Campeones · LaLiga",
-  "short_name": "TdC LaLiga",
+  "short_name": "LaLiga",
   "description": "LaLiga, Copa del Rey y Mundial de Clubes — Santi vs Roberto",
   "start_url": "/mundial-clubes/laliga/",
   "scope": "/mundial-clubes/laliga/",
   "display": "standalone",
-  "background_color": "#1a1a2e",
-  "theme_color": "#1a1a2e",
+  "background_color": "#1a0b0e",
+  "theme_color": "#1a0b0e",
   "icons": [
     {
       "src": "icon-laliga-192.png",

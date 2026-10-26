@@ -4886,6 +4886,53 @@ function getEquipo(id) {
   return getTodosEquipos().find(e => e.id === id) || null
 }
 
+// ══════════════════════════════════════════════
+// REACOMODO: en las eliminatorias nadie juega contra sí mismo.
+// Cuando termina una ronda, si en la siguiente quedan cruces Santi vs Santi y rival vs rival,
+// se intercambian equipos entre esos cruces. Si es inevitable, se define por escritorio.
+// ══════════════════════════════════════════════
+function reacAjustar(store, ronda, deseado, crucesSig, completa, duenoDe, protegidos = []) {
+  const R = (store.reac ||= {})
+  // 1) los intercambios ya hechos siguen valiendo mientras no cambien los ganadores
+  let sw = (R[ronda] || []).filter(x => deseado[x.a]?.[x.la] === x.ta && deseado[x.b]?.[x.lb] === x.tb)
+  for (const x of sw) { deseado[x.a][x.la] = x.tb; deseado[x.b][x.lb] = x.ta }
+  if (completa) {
+    const ids = Object.keys(deseado)
+    const jugado = id => { const c = crucesSig.find(k => k.id === id); return c && (c.golesLocal != null || c.golesVisitante != null || c.ganador) && c.local === deseado[id].local && c.visitante === deseado[id].visitante }
+    const mismo = id => { const d = deseado[id]; const a = d.local && duenoDe(d.local); return a && d.visitante && a === duenoDe(d.visitante) }
+    const conf = ids.filter(id => mismo(id) && !jugado(id))
+    const porD = {}
+    conf.forEach(id => (porD[duenoDe(deseado[id].local)] ||= []).push(id))
+    const ds = Object.keys(porD)
+    if (ds.length >= 2) {
+      const A = porD[ds[0]], B = porD[ds[1]], mitad = ids.length / 2
+      const lado = id => (protegidos.includes(deseado[id].visitante) ? 'local' : 'visitante')
+      while (A.length && B.length) {
+        // primero dentro de la misma mitad del cuadro
+        let par = null
+        for (const a of A) { for (const b of B) if ((ids.indexOf(a) < mitad) === (ids.indexOf(b) < mitad)) { par = [a, b]; break } if (par) break }
+        if (!par) par = [A[0], B[0]]
+        const [a, b] = par, la = lado(a), lb = lado(b)
+        const x = { a, la, ta: deseado[a][la], b, lb, tb: deseado[b][lb] }
+        deseado[a][la] = x.tb; deseado[b][lb] = x.ta
+        sw.push(x)
+        A.splice(A.indexOf(a), 1); B.splice(B.indexOf(b), 1)
+      }
+    }
+  }
+  R[ronda] = sw
+}
+// Cruce entre dos equipos del mismo dueño: el admin elige quién pasa (por escritorio)
+function escritorioHTML(n1, n2, fn) {
+  return `<div style="background:rgba(245,166,35,.1);border:1px solid rgba(245,166,35,.4);border-radius:10px;padding:10px;margin:0 0 14px;text-align:center;">
+    <div style="font-weight:800;font-size:13px;margin-bottom:4px;">🗂️ Los dos equipos son del mismo dueño</div>
+    <div class="text-gris" style="font-size:12px;margin-bottom:8px;">No se juega: elige quién pasa por escritorio.</div>
+    <div style="display:flex;gap:8px;flex-wrap:wrap;justify-content:center;">
+      <button class="btn btn-secondary btn-sm" onclick="${fn}('local')">✅ Pasa ${n1}</button>
+      <button class="btn btn-secondary btn-sm" onclick="${fn}('visitante')">✅ Pasa ${n2}</button>
+    </div></div>`
+}
+
 function calcularGanadorCruce(cruce) {
   if (cruce.golesLocal === null || cruce.golesVisitante === null) return null
   if (cruce.golesLocal > cruce.golesVisitante) return cruce.local
@@ -4902,18 +4949,25 @@ function avanzarRonda(rondaActual, siguienteRonda) {
   const prefixActual = RONDA_PREFIJO[rondaActual]
   const prefixSig = RONDA_PREFIJO[siguienteRonda]
   const mitad = RONDA_TAMANO[rondaActual] / 2
+  // Qué debería haber en cada cruce de la ronda siguiente (con el reacomodo aplicado)
+  const deseado = {}
+  for (let i = 0; i < mitad; i++) {
+    const c1 = crucesActual.find(c => c.id === `${prefixActual}${i * 2 + 1}`)
+    const c2 = crucesActual.find(c => c.id === `${prefixActual}${i * 2 + 2}`)
+    deseado[`${prefixSig}${i + 1}`] = { local: c1?.ganador || null, visitante: c2?.ganador || null }
+  }
+  const completa = Object.values(deseado).every(d => d.local && d.visitante)
+  reacAjustar(estado.bracket, siguienteRonda, deseado, crucesSig, completa, id => getEquipo(id)?.dueno, ['pa1', 'pa2'])
   for (let i = 0; i < mitad; i++) {
     // Se busca por id fijo (o1, o2...), no por posición en el array: como los cruces
     // se van creando de a uno a medida que se conocen los ganadores, el array de una
     // ronda puede tener "huecos" (faltar un cruce todavía no definido) y la posición
     // ya no coincide con el número de cruce.
-    const c1 = crucesActual.find(c => c.id === `${prefixActual}${i * 2 + 1}`)
-    const c2 = crucesActual.find(c => c.id === `${prefixActual}${i * 2 + 2}`)
     const id = `${prefixSig}${i + 1}`
     // Cada lado se muestra apenas se conoce su ganador, aunque el otro lado
     // todavía no esté definido (queda "Por definir" hasta que se juegue).
-    const nuevoLocal = c1?.ganador || null
-    const nuevoVisitante = c2?.ganador || null
+    const nuevoLocal = deseado[id].local
+    const nuevoVisitante = deseado[id].visitante
     let sig = crucesSig.find(c => c.id === id)
     if (!sig) {
       if (!nuevoLocal && !nuevoVisitante) continue
@@ -5325,6 +5379,7 @@ function abrirModalResultado(cruceId, ronda) {
       <div class="modal">
         <h3>⚽ ${tituloRonda}</h3>
         <div class="modal-label" style="margin-bottom:12px;">Partido único</div>
+        ${esAdmin && d1 && d1 === d2 ? escritorioHTML(eq1?.nombre || '?', eq2?.nombre || '?', 'escritorioMundial') : ''}
         <div class="modal-row">
           <span class="modal-equipo-nombre ${d1}" style="color:${d1==='santi'?'#4a9eff':d1==='luciano'?'#ff6b6b':'var(--texto)'}">${eq1?.nombre || '?'}</span>
           <input class="input modal-input" id="gl1" type="number" min="0" max="99" value="${cruce.golesLocal ?? ''}" placeholder="-">
@@ -5344,6 +5399,18 @@ function abrirModalResultado(cruceId, ronda) {
     </div>`
 }
 
+async function escritorioMundial(lado) {
+  const cruce = estado.bracket[modalRonda]?.find(c => c.id === modalCruceId)
+  if (!cruce) return
+  snapshotBracket()
+  cruce.golesLocal = null; cruce.golesVisitante = null
+  cruce.ganador = cruce[lado]; cruce.escritorio = true
+  avanzarGanadores()
+  await guardarEstado()
+  cerrarModal(); renderBracket()
+  toast(`🗂️ Pasa ${getEquipo(cruce.ganador)?.nombre || ''} por escritorio`)
+  verificarCampeon()
+}
 function cerrarModal() {
   const el = document.getElementById('bracket-modal')
   if (el) el.innerHTML = ''
@@ -7112,30 +7179,38 @@ function getCopaDueno(id) {
   return eq ? eq.dueno : ''
 }
 
-function avanzarRondaCopa(crucesActual, siguienteRonda, prefix) {
+const COPA_MITAD = { r2: 8, cuartos: 4, semis: 2, final: 1 }
+function avanzarRondaCopa(crucesActual, siguienteRonda, prefix, prefixAnt) {
   const crucesSig = estado.copaArgentina.bracket[siguienteRonda]
-  const mitad = Math.floor(crucesActual.length / 2)
+  const mitad = COPA_MITAD[siguienteRonda] || Math.floor(crucesActual.length / 2)
+  const deseado = {}
+  // por número de cruce (no por posición), así no importa el orden en que se fueron creando
+  const cr = n => (prefixAnt && crucesActual.find(c => c.id === `${prefixAnt}${n}`)) || (!prefixAnt ? crucesActual[n - 1] : null)
   for (let i = 0; i < mitad; i++) {
-    const c1 = crucesActual[i * 2]
-    const c2 = crucesActual[i * 2 + 1]
+    const c1 = cr(i * 2 + 1), c2 = cr(i * 2 + 2)
     if (!c1?.ganador || !c2?.ganador) continue
-    const id = `${prefix}${i + 1}`
+    deseado[`${prefix}${i + 1}`] = { local: c1.ganador, visitante: c2.ganador }
+  }
+  const completa = mitad > 0 && Object.keys(deseado).length === mitad
+  reacAjustar(estado.copaArgentina.bracket, siguienteRonda, deseado, crucesSig, completa, getCopaDueno)
+  for (const [id, d] of Object.entries(deseado)) {
     let sig = crucesSig.find(c => c.id === id)
     if (!sig) {
-      sig = { id, local: c1.ganador, visitante: c2.ganador, golesLocal: null, golesVisitante: null, ganador: null }
-      crucesSig.push(sig)
-    } else {
-      sig.local = c1.ganador; sig.visitante = c2.ganador
+      crucesSig.push({ id, local: d.local, visitante: d.visitante, golesLocal: null, golesVisitante: null, ganador: null })
+    } else if (sig.local !== d.local || sig.visitante !== d.visitante) {
+      sig.local = d.local; sig.visitante = d.visitante
+      sig.golesLocal = null; sig.golesVisitante = null; sig.ganador = null; delete sig.escritorio
     }
   }
+  crucesSig.sort((a, b) => parseInt(a.id.split('_').pop()) - parseInt(b.id.split('_').pop()))
 }
 
 function avanzarGanadoresCopa() {
   const b = estado.copaArgentina.bracket
-  avanzarRondaCopa(b.r1, 'r2', 'cr2_')
-  avanzarRondaCopa(b.r2, 'cuartos', 'cc_')
-  avanzarRondaCopa(b.cuartos, 'semis', 'cs_')
-  avanzarRondaCopa(b.semis, 'final', 'cf_')
+  avanzarRondaCopa(b.r1, 'r2', 'cr2_', 'cr1_')
+  avanzarRondaCopa(b.r2, 'cuartos', 'cc_', 'cr2_')
+  avanzarRondaCopa(b.cuartos, 'semis', 'cs_', 'cc_')
+  avanzarRondaCopa(b.semis, 'final', 'cf_', 'cs_')
 }
 
 function renderCopaBracket(cont) {
@@ -7257,6 +7332,7 @@ function abrirModalCopa(cruceId, ronda) {
       <div class="modal">
         <h3>🏆 Copa Argentina</h3>
         <div class="modal-label" style="margin-bottom:12px;">Partido único</div>
+        ${esAdmin && d1 && d1 === d2 ? escritorioHTML(n1, n2, 'escritorioCopa') : ''}
         <div class="modal-row">
           <span class="modal-equipo-nombre" style="color:${d1==='santi'?'#4a9eff':'#ff6b6b'}">${n1}</span>
           <input class="input modal-input" id="copa_gl" type="number" min="0" max="99" value="${cruce.golesLocal ?? ''}" placeholder="-">
@@ -7273,6 +7349,17 @@ function abrirModalCopa(cruceId, ronda) {
     </div>`
 }
 
+async function escritorioCopa(lado) {
+  const cruce = estado.copaArgentina.bracket[modalRonda]?.find(c => c.id === modalCruceId)
+  if (!cruce) return
+  cruce.golesLocal = null; cruce.golesVisitante = null
+  cruce.ganador = cruce[lado]; cruce.escritorio = true
+  avanzarGanadoresCopa()
+  await guardarEstado()
+  cerrarModalCopa(); renderCopaBracket(document.getElementById('copa-contenido'))
+  toast(`🗂️ Pasa ${getCopaNombre(cruce.ganador)} por escritorio`)
+  verificarCampeon()
+}
 function cerrarModalCopa() { const el = document.getElementById('copa-modal'); if (el) el.innerHTML = '' }
 
 async function guardarResultadoCopa() {

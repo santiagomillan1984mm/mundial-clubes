@@ -336,6 +336,26 @@
     .alb-lb-cerrar { position: absolute; top: 14px; right: 14px; background: rgba(255,255,255,.12); border: none; color: #fff; font-size: 18px; width: 38px; height: 38px; border-radius: 10px; cursor: pointer; }
     .alb-subiendo { font-size: 12px; color: var(--gris); margin-top: 8px; }
     /* Perfiles */
+    /* Carta FUT */
+    .fut { position: relative; width: 270px; aspect-ratio: 500 / 698; margin: 0 auto; container-type: inline-size; color: #3b2a10; filter: drop-shadow(0 14px 26px rgba(0,0,0,.55)); }
+    .fut-bg { position: absolute; inset: 0; width: 100%; height: 100%; }
+    .fut-izq { position: absolute; left: 17%; top: 13%; width: 17%; display: flex; flex-direction: column; align-items: center; z-index: 2; }
+    .fut-izq b { font-size: 17cqw; font-weight: 800; line-height: .9; letter-spacing: -1px; font-family: 'Oswald', 'Arial Narrow', sans-serif; }
+    .fut-izq small { font-size: 7.5cqw; font-weight: 700; line-height: 1.1; font-family: 'Oswald', 'Arial Narrow', sans-serif; }
+    .fut-linea { width: 70%; height: 1.5px; background: rgba(59,42,16,.55); margin: 3cqw 0 2.5cqw; }
+    .fut-flag { font-size: 9cqw; line-height: 1; }
+    .fut-esc { width: 13cqw; height: 13cqw; display: flex; align-items: center; justify-content: center; margin-top: 2.5cqw; }
+    .fut-esc img { width: 12cqw !important; height: 12cqw !important; object-fit: contain; filter: drop-shadow(0 2px 3px rgba(0,0,0,.3)); }
+    .fut-foto { position: absolute; right: 11%; top: 11.5%; width: 50%; aspect-ratio: 1; object-fit: cover; border-radius: 50% 50% 8px 8px; z-index: 1; cursor: zoom-in;
+      -webkit-mask-image: linear-gradient(to bottom, #000 70%, transparent 100%); mask-image: linear-gradient(to bottom, #000 70%, transparent 100%); }
+    .fut-nom { position: absolute; left: 0; right: 0; top: 53.5%; text-align: center; font-size: 10.5cqw; font-weight: 700; letter-spacing: .5px; text-transform: uppercase; z-index: 2; font-family: 'Oswald', 'Arial Narrow', sans-serif; }
+    .fut-nom::after { content: ''; display: block; width: 68%; height: 1.5px; margin: 1.5cqw auto 0; background: rgba(59,42,16,.45); }
+    .fut-stats { position: absolute; left: 19%; right: 17%; top: 63.5%; display: grid; grid-template-columns: 1fr 1fr; z-index: 2; font-family: 'Oswald', 'Arial Narrow', sans-serif; }
+    .fut-stats > div:first-child { border-right: 1.5px solid rgba(59,42,16,.45); }
+    .fut-stats > div:last-child { padding-left: 11%; }
+    .fut-stats p { margin: 0; font-size: 6.9cqw; font-weight: 500; line-height: 1.38; white-space: nowrap; }
+    .fut-stats p b { font-weight: 800; display: inline-block; min-width: 1.6em; }
+    .fut-pie { position: absolute; left: 0; right: 0; bottom: 7%; text-align: center; font-size: 4.6cqw; font-weight: 800; letter-spacing: 1px; opacity: .7; z-index: 2; font-family: 'Oswald', 'Arial Narrow', sans-serif; }
     /* Carta de jugador (estilo FUT) */
     .pf-carta { position: relative; width: 250px; margin: 0 auto; padding: 16px 16px 14px; border-radius: 22px 22px 60px 60px / 22px 22px 34px 34px; overflow: hidden;
       background: linear-gradient(160deg, #f7e7b0 0%, #d9b45a 30%, #a8792a 62%, #6e4a14 100%); color: #2a1a05;
@@ -1252,6 +1272,7 @@
       50% { opacity: 0.35; transform: scale(0.7); }
     }
   </style>
+  <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@500;700&display=swap" rel="stylesheet">
 </head>
 <body>
 
@@ -7865,6 +7886,14 @@ function renderPerfiles() {
   const st = pfStats(k), ti = pfTitulos(k), riv = pfStats(otro)
   const pct = st.pj ? Math.round(st.pg / st.pj * 100) : 0
   const apodo = estado.perfiles?.[k]?.apodo || ''
+  // Valores estilo carta FUT (0-99) a partir de los números reales
+  const cl = v => Math.max(30, Math.min(99, Math.round(v)))
+  const fut = (() => {
+    if (!st.pj) return { media: 50, stats: [[50, 'VIC'], [50, 'GOL'], [50, 'DEF'], [50, 'TÍT'], [50, 'RAC'], [50, 'EXP']] }
+    const s = [[cl(st.pg / st.pj * 100 + 20), 'VIC'], [cl(st.gf / st.pj * 22), 'GOL'], [cl(99 - st.gc / st.pj * 14), 'DEF'],
+               [cl(45 + ti.total * 9), 'TÍT'], [cl(45 + st.mejorGan * 9), 'RAC'], [cl(45 + st.pj * .6), 'EXP']]
+    return { media: cl(s.reduce((a, x) => a + x[0], 0) / s.length), stats: s }
+  })()
   if (!pfLogosPedidos) { pfLogosPedidos = true; cargarLogosIntl(Object.values(PF_JUG).map(j => j.club).filter(Boolean)).then(n => { if (n) renderPerfiles() }) }
   const escClub = J.club ? escudoNombre(J.club, 46) : ''
   const sel = Object.entries(PF_JUG).map(([kk, j]) => `<button class="${kk === k ? 'on' : ''}" style="--c:${j.color}" onclick="pfActual='${kk}';renderPerfiles()"><img src="${j.foto}" alt="">${j.nombre}</button>`).join('')
@@ -7882,17 +7911,21 @@ function renderPerfiles() {
   cont.innerHTML = `
     <div class="pf-sel">${sel}</div>
     <div class="pf-hero" style="--c:${J.color}">
-      <div class="pf-carta" style="--c:${J.color}">
-        <div class="pf-carta-brillo"></div>
-        <div class="pf-carta-izq">
-          <b>${pct}</b><small>% VIC</small>
-          <span class="pf-carta-sep"></span>
-          <span class="pf-carta-flag">${J.bandera}</span>
-          ${J.club ? `<span class="pf-carta-esc">${escudoNombre(J.club, 34) || '⚽'}</span>` : ''}
+      <div class="fut" style="--c:${J.color}">
+        <img class="fut-bg" src="fut-carta.png" alt="">
+        <div class="fut-izq">
+          <b>${fut.media}</b><small>DT</small>
+          <span class="fut-linea"></span>
+          <span class="fut-flag">${J.bandera}</span>
+          ${J.club ? `<span class="fut-esc">${escudoNombre(J.club, 40) || '⚽'}</span>` : ''}
         </div>
-        <img class="pf-carta-foto" src="${J.foto}" alt="${J.nombre}" onclick="pfFotoGrande('${k}')">
-        <div class="pf-carta-nom">${J.nombre}</div>
-        <div class="pf-carta-stats"><div><b>${st.pj}</b><small>PJ</small></div><div><b>${st.pg}</b><small>PG</small></div><div><b>${st.gf}</b><small>GOL</small></div><div><b>${ti.total}</b><small>TÍT</small></div></div>
+        <img class="fut-foto" src="${J.foto}" alt="${J.nombre}" onclick="pfFotoGrande('${k}')">
+        <div class="fut-nom">${J.nombre}</div>
+        <div class="fut-stats">
+          <div>${fut.stats.slice(0, 3).map(([v, l]) => `<p><b>${v}</b> ${l}</p>`).join('')}</div>
+          <div>${fut.stats.slice(3).map(([v, l]) => `<p><b>${v}</b> ${l}</p>`).join('')}</div>
+        </div>
+        <div class="fut-pie">TdC</div>
       </div>
       <div class="pf-datos">${J.club ? `${escudoNombre(J.club, 18)} Hincha de <b>${J.club}</b> · ` : ''}📍 ${J.bandera} ${J.ciudad}</div>
       <div class="pf-apodo">${apodo ? `“${apodo}”` : ''}${esAdmin ? ` <button onclick="editarApodo('${k}')" style="background:none;border:none;cursor:pointer;font-size:13px;opacity:.7;">✏️</button>` : ''}</div>

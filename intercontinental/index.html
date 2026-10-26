@@ -368,7 +368,13 @@ function rankingGlobal() {
     const s = st[d] || { pj: 0, pg: 0, pe: 0, pp: 0, gf: 0, gc: 0 }
     const mis = tit.filter(t => t.dueno === d)
     const ptsP = s.pg * 3 + s.pe, ptsT = mis.reduce((n, t) => n + ptsTitulo(t), 0)
-    return { d, ...s, titulos: mis.length, ptsP, ptsT, pts: ptsP + ptsT, ef: s.pj ? Math.round((s.pg * 3 + s.pe) / (s.pj * 3) * 100) : 0 }
+    // Parejo: lo de las apps se divide entre la cantidad de apps en que jugó (Santi juega en las dos).
+    // El Balón de Oro no se divide porque ya se calcula parejo.
+    const apps = Object.keys(FUENTES).filter(app => { const r = res(app); return r && ([...(r.act || []), ...(r.arch || [])].some(m => m[2] === d || m[4] === d) || (r.historial || []).some(h => h.dueno === d)) }).length || 1
+    const ptsBalon = mis.filter(t => t.tipo === 'balon').reduce((n, t) => n + ptsTitulo(t), 0)
+    const bruto = ptsP + ptsT
+    const pts = Math.round(((bruto - ptsBalon) / apps + ptsBalon) * 10) / 10
+    return { d, ...s, titulos: mis.length, ptsP, ptsT, bruto, apps, pts, ef: s.pj ? Math.round((s.pg * 3 + s.pe) / (s.pj * 3) * 100) : 0 }
   })
   return filas.sort((a, b) => b.pts - a.pts || b.ef - a.ef)
 }
@@ -562,10 +568,10 @@ function renderRanking() {
         <td>${x.pj}</td><td>${x.pg}</td><td>${x.pe}</td><td>${x.pp}</td><td>${x.gf - x.gc > 0 ? '+' : ''}${x.gf - x.gc}</td><td>${x.titulos}</td><td>${x.ef}</td><td class="pts">${x.pts}</td></tr>`).join('')}
       </tbody></table></div>`
   const tit = todosLosTitulos()
-  const det = r.map(x => `<div class="desglose" style="margin-bottom:6px;">${foto(x.d, 18)} <b style="color:${colorDe(x.d)}">${esc(nomJ(x.d))}</b>: ${x.ptsP} por partidos + ${x.ptsT} por títulos · ${x.gf} goles a favor, ${x.gc} en contra<br>${listaTitulos(tit.filter(t => t.dueno === x.d))}</div>`).join('')
+  const det = r.map(x => `<div class="desglose" style="margin-bottom:6px;">${foto(x.d, 18)} <b style="color:${colorDe(x.d)}">${esc(nomJ(x.d))}</b>: ${x.ptsP} por partidos + ${x.ptsT} por títulos = ${x.bruto}${x.apps > 1 ? ` ÷ ${x.apps} apps = <b style="color:var(--oro2)">${x.pts}</b>` : ''} · ${x.gf} goles a favor, ${x.gc} en contra<br>${listaTitulos(tit.filter(t => t.dueno === x.d))}</div>`).join('')
   const reglas = `<div class="card"><div class="lbl" style="margin-bottom:6px;">Cómo se suma</div>${det}<div class="desglose" style="margin-top:8px;">
       Partidos: 3 por victoria y 1 por empate (solo entre jugadores distintos).<br>Títulos: Liga ${PTS_TITULO.liga} · Copa ${PTS_TITULO.copa} · Mundial ${PTS_TITULO.mundial} · Supercopa ${PTS_TITULO.supercopa} · Súper Final ${PTS_TITULO.superfinal} · Final Intercontinental ${PTS_TITULO.inter} · Relámpago ${PTS_TITULO.rl} · Balón de Oro ${PTS_TITULO.balon}.<br>
-      Santi juega en las dos apps, por eso tiene más partidos: la columna % muestra la efectividad.</div></div>`
+      <b>Justo para todos:</b> como Santi juega en las dos apps tiene el doble de partidos y de chances de títulos, así que su total se divide entre 2 (menos los Balones de Oro, que ya son parejos). La columna % muestra la efectividad.</div></div>`
   cont.innerHTML = cab + tabla + reglas
 }
 let vitJug = 'santi'

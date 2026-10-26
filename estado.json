@@ -1,6 +1,6 @@
 {
   "version": "1.0",
-  "ultimaActualizacion": "2026-10-26T06:18:55.096Z",
+  "ultimaActualizacion": "2026-10-26T06:41:04.311Z",
   "equiposArgentinos": [
     {
       "id": "arg1",
@@ -1453,9 +1453,9 @@
           "id": "cr1_4",
           "local": "pa29",
           "visitante": "pa7",
-          "golesLocal": null,
-          "golesVisitante": null,
-          "ganador": null
+          "golesLocal": 4,
+          "golesVisitante": 10,
+          "ganador": "pa7"
         },
         {
           "id": "cr1_5",
@@ -1559,6 +1559,14 @@
           "id": "cr2_1",
           "local": "pa32",
           "visitante": "pa6",
+          "golesLocal": null,
+          "golesVisitante": null,
+          "ganador": null
+        },
+        {
+          "id": "cr2_2",
+          "local": "pa24",
+          "visitante": "pa7",
           "golesLocal": null,
           "golesVisitante": null,
           "ganador": null

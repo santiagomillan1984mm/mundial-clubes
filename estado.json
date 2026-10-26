@@ -1,6 +1,6 @@
 {
   "version": "1.0",
-  "ultimaActualizacion": "2026-10-26T20:32:03.138Z",
+  "ultimaActualizacion": "2026-10-26T20:32:16.694Z",
   "equiposArgentinos": [
     {
       "id": "arg1",
@@ -2306,7 +2306,7 @@
   ],
   "histAuto": {},
   "resumen": {
-    "at": "2026-10-26T20:32:03.138Z",
+    "at": "2026-10-26T20:32:16.694Z",
     "labels": {
       "liga": "Liga AFA",
       "copa": "Copa Argentina",
@@ -2875,12 +2875,5 @@
       "LOSC Lille": "https://thumb.wikimedia.org/wikipedia/en/thumb/3/3f/Lille_OSC_2018_logo.svg/250px-Lille_OSC_2018_logo.svg.png?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail"
     }
   },
-  "avisos": [
-    {
-      "id": "avmvppq24h",
-      "texto": "Pedazo de toga",
-      "fecha": "2026-10-26T20:32:03.137Z",
-      "enviados": 1
-    }
-  ]
+  "avisos": []
 }

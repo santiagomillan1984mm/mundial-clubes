@@ -9691,8 +9691,26 @@ function startPolling() {
   }, 30000)
 }
 
-function solicitarNotificaciones() {
+// Sin modo admin no se sabe de quién es el teléfono: se pregunta al activar los avisos
+function preguntarQuien(seguir) {
+  document.getElementById('quien-ov')?.remove()
+  document.body.insertAdjacentHTML('beforeend', `<div id="quien-ov" class="modal-overlay" style="z-index:9700;"><div class="modal" style="max-width:360px;text-align:center;">
+    <h3>🔔 ¿De quién es este teléfono?</h3><div class="text-gris" style="font-size:13px;margin:6px 0 14px;">Así los avisos le llegan solo a quien corresponde.</div>
+    <div style="display:flex;gap:10px;justify-content:center;">
+      <button class="btn btn-secondary" style="flex:1;" onclick="elegirQuien('${EV_RIVAL}')">Soy ${EV_RIVAL}</button>
+      <button class="btn btn-secondary" style="flex:1;" onclick="elegirQuien('Santi')">Soy Santi</button>
+    </div></div></div>`)
+  window.__quienSeguir = seguir
+}
+function elegirQuien(q) {
+  try { localStorage.setItem('tdl_quien', q) } catch (e) {}
+  document.getElementById('quien-ov')?.remove()
+  const f = window.__quienSeguir; window.__quienSeguir = null
+  if (f) f()
+}
+function solicitarNotificaciones(yaPregunto) {
   if (!('Notification' in window)) { toast('Tu navegador no soporta notificaciones', true); return }
+  if (!esAdmin && !yaPregunto) { preguntarQuien(() => solicitarNotificaciones(true)); return }
   if (Notification.permission === 'granted') { pushSuscribir(false).then(ok => toast(ok ? '🔔 Avisos activados ✓ (te llegan aunque la app esté cerrada)' : 'Las notificaciones ya están activas ✓')); return }
   Notification.requestPermission().then(p => {
     if (p === 'granted') {
@@ -9764,7 +9782,7 @@ const EV_CANAL = 'sorteos-esp'
 const EV_RIVAL = 'Roberto'
 let evCanal = null, evListo = false, evConectados = []
 let evZonaCorriendo = false, evZonaPendiente = false
-function evQuien() { return esAdmin ? 'Santi' : EV_RIVAL }
+function evQuien() { if (esAdmin) return 'Santi'; try { return localStorage.getItem('tdl_quien') || EV_RIVAL } catch (e) { return EV_RIVAL } }
 // ══════════════════════════════════════════════
 // AVISOS PUSH (llegan aunque la app esté cerrada). Se guardan en Supabase y los manda la función "notificar".
 // ══════════════════════════════════════════════

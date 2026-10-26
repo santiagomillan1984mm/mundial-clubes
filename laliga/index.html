@@ -6561,8 +6561,13 @@ function lsOverlayHTML(asig) {
       #ls-ov .ls-slot.r.ok{border-color:#ff6b6b;background:rgba(255,107,107,.14)}
       #ls-ov .ls-slot.ok{animation:lsPop .45s ease}
       @keyframes lsPop{from{transform:scale(.7);opacity:0}70%{transform:scale(1.05)}to{transform:scale(1);opacity:1}}
-      #ls-ov .ls-big{text-align:center;min-height:150px;display:flex;flex-direction:column;align-items:center;justify-content:center}
-      #ls-ov .ls-big .n{font-size:22px;font-weight:900;margin-top:8px}
+      #ls-ov .ls-big{text-align:center;min-height:240px;padding-top:14px;display:flex;flex-direction:column;align-items:center;justify-content:center}
+      #ls-ov .ls-big .n{font-size:24px;font-weight:900;margin-top:10px;animation:lsSube .5s ease .25s both}
+      #ls-ov .ls-big .d{animation:lsSube .5s ease .35s both}
+      @keyframes lsSube{from{transform:translateY(12px);opacity:0}to{transform:none;opacity:1}}
+      #ls-ov .ls-zoom{width:160px;height:160px;border-radius:50%;background:radial-gradient(circle,#fff 55%,#f3f3f3);display:flex;align-items:center;justify-content:center;box-shadow:0 0 0 4px var(--zc,#ffc400),0 0 50px var(--zc,#ffc400);animation:lsZoom .75s cubic-bezier(.2,1.4,.4,1)}
+      #ls-ov .ls-zoom img,#ls-ov .ls-zoom .logo-init{width:118px !important;height:118px !important}
+      @keyframes lsZoom{0%{transform:scale(.15) rotate(-25deg);opacity:0}60%{transform:scale(1.18) rotate(4deg);opacity:1}100%{transform:scale(1) rotate(0)}}
       #ls-ov .ls-big .d{font-size:13px;font-weight:800;letter-spacing:2px;margin-top:4px}
       #ls-ov .ls-bola{width:92px;height:92px;border-radius:50%;background:#fff;display:flex;align-items:center;justify-content:center;box-shadow:0 0 30px rgba(255,196,0,.45);animation:lsPop .5s ease}
       #ls-ov .ls-gira{font-size:60px;animation:lsGira .6s linear infinite}
@@ -6587,7 +6592,10 @@ function mostrarSorteoLiga(asig) {
   document.body.classList.add('bp-bloqueo')
   envivoPintar()
   const mi = ++lsAnimId
-  const pasos = asig.flatMap((a, i) => [{ i, d: 'santi', id: a.santi }, { i, d: 'roberto', id: a.roberto }])
+  // las 20 bolillas salen en cualquier orden (el reparto ya respeta el nivel); cada una va al próximo lugar libre de su columna
+  const cuenta = { santi: 0, roberto: 0 }
+  const pasos = (asig.orden || lsMezclar(asig.flatMap(a => [{ d: 'santi', id: a.santi }, { d: 'roberto', id: a.roberto }])))
+    .map(p => ({ ...p, i: cuenta[p.d]++ }))
   let k = 0
   const paso = () => {
     if (mi !== lsAnimId) return
@@ -6600,11 +6608,11 @@ function mostrarSorteoLiga(asig) {
     setTimeout(() => {
       if (mi !== lsAnimId) return
       const c = p.d === 'santi' ? '#4a9eff' : '#ff6b6b'
-      big.innerHTML = `<div class="ls-bola">${lsEsc(p.id, 64)}</div><div class="n">${getPoolNombre(p.id)}</div><div class="d" style="color:${c};">PARA ${p.d === 'santi' ? 'SANTI' : 'ROBERTO'}</div>`
+      big.innerHTML = `<div class="ls-zoom" style="--zc:${c}">${lsEsc(p.id, 118)}</div><div class="n">${getPoolNombre(p.id)}</div><div class="d" style="color:${c};">PARA ${p.d === 'santi' ? 'SANTI' : 'ROBERTO'}</div>`
       const slot = document.getElementById(`ls-${p.d === 'santi' ? 's' : 'r'}-${p.i}`)
       if (slot) { slot.classList.add('ok'); slot.innerHTML = `${lsEsc(p.id, 22)}<span>${getPoolNombre(p.id)}</span>`; slot.scrollIntoView({ behavior: 'smooth', block: 'nearest' }) }
       try { sfx.pop() } catch (e) {}
-      setTimeout(paso, 1100)
+      setTimeout(paso, 1500)
     }, 750)
   }
   setTimeout(paso, 900)
@@ -6642,7 +6650,9 @@ function ligaSorteoVivo() {
   if (!esAdmin) return
   const asig = ligaSorteoArmar()
   if (asig.length < 10) { toast('No están los 20 equipos de LaLiga en el pool', true); return }
-  envivoEnviar('liga_start', { asig })
+  const orden = lsMezclar(asig.flatMap(a => [{ d: 'santi', id: a.santi }, { d: 'roberto', id: a.roberto }]))
+  asig.orden = orden
+  envivoEnviar('liga_start', { asig, orden })
   mostrarSorteoLiga(asig)
 }
 async function lsConfirmar() {
@@ -10074,7 +10084,8 @@ function envivoRecibir(m) {
   } else if (m.tipo === 'liga_start') {
     toast('🔴 ¡Santi empezó el sorteo de LaLiga en vivo!')
     mostrarSeccion('liga')
-    mostrarSorteoLiga(m.asig || [])
+    const asig = m.asig || []; asig.orden = m.orden
+    mostrarSorteoLiga(asig)
   } else if (m.tipo === 'liga_fin') {
     lsCerrar(); toast('✅ Liga confirmada'); cargarEstado()
   } else if (m.tipo === 'copa_saltar') {

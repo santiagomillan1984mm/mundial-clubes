@@ -1243,6 +1243,7 @@
       50% { opacity: 0.35; transform: scale(0.7); }
     }
   </style>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.117.2/dist/umd/supabase.js" async onload="window.envivoIniciar && envivoIniciar()"></script>
 </head>
 <body>
 
@@ -4140,6 +4141,7 @@ function elegirPorLiga(lista) {
 function salirBolilleroFull() {
   document.getElementById('bolillero-container')?.classList.remove('bp-full')
   document.body.classList.remove('bp-bloqueo')
+  setTimeout(envivoPintar, 0)
 }
 function hacerSorteo() {
   if (poolClubes.length < 10) { toast('Pool de clubes no cargado', true); return }
@@ -4170,8 +4172,13 @@ function hacerSorteo() {
   cargarLogosIntl(elegidos.map(e => e.nombre))
   estado.sorteo.realizado = true
   estado.sorteo.confirmado = false
-
+  envivoEnviar('mundial_start', { elegidos, plan })
+  mostrarSorteoMundial(elegidos)
+}
+// Animación del bolillero del Mundial (la usan el admin y, en vivo, el que mira)
+function mostrarSorteoMundial(elegidos) {
   const contBol = document.getElementById('bolillero-container')
+  if (!contBol) { renderSorteo(); return }
   contBol.style.display = 'block'
   contBol.classList.add('bp-full'); contBol.scrollTop = 0
   document.body.classList.add('bp-bloqueo')
@@ -4181,12 +4188,14 @@ function hacerSorteo() {
   // cola de zonas: se sortean por partes
   sorteoZonasCola = ZONAS_MUNDIAL.map(z => ({ zona: z, bolillas: elegidos.filter(e => e.zona === z.id) }))
   const miAnim = ++sorteoAnimId
+  envivoPintar()
   document.querySelectorAll('[onclick="hacerSorteo()"]').forEach(b => b.disabled = true)
   sortearSiguienteZona(miAnim)
 }
 function sortearSiguienteZona(animId = sorteoAnimId) {
   if (animId !== sorteoAnimId) return
   const sig = document.getElementById('bol-sig-zona'); if (sig) { sig.style.display = 'none'; sig.innerHTML = '' }
+  evZonaCorriendo = true
   const parte = sorteoZonasCola.shift()
   if (!parte) return
   document.querySelectorAll('.zona-box').forEach(b => b.classList.toggle('activa', b.id === `zona-${parte.zona.id}`))
@@ -4205,6 +4214,7 @@ function sortearSiguienteZona(animId = sorteoAnimId) {
 }
 function zonaTerminada(animId) {
   // Se llama al final de cada zona: si quedan zonas, pausa con botón para seguir
+  evZonaCorriendo = false
   if (!sorteoZonasCola.length) return false
   const prox = sorteoZonasCola[0].zona
   const esfera = document.getElementById('bolillero-esfera'); esfera?.classList.remove('girando')
@@ -4216,7 +4226,9 @@ function zonaTerminada(animId) {
   sfx.tribuna(1.4, .18)
   const sig = document.getElementById('bol-sig-zona')
   if (sig) {
-    sig.innerHTML = `<button class="btn btn-gold" onclick="sortearSiguienteZona(${animId})">▶️ Sortear ${prox.emoji} ${prox.nombre}</button>`
+    sig.innerHTML = esAdmin ? `<button class="btn btn-gold" onclick="evSiguienteZona(${animId})">▶️ Sortear ${prox.emoji} ${prox.nombre}</button>`
+      : `<div class="text-gris" style="text-align:center;font-weight:700;">⏳ Esperando que Santi sortee ${prox.emoji} ${prox.nombre}…</div>`
+    if (!esAdmin && evZonaPendiente) { evZonaPendiente = false; setTimeout(() => sortearSiguienteZona(animId), 900) }
     sig.style.display = 'block'
     const box = document.getElementById('bolillero-container')
     if (box?.classList.contains('bp-full')) setTimeout(() => sig.scrollIntoView({ behavior: 'smooth', block: 'center' }), 200)
@@ -4582,6 +4594,7 @@ function animarBolillero(bolillas, idx, animId = sorteoAnimId) {
     numEl.textContent = ''
     duenoEl.innerHTML = ''
     document.getElementById('bol-botones').style.display = 'flex'
+    if (!esAdmin) document.querySelectorAll('#bol-botones [onclick="confirmarSorteo()"], #bol-botones [onclick="hacerSorteo()"]').forEach(b => b.style.display = 'none')
     document.querySelectorAll('[onclick="hacerSorteo()"]').forEach(b => b.disabled = false)
     // agregar ✏️ a cada equipo para resortearlo individualmente
     if (esAdmin) document.querySelectorAll('#bolillero-container .bolilla-item').forEach(row => {
@@ -4694,6 +4707,7 @@ async function confirmarSorteo() {
   salirBolilleroFull()
   estado.sorteo.confirmado = true
   await guardarEstado()
+  envivoEnviar('mundial_fin')
   renderTodo()
   toast('¡Sorteo confirmado!')
 }
@@ -6672,6 +6686,7 @@ async function confirmarCopa() {
   copa.sorteo.confirmado = true
   copa.configurado = true
   await guardarEstado()
+  envivoEnviar('copa_fin')
   renderCopa()
   toast('¡Copa Argentina confirmada!')
 }
@@ -6881,6 +6896,7 @@ function toggleEditarCopa() { copaEditando = !copaEditando; copaEditSel = null; 
 function salirCopaBolFull() {
   document.getElementById('copa-bol')?.classList.remove('bp-full')
   document.body.classList.remove('bp-bloqueo')
+  setTimeout(envivoPintar, 0)
 }
 function cbCruceHTML(i, c, mostrar = {}) {
   const lado = (id, ver) => {
@@ -6942,7 +6958,11 @@ async function hacerSorteoCopa() {
   copa.bracket = { r1, r2: [], cuartos: [], semis: [], final: [] }
   copa.sorteo = { realizado: true, confirmado: false }
   copa.configurado = false
-
+  envivoEnviar('copa_start', { equipos, bracket: copa.bracket })
+  await mostrarSorteoCopa(extras, invitados, r1)
+}
+// Animación del bolillero de la Copa (la usan el admin y, en vivo, el que mira)
+async function mostrarSorteoCopa(extras, invitados, r1) {
   // Pasos del bolillero
   copaPasos = [
     ...extras.map(e => ({ tipo: 'extra', id: e.id })),
@@ -6959,6 +6979,7 @@ async function hacerSorteoCopa() {
   document.getElementById('cb-cruces').innerHTML = r1.map((c, i) => cbCruceHTML(i, c, { local: false, visitante: false })).join('')
   copaSorteoCorriendo = true
   const miAnim = ++copaAnimId
+  envivoPintar()
   document.getElementById('cb-revela').innerHTML = `${compLogos.copa ? `<img src="${compLogos.copa}" alt="Copa Argentina" style="height:70px;object-fit:contain;display:block;margin:0 auto 4px;">` : ''}<div class="bolillero-texto">Preparando bolillas…</div>`
   await Promise.race([cargarLogosMX(invitados.map(e => e.nombre)), new Promise(r => setTimeout(r, 3000))])
   if (miAnim !== copaAnimId) return
@@ -7019,6 +7040,7 @@ function finSorteoCopa() {
   sfx.tribuna(2.5, .25)
 }
 function saltarSorteoCopa() {
+  envivoEnviar('copa_saltar')
   ++copaAnimId
   const r1 = estado.copaArgentina.bracket.r1
   copaPasos.forEach(p => { if (p.tipo !== 'cruce') cbPonerEnLista(p) })
@@ -7297,6 +7319,7 @@ function mostrarSeccion(id) {
   if (btn) btn.classList.add('active')
   if (id === 'superfinal') renderSuperFinal()
   if (id === 'admin') renderHimnos()
+  try { envivoPintar() } catch (e) {}
 }
 
 // ══════════════════════════════════════════════
@@ -9461,6 +9484,89 @@ function ocultarSplash() {
   setTimeout(() => { el.classList.add('oculto'); setTimeout(() => el.remove(), 550) }, espera)
 }
 
+// ══════════════════════════════════════════════
+// SORTEO EN VIVO (Supabase Realtime): el otro ve el bolillero al mismo tiempo
+// ══════════════════════════════════════════════
+const EV_URL = 'https://tagsayeupezrfllbjpjv.supabase.co'
+const EV_KEY = 'sb_publishable_xZVN3lc7qhR1RSr4jk054A_oygTrLka'
+const EV_CANAL = 'sorteos-arg'
+const EV_RIVAL = 'Luciano'
+let evCanal = null, evListo = false, evConectados = []
+let evZonaCorriendo = false, evZonaPendiente = false
+function evQuien() { return esAdmin ? 'Santi' : EV_RIVAL }
+function envivoIniciar() {
+  if (evCanal || !window.supabase?.createClient) return
+  try {
+    const sb = window.supabase.createClient(EV_URL, EV_KEY, { auth: { persistSession: false, autoRefreshToken: false }, realtime: { params: { eventsPerSecond: 20 } } })
+    const yo = evQuien() + '-' + Math.random().toString(36).slice(2, 7)
+    evCanal = sb.channel(EV_CANAL, { config: { broadcast: { self: false, ack: false }, presence: { key: yo } } })
+    evCanal.on('broadcast', { event: 'sorteo' }, ({ payload }) => { try { envivoRecibir(payload || {}) } catch (e) { console.warn('en vivo', e) } })
+    evCanal.on('presence', { event: 'sync' }, () => {
+      try { evConectados = Object.values(evCanal.presenceState()).flat().map(p => p.quien).filter(Boolean) } catch (e) { evConectados = [] }
+      envivoPintar()
+    })
+    evCanal.subscribe(async st => {
+      if (st === 'SUBSCRIBED') { evListo = true; try { await evCanal.track({ quien: evQuien() }) } catch (e) {} }
+      else if (st === 'CHANNEL_ERROR' || st === 'TIMED_OUT' || st === 'CLOSED') evListo = false
+      envivoPintar()
+    })
+  } catch (e) { console.warn('en vivo', e) }
+}
+function envivoEnviar(tipo, data = {}) {
+  if (!esAdmin || !evCanal || !evListo) return
+  try { evCanal.send({ type: 'broadcast', event: 'sorteo', payload: { tipo, ...data } }) } catch (e) {}
+}
+function envivoPintar() {
+  let el = document.getElementById('ev-pill')
+  if (!el) {
+    el = document.createElement('div'); el.id = 'ev-pill'
+    el.style.cssText = 'position:fixed;left:50%;transform:translateX(-50%);bottom:calc(86px + env(safe-area-inset-bottom));z-index:9600;background:rgba(12,16,32,.94);border:1px solid rgba(255,255,255,.18);color:#fff;font-size:12.5px;font-weight:800;padding:7px 14px;border-radius:999px;box-shadow:0 6px 20px rgba(0,0,0,.45);white-space:nowrap;pointer-events:none;display:none;'
+    document.body.appendChild(el)
+  }
+  const enSorteo = document.body.classList.contains('bp-bloqueo') || (esAdmin && ['sec-sorteo', 'sec-copa'].some(id => document.getElementById(id)?.classList.contains('activa')))
+  if (!evListo || !enSorteo) { el.style.display = 'none'; return }
+  const otros = [...new Set(evConectados.filter(q => q !== evQuien()))]
+  const dot = '<span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:#ff3b3b;margin-right:6px;box-shadow:0 0 8px #ff3b3b;vertical-align:1px;"></span>'
+  el.innerHTML = esAdmin
+    ? `${dot}EN VIVO · ${otros.length ? `👀 ${otros.join(' y ')} ${otros.length > 1 ? 'están' : 'está'} mirando` : 'nadie mirando todavía'}`
+    : `${dot}EN VIVO${otros.includes('Santi') ? ' con Santi' : ''}`
+  el.style.display = 'block'
+}
+function envivoRecibir(m) {
+  if (esAdmin || !estado) return   // el admin es el que sortea
+  if (m.tipo === 'mundial_start') {
+    toast('🔴 ¡Santi empezó el sorteo del Mundial en vivo!')
+    estado.sorteo = { ...(estado.sorteo || {}), internacionales: m.elegidos || [], realizado: false, confirmado: false }
+    sorteoSlotsPlan = m.plan || []
+    mostrarSeccion('sorteo'); renderSorteo()
+    estado.sorteo.realizado = true
+    cargarLogosIntl((m.elegidos || []).map(e => e.nombre))
+    evZonaPendiente = false
+    mostrarSorteoMundial(m.elegidos || [])
+  } else if (m.tipo === 'mundial_zona') {
+    if (evZonaCorriendo) evZonaPendiente = true
+    else sortearSiguienteZona(sorteoAnimId)
+  } else if (m.tipo === 'mundial_fin') {
+    ++sorteoAnimId; salirBolilleroFull(); toast('✅ Sorteo del Mundial confirmado'); cargarEstado()
+  } else if (m.tipo === 'copa_start') {
+    toast('🔴 ¡Santi empezó el sorteo de la Copa Argentina en vivo!')
+    const copa = estado.copaArgentina ||= {}
+    copa.equipos = m.equipos || []; copa.bracket = m.bracket || { r1: [], r2: [], cuartos: [], semis: [], final: [] }
+    copa.sorteo = { realizado: true, confirmado: false }; copa.configurado = false
+    mostrarSeccion('copa')
+    mostrarSorteoCopa(copa.equipos.filter(e => e.origen === 'extra'), copa.equipos.filter(e => e.origen === 'invitado'), copa.bracket.r1 || [])
+  } else if (m.tipo === 'copa_saltar') {
+    if (copaSorteoCorriendo) saltarSorteoCopa()
+  } else if (m.tipo === 'copa_fin') {
+    ++copaAnimId; copaSorteoCorriendo = false; salirCopaBolFull(); toast('✅ Sorteo de la Copa Argentina confirmado'); cargarEstado()
+  }
+  envivoPintar()
+}
+function evSiguienteZona(animId) {
+  envivoEnviar('mundial_zona')
+  sortearSiguienteZona(animId)
+}
+
 async function init() {
   const seVaARecargar = await verificarVersionApp()
   if (seVaARecargar) return
@@ -9472,6 +9578,7 @@ async function init() {
   actualizarUIAdmin()
   actualizarBtnNotif()
   startPolling()
+  envivoIniciar()
   // Cargar logos en segundo plano; re-renderizar cuando terminen
   renderTodo()
   ocultarSplash()

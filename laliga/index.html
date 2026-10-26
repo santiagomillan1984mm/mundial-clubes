@@ -6192,7 +6192,7 @@ function renderLigaConfig(cont) {
           return `<div style="display:flex;align-items:center;gap:6px;background:var(--card);border-radius:6px;padding:5px 10px;font-size:12px;font-weight:600;">
             ${logoHTML(ep.id, 18)}
             <span>${eq?.nombre || ep.id}</span>
-            <span class="badge-${ep.dueno}" style="font-size:10px;padding:1px 6px;">${ep.dueno === 'santi' ? 'S' : 'L'}</span>
+            <span class="badge-${ep.dueno}" style="font-size:10px;padding:1px 6px;">${ep.dueno === 'santi' ? 'S' : 'R'}</span>
             <span style="font-size:10px;color:var(--gris);">🔒</span>
           </div>`
         }).join('')}
@@ -6200,9 +6200,12 @@ function renderLigaConfig(cont) {
     </div>`
   }
 
+  // Para la liga solo se eligen equipos de Primera (LaLiga). Los de la Hypermotion van a la Copa del Rey.
+  const ligaDe = eq => eq.liga || POOL_ARG.find(x => x.id === eq.id)?.liga || ''
+  const elegibles = pool.filter(eq => ligaDe(eq) === 'España · LaLiga' || selSanti.includes(eq.id) || selRoberto.includes(eq.id) || desdePromoIds.has(eq.id))
   if (esAdmin) {
     html += `<div class="pool-grid" id="pool-liga-grid">
-      ${pool.map(eq => {
+      ${elegibles.map(eq => {
         const isSanti = selSanti.includes(eq.id)
         const isLuc = selRoberto.includes(eq.id)
         const bloqueado = desdePromoIds.has(eq.id)
@@ -6215,11 +6218,11 @@ function renderLigaConfig(cont) {
           <span style="flex:1;">${eq.nombre}</span>
           ${bloqueado ? '<span style="font-size:10px;color:var(--gris);">🔒</span>' : ''}
           ${isSanti && !bloqueado ? '<span class="badge-santi" style="font-size:10px;padding:1px 7px;">S</span>' : ''}
-          ${isLuc && !bloqueado ? '<span class="badge-roberto" style="font-size:10px;padding:1px 7px;">L</span>' : ''}
+          ${isLuc && !bloqueado ? '<span class="badge-roberto" style="font-size:10px;padding:1px 7px;">R</span>' : ''}
         </div>`
       }).join('')}
     </div>
-    <p class="text-gris" style="margin-bottom:14px;">Click para asignar: primero click = Santi, segundo click = Roberto, tercer click = quitar.</p>
+    <p class="text-gris" style="margin-bottom:14px;">Solo equipos de LaLiga (Primera). Los de la Hypermotion entran por sorteo en la Copa del Rey. Click para asignar: primero click = Santi, segundo click = Roberto, tercer click = quitar.</p>
     <div class="flex-gap">
       <button class="btn btn-primary" onclick="confirmarLiga()" id="btn-confirmar-liga">⚽ Confirmar y generar fixtures</button>
     </div>`
@@ -6269,7 +6272,7 @@ function togglePoolLiga(id) {
     const badge = document.createElement('span')
     badge.className = `badge-${eq.dueno}`
     badge.style.cssText = 'font-size:10px;margin-left:auto;'
-    badge.textContent = eq.dueno === 'santi' ? 'S' : 'L'
+    badge.textContent = eq.dueno === 'santi' ? 'S' : 'R'
     el.appendChild(badge)
   }
   const cntS = equipos.filter(e => e.dueno === 'santi').length

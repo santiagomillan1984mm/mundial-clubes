@@ -6261,7 +6261,7 @@ async function confirmarLiga() {
   estado.ligaAfa.partidos = generarFixturesLiga()
   estado.ligaAfa.configurado = true
   await guardarEstado()
-  renderLiga()
+  renderTodo()  // también la Copa, que depende de la liga
   toast('¡Liga generada! 100 partidos listos.')
 }
 

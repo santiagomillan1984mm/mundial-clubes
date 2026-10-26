@@ -1,6 +1,6 @@
 {
   "version": "1.0",
-  "ultimaActualizacion": "2026-10-26T05:57:20.530Z",
+  "ultimaActualizacion": "2026-10-26T05:57:22.486Z",
   "equiposArgentinos": [
     {
       "id": "arg1",
@@ -557,7 +557,7 @@
         "local": "pa1",
         "visitante": "pa3",
         "golesLocal": 3,
-        "golesVisitante": null
+        "golesVisitante": 5
       },
       {
         "id": "liga_14",

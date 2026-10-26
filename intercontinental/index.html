@@ -509,10 +509,23 @@ function renderTemporada() {
   }).join('') : ''
   cont.innerHTML = banner + pasos + `<div class="cols">${col('arg')}${col('esp')}</div>` + histHTML
 }
+// Lista de títulos agrupada: "🏆 Liga Argentina (2) · 🌍 Mundial de Clubes"
+const NOMBRE_LINDO = { 'Liga AFA': 'Liga Argentina' }
+function listaTitulos(lista, conBandera = true) {
+  if (!lista.length) return '<i>ninguno</i>'
+  const g = new Map()
+  for (const t of lista) {
+    const nom = NOMBRE_LINDO[t.nombre] || t.nombre
+    const k = t.tipo + '|' + nom + '|' + (t.app || '')
+    const x = g.get(k) || { n: 0, nom, tipo: t.tipo, app: t.app }; x.n++; g.set(k, x)
+  }
+  return [...g.values()].sort((a, b) => b.n - a.n).map(x => `${CUP[x.tipo] || '🏆'} ${esc(x.nom)}${x.n > 1 ? ` <b>(${x.n})</b>` : ''}${conBandera && FUENTES[x.app] && x.tipo === 'mundial' ? ' ' + FUENTES[x.app].bandera : ''}`).join(' · ')
+}
 function renderBalon() {
   const cont = document.getElementById('balon'); if (!cont || !est) return
   const b = balonDeOro()
   const T = estadoTemporada()
+  const carrera = todosLosTitulos()
   const orden = [b[1], b[0], b[2]].filter(Boolean)
   const alto = { 0: 70, 1: 100, 2: 50 }
   const podio = `<div class="podio">${orden.map(x => { const pos = b.indexOf(x); return `<div class="p">
@@ -522,12 +535,15 @@ function renderBalon() {
   const cab = `<div class="banner"><div style="font-size:54px;">⚽</div><div class="t">${T.completa ? '¡Listo para entregar!' : 'Carrera al Balón de Oro'}</div>
       <div class="d">Temporada ${est.temporada}${b[0]?.total ? ` · Favorito: <b style="color:${colorDe(b[0].d)}">${esc(nomJ(b[0].d))}</b>` : ''}</div>${podio}</div>`
   const det = b.map((x, i) => `<div class="card"><div class="row">${foto(x.d, 44)}<div style="flex:1;min-width:0;"><b style="color:${colorDe(x.d)}">${i + 1}. ${esc(nomJ(x.d))}</b>
-      <div class="desglose">🏆 Títulos: <b>${x.ptsT}</b> · 📈 Rendimiento: <b>${x.rend}</b> · ⚽ Goles: <b>${x.golesBonus}</b><br>
-      ${x.s.pj} partidos · ${x.s.pg}G ${x.s.pe}E ${x.s.pp}P · ${x.s.gf}-${x.s.gc}${x.mis.length ? '<br>' + x.mis.map(t => `${CUP[t.tipo] || '🏆'} ${esc(t.nombre)}`).join(' · ') : ''}</div></div>
+      <div class="desglose">🏆 Pts por títulos: <b>${x.ptsT}</b> · 📈 Rendimiento: <b>${x.rend}</b> · ⚽ Goles: <b>${x.golesBonus}</b><br>
+      ${x.s.pj} partidos · ${x.s.pg}G ${x.s.pe}E ${x.s.pp}P · ${x.s.gf}-${x.s.gc}
+      <div style="margin-top:6px;"><b style="color:var(--txt)">Títulos de esta temporada:</b> ${listaTitulos(x.mis)}</div>
+      <div><b style="color:var(--txt)">En su carrera (${carrera.filter(t => t.dueno === x.d).length}):</b> ${listaTitulos(carrera.filter(t => t.dueno === x.d))}</div></div></div>
       <div style="font-family:Oswald;font-size:24px;color:var(--oro2);">${x.total}</div></div></div>`).join('')
   const reglas = `<div class="card"><div class="lbl" style="margin-bottom:6px;">Cómo se calcula</div><div class="desglose">
       Títulos de esta temporada: Liga ${PTS_TITULO.liga} · Copa ${PTS_TITULO.copa} · Mundial ${PTS_TITULO.mundial} · Supercopa ${PTS_TITULO.supercopa} · cada final Intercontinental ${PTS_TITULO.inter}<br>
-      Rendimiento: hasta 20 según el promedio de puntos por partido (ganar todo = 20)<br>Goles: diferencia de gol promedio × 2<br>Solo cuentan los partidos entre jugadores distintos.</div></div>`
+      Rendimiento: hasta 20 según el promedio de puntos por partido (ganar todo = 20)<br>Goles: diferencia de gol promedio × 2<br>Solo cuentan los partidos entre jugadores distintos.<br>
+      Para el Balón de Oro solo cuentan los títulos de <b>esta temporada</b> (las competiciones que se están jugando ahora). Los de temporadas anteriores están en "En su carrera" y suman en el Ranking Global.</div></div>`
   const ant = (est.historial || []).filter(h => h.tipo === 'balon')
   const palm = ant.length ? `<div class="grupo-t">🏅 Palmarés</div><div class="card">${ant.map(h => `<div class="row" style="padding:5px 0;">${foto(h.dueno, 30)}<span><b style="color:${colorDe(h.dueno)}">${esc(nomJ(h.dueno))}</b> <span style="color:var(--gris);font-size:12px;">· Temporada ${h.temporada} · ${h.total} pts</span></span></div>`).join('')}</div>` : ''
   cont.innerHTML = cab + det + reglas + palm
@@ -541,7 +557,8 @@ function renderRanking() {
       ${r.map((x, i) => `<tr><td>${['🥇', '🥈', '🥉'][i] || i + 1}</td><td class="j"><div class="row" style="gap:7px;">${foto(x.d, 28)}<b style="color:${colorDe(x.d)}">${esc(nomJ(x.d))}</b></div></td>
         <td>${x.pj}</td><td>${x.pg}</td><td>${x.pe}</td><td>${x.pp}</td><td>${x.gf - x.gc > 0 ? '+' : ''}${x.gf - x.gc}</td><td>${x.titulos}</td><td>${x.ef}</td><td class="pts">${x.pts}</td></tr>`).join('')}
       </tbody></table></div>`
-  const det = r.map(x => `<div class="desglose">${foto(x.d, 18)} <b style="color:${colorDe(x.d)}">${esc(nomJ(x.d))}</b>: ${x.ptsP} por partidos + ${x.ptsT} por títulos · ${x.gf} goles a favor, ${x.gc} en contra</div>`).join('')
+  const tit = todosLosTitulos()
+  const det = r.map(x => `<div class="desglose" style="margin-bottom:6px;">${foto(x.d, 18)} <b style="color:${colorDe(x.d)}">${esc(nomJ(x.d))}</b>: ${x.ptsP} por partidos + ${x.ptsT} por títulos · ${x.gf} goles a favor, ${x.gc} en contra<br>${listaTitulos(tit.filter(t => t.dueno === x.d))}</div>`).join('')
   const reglas = `<div class="card"><div class="lbl" style="margin-bottom:6px;">Cómo se suma</div>${det}<div class="desglose" style="margin-top:8px;">
       Partidos: 3 por victoria y 1 por empate (solo entre jugadores distintos).<br>Títulos: Liga ${PTS_TITULO.liga} · Copa ${PTS_TITULO.copa} · Mundial ${PTS_TITULO.mundial} · Supercopa ${PTS_TITULO.supercopa} · Súper Final ${PTS_TITULO.superfinal} · Final Intercontinental ${PTS_TITULO.inter} · Relámpago ${PTS_TITULO.rl} · Balón de Oro ${PTS_TITULO.balon}.<br>
       Santi juega en las dos apps, por eso tiene más partidos: la columna % muestra la efectividad.</div></div>`

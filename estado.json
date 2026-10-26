@@ -1,6 +1,6 @@
 {
   "version": "1.0",
-  "ultimaActualizacion": "2026-10-26T20:32:16.694Z",
+  "ultimaActualizacion": "2026-10-26T21:09:35.577Z",
   "equiposArgentinos": [
     {
       "id": "arg1",
@@ -2306,7 +2306,7 @@
   ],
   "histAuto": {},
   "resumen": {
-    "at": "2026-10-26T20:32:16.694Z",
+    "at": "2026-10-26T21:09:35.578Z",
     "labels": {
       "liga": "Liga AFA",
       "copa": "Copa Argentina",
@@ -2875,5 +2875,12 @@
       "LOSC Lille": "https://thumb.wikimedia.org/wikipedia/en/thumb/3/3f/Lille_OSC_2018_logo.svg/250px-Lille_OSC_2018_logo.svg.png?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail"
     }
   },
-  "avisos": []
+  "avisos": [
+    {
+      "id": "avmvpr2c48",
+      "texto": "👑 Tu Argentinos Juniors es líder de la Liga Argentina con 6 pts. ¡A sostenerlo!",
+      "fecha": "2026-10-26T21:09:35.576Z",
+      "enviados": 1
+    }
+  ]
 }

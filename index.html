@@ -335,6 +335,46 @@
     .alb-lb-nav { position: absolute; top: 50%; transform: translateY(-50%); background: rgba(255,255,255,.1); border: none; color: #fff; font-size: 26px; width: 44px; height: 44px; border-radius: 50%; cursor: pointer; }
     .alb-lb-cerrar { position: absolute; top: 14px; right: 14px; background: rgba(255,255,255,.12); border: none; color: #fff; font-size: 18px; width: 38px; height: 38px; border-radius: 10px; cursor: pointer; }
     .alb-subiendo { font-size: 12px; color: var(--gris); margin-top: 8px; }
+    /* Perfiles */
+    .pf-sel { display: flex; gap: 10px; margin-bottom: 12px; }
+    .pf-sel button { flex: 1; display: flex; align-items: center; gap: 8px; padding: 8px 10px; border-radius: 14px; border: 2px solid var(--border); background: var(--card); color: var(--texto); font-weight: 800; cursor: pointer; }
+    .pf-sel button img { width: 34px; height: 34px; border-radius: 50%; object-fit: cover; }
+    .pf-sel button.on { border-color: var(--c); box-shadow: 0 0 16px color-mix(in srgb, var(--c) 35%, transparent); }
+    .pf-hero { text-align: center; padding: 22px 14px 16px; border-radius: 18px; margin-bottom: 12px; border: 1px solid var(--border);
+      background: radial-gradient(circle at 50% 0%, color-mix(in srgb, var(--c) 30%, transparent), transparent 70%), var(--card); }
+    .pf-foto { width: 210px; height: 210px; cursor: zoom-in; border-radius: 50%; object-fit: cover; border: 4px solid var(--c); box-shadow: 0 0 0 6px rgba(0,0,0,.25), 0 10px 30px color-mix(in srgb, var(--c) 45%, transparent); }
+    .pf-foto-wrap { position: relative; display: inline-block; }
+    .pf-club { position: absolute; right: 2px; bottom: 4px; width: 66px; height: 66px; border-radius: 50%; background: #fff; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 12px rgba(0,0,0,.45); border: 3px solid var(--c); }
+    .pf-club img { width: 50px !important; height: 50px !important; object-fit: contain; }
+    .pf-datos { font-size: 12px; color: var(--gris); margin-top: 4px; }
+    .pf-datos b { color: var(--texto); }
+    .pf-nom { font-size: 26px; font-weight: 900; letter-spacing: 2px; color: var(--c); margin-top: 10px; text-transform: uppercase; }
+    .pf-apodo { font-size: 14px; font-style: italic; color: var(--dorado2); margin-top: 2px; min-height: 18px; }
+    .pf-chips { display: flex; justify-content: center; gap: 8px; flex-wrap: wrap; margin-top: 12px; }
+    .pf-chips span { background: rgba(255,255,255,.06); border: 1px solid var(--border); border-radius: 20px; padding: 4px 10px; font-size: 12px; font-weight: 700; }
+    .pf-vitrina { display: grid; grid-template-columns: repeat(5, 1fr); gap: 6px; text-align: center; }
+    .pf-vitrina > div { background: var(--azul3); border-radius: 12px; padding: 10px 4px; }
+    .pf-vitrina .t-ico { font-size: 26px; height: 32px; display: flex; align-items: center; justify-content: center; }
+    .pf-vitrina .t-ico img { max-height: 30px; max-width: 40px; object-fit: contain; }
+    .pf-vitrina b { display: block; font-size: 22px; font-weight: 900; color: var(--dorado2); }
+    .pf-vitrina small { font-size: 9px; color: var(--gris); text-transform: uppercase; letter-spacing: .5px; }
+    .pf-vitrina > div.cero { opacity: .35; filter: grayscale(1); }
+    .pf-nums { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+    .pf-nums > div { background: var(--azul3); border-radius: 12px; padding: 10px 6px; text-align: center; }
+    .pf-nums b { display: block; font-size: 22px; font-weight: 900; }
+    .pf-nums small { font-size: 10px; color: var(--gris); text-transform: uppercase; letter-spacing: .5px; }
+    .pf-forma { display: flex; gap: 4px; justify-content: center; margin-top: 8px; flex-wrap: wrap; }
+    .pf-forma span { width: 22px; height: 22px; border-radius: 6px; font-size: 11px; font-weight: 900; display: flex; align-items: center; justify-content: center; color: #111; }
+    .pf-fila { display: flex; align-items: center; gap: 8px; padding: 7px 0; border-bottom: 1px solid var(--border); font-size: 13px; }
+    .pf-fila:last-child { border-bottom: none; }
+    .pf-fila .n { flex: 1; min-width: 0; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .pf-logros { display: grid; grid-template-columns: repeat(auto-fill, minmax(96px, 1fr)); gap: 8px; }
+    .pf-logro { text-align: center; padding: 10px 6px; border-radius: 12px; background: var(--azul3); border: 1px solid var(--border); }
+    .pf-logro .i { font-size: 28px; }
+    .pf-logro b { display: block; font-size: 11px; margin-top: 4px; }
+    .pf-logro small { display: block; font-size: 9px; color: var(--gris); margin-top: 2px; line-height: 1.2; }
+    .pf-logro.off { opacity: .35; filter: grayscale(1); }
+    .pf-logro.on { border-color: var(--dorado2); box-shadow: 0 0 12px rgba(255,196,0,.18); }
     /* Paneles desplegables dentro de cada competencia */
     .sec-panel { border-radius: 14px; margin-bottom: 10px; }
     .sec-panel .hl-head { padding: 11px 12px; gap: 10px; }
@@ -1249,6 +1289,7 @@
   <button class="nav-btn" onclick="mostrarSeccion('historial')">🏅 Historial</button>
   <button class="nav-btn" onclick="mostrarSeccion('relampago')">⚡ Relámpago</button>
   <button class="nav-btn" onclick="mostrarSeccion('premios')">🎁 Premios</button>
+  <button class="nav-btn" onclick="mostrarSeccion('perfiles')">👤 Perfiles</button>
   <button class="nav-btn" onclick="mostrarSeccion('album')">📸 Álbum</button>
   <button class="nav-btn" onclick="mostrarSeccion('admin')">Admin</button>
 </nav>
@@ -1333,6 +1374,12 @@
   <div id="sec-relampago" class="seccion">
     <div class="sec-titulo">⚡ Torneos Relámpago</div>
     <div id="relampago-contenido"></div>
+  </div>
+
+  <!-- PERFILES -->
+  <div id="sec-perfiles" class="seccion">
+    <div class="sec-titulo">👤 Perfiles</div>
+    <div id="perfiles-contenido"></div>
   </div>
 
   <!-- ÁLBUM DE FOTOS -->
@@ -2323,6 +2370,7 @@ function renderTodo() {
   renderRelampago()
   renderPremios()
   renderAlbum()
+  renderPerfiles()
 }
 
 // ── Stats helpers ──────────────────────────────
@@ -2997,14 +3045,14 @@ function marcadorGeneralHTML(c) {
   return `<div class="mg" onclick="abrirMarcadorDetalle()" role="button">
     <div class="mg-top"><span class="mg-vivo"><span class="dot-en-vivo"></span>EN VIVO</span><span class="mg-tit">Marcador general</span><span class="mg-mas">Ver detalle ›</span></div>
     <div class="mg-jug">
-      <div class="mg-lado"><img src="santi-avatar.png" alt="" style="box-shadow:0 0 0 3px #4a9eff,0 0 18px rgba(74,158,255,.5)"><b style="color:#4a9eff">SANTI</b><span class="mg-tro">🏆 ${tit.santi}</span></div>
+      <div class="mg-lado" onclick="event.stopPropagation();abrirPerfil('santi')" style="cursor:pointer"><img src="santi-avatar.png" alt="" style="box-shadow:0 0 0 3px #4a9eff,0 0 18px rgba(74,158,255,.5)"><b style="color:#4a9eff">SANTI</b><span class="mg-tro">🏆 ${tit.santi}</span></div>
       <div class="mg-centro">
         <div class="mg-fila"><div class="mg-col">${num(S.pg, 'az')}</div><div class="mg-lab">Victorias</div><div class="mg-col">${num(L.pg, 'ro')}</div></div>
         ${barraDuelo(S.pg, L.pg)}
         <div class="mg-fila" style="margin-top:10px"><div class="mg-col">${num(S.goles, 'az chico')}</div><div class="mg-lab">Goles ⚽</div><div class="mg-col">${num(L.goles, 'ro chico')}</div></div>
         ${barraDuelo(S.goles, L.goles)}
       </div>
-      <div class="mg-lado"><img src="luciano-avatar.png" alt="" style="box-shadow:0 0 0 3px #ff6b6b,0 0 18px rgba(255,107,107,.5)"><b style="color:#ff6b6b">LUCIANO</b><span class="mg-tro">🏆 ${tit.luciano}</span></div>
+      <div class="mg-lado" onclick="event.stopPropagation();abrirPerfil('luciano')" style="cursor:pointer"><img src="luciano-avatar.png" alt="" style="box-shadow:0 0 0 3px #ff6b6b,0 0 18px rgba(255,107,107,.5)"><b style="color:#ff6b6b">LUCIANO</b><span class="mg-tro">🏆 ${tit.luciano}</span></div>
     </div>
     <div class="mg-lider">${lider}</div>
   </div>`
@@ -3090,7 +3138,7 @@ function renderEstadoInicio() {
   if (tituloEl) tituloEl.innerHTML = '🏆 Torneo de Campeones'
   const marcadorHTML = marcadorGeneralHTML(contadorGeneral)
 
-  const avatarJugador = (img, nombre, color, tit) => `<div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:8px;min-width:0;">
+  const avatarJugador = (img, nombre, color, tit) => `<div onclick="abrirPerfil('${nombre.toLowerCase()}')" style="cursor:pointer;flex:1;display:flex;flex-direction:column;align-items:center;gap:8px;min-width:0;">
       <div style="width:112px;height:112px;border-radius:50%;padding:3px;background:${color};box-shadow:0 0 0 4px rgba(0,0,0,0.25),0 6px 22px ${color}66;">
         <img src="${img}" alt="${nombre}" style="width:100%;height:100%;border-radius:50%;object-fit:cover;display:block;border:3px solid var(--azul);box-sizing:border-box;" />
       </div>
@@ -7700,6 +7748,153 @@ async function borrarFotoAlbum(id) {
   } catch (e) {}
   renderAlbum()
   toast('🗑️ Foto borrada')
+}
+
+// ══════════════════════════════════════════════
+// PERFILES — ficha de cada jugador con foto, títulos, números y logros
+// ══════════════════════════════════════════════
+const PF_JUG = {
+  santi: { nombre: 'Santi', foto: 'santi-avatar.png', color: '#4a9eff', club: 'Boca Juniors', ciudad: 'Mar del Plata', bandera: '🇦🇷' },
+  luciano: { nombre: 'Luciano', foto: 'luciano-avatar.png', color: '#ff6b6b', club: '', ciudad: 'Don Torcuato', bandera: '🇦🇷' },
+}
+let pfLogosPedidos = false
+let pfActual = 'santi'
+// Foto en pantalla completa
+function pfFotoGrande(k) {
+  const J = PF_JUG[k]; if (!J) return
+  fxMostrar(`<div style="text-align:center;"><img src="${J.foto}" alt="" style="width:min(86vw,420px);height:min(86vw,420px);border-radius:50%;object-fit:cover;border:6px solid ${J.color};box-shadow:0 0 40px ${J.color}88;">
+    <div style="font-size:28px;font-weight:900;letter-spacing:3px;color:${J.color};margin-top:14px;text-transform:uppercase;">${J.nombre}</div>
+    <div style="color:#ddd;margin-top:4px;">${J.club ? `${escudoNombre(J.club, 26)} ${J.club} · ` : ''}${J.bandera} ${J.ciudad}</div></div>`, J.color, 0)
+}
+function abrirPerfil(k) { if (!PF_JUG[k]) return; pfActual = k; mostrarSeccion('perfiles'); renderPerfiles(); window.scrollTo({ top: 0, behavior: 'smooth' }) }
+// Partidos en orden aproximado de juego: temporadas archivadas primero, después las actuales
+function pfPartidos() {
+  const todos = todosLosPartidos()
+  const arch = todos.filter(m => !['Liga AFA', 'Copa Argentina', 'Mundial de Clubes', 'Promoción', 'Supercopa', 'Súper Final'].includes(m.comp))
+  const orden = ['Promoción', 'Liga AFA', 'Copa Argentina', 'Supercopa', 'Mundial de Clubes', 'Súper Final']
+  const act = todos.filter(m => orden.includes(m.comp)).sort((a, b) => orden.indexOf(a.comp) - orden.indexOf(b.comp))
+  return [...arch, ...act]
+}
+function pfStats(k) {
+  const ps = pfPartidos().filter(m => m.l.dueno === k || m.v.dueno === k).filter(m => m.l.dueno !== m.v.dueno)
+  const st = { pj: 0, pg: 0, pe: 0, pp: 0, gf: 0, gc: 0, forma: [], mejorInv: 0, mejorGan: 0, goleada: null, derrota: null, porComp: {}, equipos: {} }
+  let inv = 0, gan = 0
+  for (const m of ps) {
+    const yo = m.l.dueno === k ? m.l : m.v, rival = m.l.dueno === k ? m.v : m.l
+    const gf = m.l.dueno === k ? m.gl : m.gv, gc = m.l.dueno === k ? m.gv : m.gl
+    const r = gf > gc ? 'G' : gf < gc ? 'P' : 'E'
+    st.pj++; st.gf += gf; st.gc += gc; st[{ G: 'pg', E: 'pe', P: 'pp' }[r]]++; st.forma.push(r)
+    inv = r === 'P' ? 0 : inv + 1; gan = r === 'G' ? gan + 1 : 0
+    st.mejorInv = Math.max(st.mejorInv, inv); st.mejorGan = Math.max(st.mejorGan, gan)
+    const dif = gf - gc, desc = { dif, gf, gc, yo: yo.nombre, rival: rival.nombre, comp: m.comp }
+    if (dif > 0 && (!st.goleada || dif > st.goleada.dif || (dif === st.goleada.dif && gf > st.goleada.gf))) st.goleada = desc
+    if (dif < 0 && (!st.derrota || dif < st.derrota.dif)) st.derrota = desc
+    const pc = st.porComp[m.comp] ||= { pj: 0, pg: 0, pe: 0, pp: 0, gf: 0, gc: 0 }
+    pc.pj++; pc.gf += gf; pc.gc += gc; pc[{ G: 'pg', E: 'pe', P: 'pp' }[r]]++
+    const eq = st.equipos[yo.nombre] ||= { nombre: yo.nombre, pj: 0, pg: 0, gf: 0 }
+    eq.pj++; eq.gf += gf; if (r === 'G') eq.pg++
+  }
+  st.racha = (() => { const f = st.forma; if (!f.length) return null; const u = f[f.length - 1]; let n = 0; for (let i = f.length - 1; i >= 0 && f[i] === u; i--) n++; return { tipo: u, n } })()
+  return st
+}
+function pfTitulos(k) {
+  const h = (estado.historial || []).filter(x => x.dueno === k)
+  const por = { liga: 0, copa: 0, mundial: 0, supercopa: 0, superfinal: 0 }
+  h.forEach(x => { if (por[x.competencia] !== undefined) por[x.competencia]++ })
+  const clubes = {}; h.forEach(x => { clubes[x.campeon] = (clubes[x.campeon] || 0) + 1 })
+  const club = Object.entries(clubes).sort((a, b) => b[1] - a[1])[0]
+  const porAnio = {}; h.forEach(x => { porAnio[x.temporada] = (porAnio[x.temporada] || 0) + 1 })
+  return { total: h.length, por, club, maxAnio: Math.max(0, ...Object.values(porAnio)), lista: h }
+}
+function pfLogros(st, ti) {
+  return [
+    { i: '🏆', t: 'Primer título', d: 'Ganar cualquier copa', ok: ti.total >= 1 },
+    { i: '🥈', t: 'Doblete', d: '2 títulos en una temporada', ok: ti.maxAnio >= 2 },
+    { i: '👑', t: 'Triplete', d: '3 títulos en una temporada', ok: ti.maxAnio >= 3 },
+    { i: '🇦🇷', t: 'Campeón de la Liga AFA', d: 'Ganar la liga', ok: ti.por.liga >= 1 },
+    { i: '🏅', t: 'Rey de Copas', d: '2 Copas Argentina', ok: ti.por.copa >= 2 },
+    { i: '🌍', t: 'Campeón del Mundo', d: 'Ganar el Mundial de Clubes', ok: ti.por.mundial >= 1 },
+    { i: '💎', t: 'Rey de la Súper Final', d: 'Ganar la Súper Final', ok: ti.por.superfinal >= 1 },
+    { i: '💥', t: 'Goleada histórica', d: 'Ganar por 5 o más', ok: !!st.goleada && st.goleada.dif >= 5 },
+    { i: '🧱', t: 'Invicto', d: '10 partidos sin perder', ok: st.mejorInv >= 10 },
+    { i: '🔥', t: 'Imparable', d: '5 victorias seguidas', ok: st.mejorGan >= 5 },
+    { i: '⚽', t: 'Cañonero', d: '100 goles', ok: st.gf >= 100 },
+    { i: '💯', t: 'Centenario', d: '100 partidos jugados', ok: st.pj >= 100 },
+    { i: '🎖️', t: '50 victorias', d: 'Ganar 50 partidos', ok: st.pg >= 50 },
+  ]
+}
+async function editarApodo(k) {
+  const actual = estado.perfiles?.[k]?.apodo || ''
+  const v = prompt(`Apodo o frase de ${PF_JUG[k].nombre}:`, actual)
+  if (v === null) return
+  if (!estado.perfiles) estado.perfiles = {}
+  estado.perfiles[k] = { ...(estado.perfiles[k] || {}), apodo: v.trim().slice(0, 40) }
+  await guardarEstado()
+  renderPerfiles()
+}
+function renderPerfiles() {
+  const cont = document.getElementById('perfiles-contenido')
+  if (!cont || !estado) return
+  const k = pfActual, J = PF_JUG[k], otro = k === 'santi' ? 'luciano' : 'santi'
+  const st = pfStats(k), ti = pfTitulos(k), riv = pfStats(otro)
+  const pct = st.pj ? Math.round(st.pg / st.pj * 100) : 0
+  const apodo = estado.perfiles?.[k]?.apodo || ''
+  if (!pfLogosPedidos) { pfLogosPedidos = true; cargarLogosIntl(Object.values(PF_JUG).map(j => j.club).filter(Boolean)).then(n => { if (n) renderPerfiles() }) }
+  const escClub = J.club ? escudoNombre(J.club, 46) : ''
+  const sel = Object.entries(PF_JUG).map(([kk, j]) => `<button class="${kk === k ? 'on' : ''}" style="--c:${j.color}" onclick="pfActual='${kk}';renderPerfiles()"><img src="${j.foto}" alt="">${j.nombre}</button>`).join('')
+  const trof = [['liga', '🇦🇷', 'Liga AFA'], ['copa', '🏆', 'Copa'], ['mundial', '🌍', 'Mundial'], ['supercopa', '🥇', 'Supercopa'], ['superfinal', '👑', 'Súper Final']]
+  const icoComp = (c, e) => compLogos[c] ? `<img src="${compLogos[c]}" alt="">` : e
+  const forma = st.forma.slice(-10).map(r => `<span style="background:${r === 'G' ? '#2ecc71' : r === 'E' ? '#b8b8b8' : '#e74c3c'}">${r}</span>`).join('')
+  const equipos = Object.values(st.equipos)
+  const top = [...equipos].sort((a, b) => b.pg - a.pg || b.gf - a.gf).slice(0, 3)
+  const malditos = equipos.filter(e => e.pj >= 3 && !top.includes(e)).sort((a, b) => a.pg / a.pj - b.pg / b.pj).slice(0, 3)
+  const filaEq = e => `<div class="pf-fila">${escudoNombre(e.nombre, 22) || logoHTML((estado.poolArgentino || POOL_ARG).find(x => x.nombre === e.nombre)?.id || '', 22)}<span class="n">${e.nombre}</span><span class="text-gris">${e.pg}G · ${e.pj}PJ</span></div>`
+  const partido = (x, cls) => x ? `<div class="pf-fila"><span class="n">${x.yo} <b style="color:${cls}">${x.gf}-${x.gc}</b> ${x.rival}</span><span class="text-gris" style="font-size:11px;">${x.comp}</span></div>` : '<p class="text-gris">Todavía no hay.</p>'
+  const comps = Object.entries(st.porComp)
+  const logros = pfLogros(st, ti)
+  const hechos = logros.filter(l => l.ok).length
+  cont.innerHTML = `
+    <div class="pf-sel">${sel}</div>
+    <div class="pf-hero" style="--c:${J.color}">
+      <div class="pf-foto-wrap"><img class="pf-foto" src="${J.foto}" alt="${J.nombre}" onclick="pfFotoGrande('${k}')">${escClub ? `<span class="pf-club">${escClub}</span>` : ''}</div>
+      <div class="pf-nom">${J.nombre}</div>
+      <div class="pf-datos">${J.club ? `💙 Hincha de <b>${J.club}</b> · ` : ''}📍 ${J.bandera} ${J.ciudad}</div>
+      <div class="pf-apodo">${apodo ? `“${apodo}”` : ''}${esAdmin ? ` <button onclick="editarApodo('${k}')" style="background:none;border:none;cursor:pointer;font-size:13px;opacity:.7;">✏️</button>` : ''}</div>
+      <div class="pf-chips"><span>🏆 ${ti.total} título${ti.total === 1 ? '' : 's'}</span><span>⚽ ${st.pj} partidos</span><span>📈 ${pct}% victorias</span>${ti.club ? `<span>⭐ ${ti.club[0]}</span>` : ''}</div>
+    </div>
+    <div class="card"><div class="card-titulo">🏆 Vitrina</div>
+      <div class="pf-vitrina">${trof.map(([c, e, n]) => `<div class="${ti.por[c] ? '' : 'cero'}"><div class="t-ico">${icoComp(c, e)}</div><b>${ti.por[c]}</b><small>${n}</small></div>`).join('')}</div>
+      ${ti.club ? `<p class="text-gris" style="margin-top:10px;font-size:12px;">El club que más títulos le dio: <b style="color:var(--dorado2)">${ti.club[0]}</b> (${ti.club[1]})</p>` : ''}
+    </div>
+    <div class="card"><div class="card-titulo">📊 Números de carrera</div>
+      <div class="pf-nums">
+        <div><b>${st.pj}</b><small>Jugados</small></div><div><b style="color:#2ecc71">${st.pg}</b><small>Ganados</small></div><div><b>${st.pe}</b><small>Empatados</small></div>
+        <div><b style="color:#e74c3c">${st.pp}</b><small>Perdidos</small></div><div><b>${st.gf}</b><small>Goles a favor</small></div><div><b>${st.gc}</b><small>Goles en contra</small></div>
+        <div><b>${st.racha ? `${st.racha.n}${st.racha.tipo}` : '-'}</b><small>Racha actual</small></div><div><b>${st.mejorInv}</b><small>Mejor invicto</small></div><div><b>${st.mejorGan}</b><small>Victorias seguidas</small></div>
+      </div>
+      ${forma ? `<div class="text-gris" style="text-align:center;font-size:11px;margin-top:10px;">Últimos ${Math.min(10, st.forma.length)} partidos</div><div class="pf-forma">${forma}</div>` : ''}
+    </div>
+    <div class="card"><div class="card-titulo">⚔️ Cara a cara vs ${PF_JUG[otro].nombre}</div>
+      ${st.pj ? `<div style="display:flex;justify-content:space-between;align-items:flex-end;">
+        <div style="text-align:center;"><img src="${J.foto}" style="width:48px;height:48px;border-radius:50%;object-fit:cover;border:3px solid ${J.color};"><div style="font-size:26px;font-weight:900;color:${J.color}">${st.pg}</div></div>
+        <div style="text-align:center;"><div style="font-size:20px;font-weight:900;color:var(--gris)">${st.pe}</div><small class="text-gris">empates</small></div>
+        <div style="text-align:center;"><img src="${PF_JUG[otro].foto}" style="width:48px;height:48px;border-radius:50%;object-fit:cover;border:3px solid ${PF_JUG[otro].color};"><div style="font-size:26px;font-weight:900;color:${PF_JUG[otro].color}">${st.pp}</div></div>
+      </div>
+      <div style="display:flex;height:8px;border-radius:4px;overflow:hidden;gap:2px;margin-top:8px;"><div style="flex:${st.pg || .1};background:${J.color}"></div><div style="flex:${st.pe || .1};background:var(--gris)"></div><div style="flex:${st.pp || .1};background:${PF_JUG[otro].color}"></div></div>
+      <p class="text-gris" style="text-align:center;font-size:12px;margin-top:6px;">⚽ Goles: ${st.gf} - ${st.gc}</p>
+      ${comps.length ? `<div style="margin-top:8px;">${comps.map(([c, x]) => `<div class="pf-fila"><span class="n">${c}</span><span><b style="color:#2ecc71">${x.pg}</b> · ${x.pe} · <b style="color:#e74c3c">${x.pp}</b></span><span class="text-gris" style="width:62px;text-align:right;">${x.gf}-${x.gc}</span></div>`).join('')}</div>` : ''}` : '<p class="text-gris">Todavía no jugaron.</p>'}
+    </div>
+    <div class="card"><div class="card-titulo">💥 Partidos para el recuerdo</div>
+      <div class="text-gris" style="font-size:11px;text-transform:uppercase;letter-spacing:1px;">Mayor goleada</div>${partido(st.goleada, '#2ecc71')}
+      <div class="text-gris" style="font-size:11px;text-transform:uppercase;letter-spacing:1px;margin-top:8px;">Peor derrota</div>${partido(st.derrota, '#e74c3c')}
+    </div>
+    ${equipos.length ? `<div class="card"><div class="card-titulo">🛡️ Sus equipos</div>
+      <div class="text-gris" style="font-size:11px;text-transform:uppercase;letter-spacing:1px;">Los que más ganaron</div>${top.map(filaEq).join('')}
+      ${malditos.length ? `<div class="text-gris" style="font-size:11px;text-transform:uppercase;letter-spacing:1px;margin-top:8px;">Los malditos (menos % de victorias)</div>${malditos.map(filaEq).join('')}` : ''}
+    </div>` : ''}
+    <div class="card"><div class="card-titulo">🎖️ Logros — ${hechos}/${logros.length}</div>
+      <div class="pf-logros">${logros.map(l => `<div class="pf-logro ${l.ok ? 'on' : 'off'}"><div class="i">${l.i}</div><b>${l.t}</b><small>${l.d}</small></div>`).join('')}</div>
+    </div>`
 }
 
 function renderPremios() {

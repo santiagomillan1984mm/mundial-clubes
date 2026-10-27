@@ -1,6 +1,6 @@
 {
   "version": "2.0",
-  "ultimaActualizacion": "2026-10-27T04:19:08.736Z",
+  "ultimaActualizacion": "2026-10-27T04:35:52.608Z",
   "poolArgentino": [
     {
       "id": "pa1",
@@ -311,7 +311,7 @@
         "jornada": 1,
         "local": "pa7",
         "visitante": "pa9",
-        "golesLocal": null,
+        "golesLocal": 2,
         "golesVisitante": null
       },
       {
@@ -1528,7 +1528,7 @@
     }
   ],
   "resumen": {
-    "at": "2026-10-27T04:19:08.736Z",
+    "at": "2026-10-27T04:35:52.609Z",
     "labels": {
       "liga": "LaLiga",
       "copa": "Copa del Rey",
@@ -1597,5 +1597,6 @@
       "RCD Espanyol": "https://thumb.wikimedia.org/wikipedia/en/thumb/9/92/RCD_Espanyol_crest.svg/330px-RCD_Espanyol_crest.svg.png?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail",
       "Getafe CF": "https://thumb.wikimedia.org/wikipedia/en/thumb/4/46/Getafe_logo.svg/330px-Getafe_logo.svg.png?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail"
     }
-  }
+  },
+  "histAuto": {}
 }

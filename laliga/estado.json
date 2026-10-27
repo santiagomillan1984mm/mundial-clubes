@@ -1,6 +1,6 @@
 {
   "version": "2.0",
-  "ultimaActualizacion": "2026-10-27T04:55:37.462Z",
+  "ultimaActualizacion": "2026-10-27T04:55:38.520Z",
   "poolArgentino": [
     {
       "id": "pa1",
@@ -320,7 +320,7 @@
         "local": "pa17",
         "visitante": "pa3",
         "golesLocal": 8,
-        "golesVisitante": null
+        "golesVisitante": 3
       },
       {
         "id": "liga_4",
@@ -1528,7 +1528,7 @@
     }
   ],
   "resumen": {
-    "at": "2026-10-27T04:55:37.463Z",
+    "at": "2026-10-27T04:55:38.520Z",
     "labels": {
       "liga": "LaLiga",
       "copa": "Copa del Rey",
@@ -1540,9 +1540,15 @@
     "sub": {},
     "prog": {
       "liga": {
-        "jug": 2,
+        "jug": 3,
         "total": 100,
         "top": [
+          {
+            "nombre": "Real Sociedad",
+            "dueno": "santi",
+            "pts": 3,
+            "pj": 1
+          },
           {
             "nombre": "Getafe CF",
             "dueno": "roberto",
@@ -1560,12 +1566,6 @@
             "dueno": "roberto",
             "pts": 1,
             "pj": 1
-          },
-          {
-            "nombre": "Real Sociedad",
-            "dueno": "santi",
-            "pts": 0,
-            "pj": 0
           }
         ]
       },
@@ -1595,16 +1595,25 @@
         "roberto",
         2,
         4
+      ],
+      [
+        "LaLiga",
+        "Real Sociedad",
+        "santi",
+        "Atlético de Madrid",
+        "roberto",
+        8,
+        3
       ]
     ],
     "arch": [],
     "historial": [],
     "rl": [],
     "logos": {
+      "Real Sociedad": "https://thumb.wikimedia.org/wikipedia/en/thumb/f/f1/Real_Sociedad_logo.svg/330px-Real_Sociedad_logo.svg.png?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail",
       "Getafe CF": "https://thumb.wikimedia.org/wikipedia/en/thumb/4/46/Getafe_logo.svg/330px-Getafe_logo.svg.png?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail",
       "Rayo Vallecano": "https://thumb.wikimedia.org/wikipedia/en/thumb/d/d8/Rayo_Vallecano_logo.svg/330px-Rayo_Vallecano_logo.svg.png?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail",
-      "CA Osasuna": "https://thumb.wikimedia.org/wikipedia/en/thumb/3/38/CA_Osasuna_2024_crest.svg/330px-CA_Osasuna_2024_crest.svg.png?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail",
-      "Real Sociedad": "https://thumb.wikimedia.org/wikipedia/en/thumb/f/f1/Real_Sociedad_logo.svg/330px-Real_Sociedad_logo.svg.png?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail"
+      "CA Osasuna": "https://thumb.wikimedia.org/wikipedia/en/thumb/3/38/CA_Osasuna_2024_crest.svg/330px-CA_Osasuna_2024_crest.svg.png?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail"
     }
   },
   "histAuto": {}

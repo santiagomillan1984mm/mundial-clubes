@@ -1,6 +1,6 @@
 {
   "version": "2.0",
-  "ultimaActualizacion": "2026-10-27T04:55:38.520Z",
+  "ultimaActualizacion": "2026-10-27T05:20:53.968Z",
   "poolArgentino": [
     {
       "id": "pa1",
@@ -1270,9 +1270,9 @@
           "id": "cr1_1",
           "local": "pa31",
           "visitante": "pa18",
-          "golesLocal": null,
-          "golesVisitante": null,
-          "ganador": null
+          "golesLocal": 0,
+          "golesVisitante": 1,
+          "ganador": "pa18"
         },
         {
           "id": "cr1_2",
@@ -1528,7 +1528,7 @@
     }
   ],
   "resumen": {
-    "at": "2026-10-27T04:55:38.520Z",
+    "at": "2026-10-27T05:20:53.969Z",
     "labels": {
       "liga": "LaLiga",
       "copa": "Copa del Rey",
@@ -1604,6 +1604,15 @@
         "roberto",
         8,
         3
+      ],
+      [
+        "Copa del Rey",
+        "Granada CF",
+        "roberto",
+        "Sevilla FC",
+        "santi",
+        0,
+        1
       ]
     ],
     "arch": [],

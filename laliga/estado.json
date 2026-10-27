@@ -1,6 +1,6 @@
 {
   "version": "2.0",
-  "ultimaActualizacion": "2026-10-27T04:35:52.608Z",
+  "ultimaActualizacion": "2026-10-27T04:35:53.970Z",
   "poolArgentino": [
     {
       "id": "pa1",
@@ -312,7 +312,7 @@
         "local": "pa7",
         "visitante": "pa9",
         "golesLocal": 2,
-        "golesVisitante": null
+        "golesVisitante": 4
       },
       {
         "id": "liga_3",
@@ -1528,7 +1528,7 @@
     }
   ],
   "resumen": {
-    "at": "2026-10-27T04:35:52.609Z",
+    "at": "2026-10-27T04:35:53.970Z",
     "labels": {
       "liga": "LaLiga",
       "copa": "Copa del Rey",
@@ -1540,9 +1540,15 @@
     "sub": {},
     "prog": {
       "liga": {
-        "jug": 1,
+        "jug": 2,
         "total": 100,
         "top": [
+          {
+            "nombre": "Getafe CF",
+            "dueno": "roberto",
+            "pts": 3,
+            "pj": 1
+          },
           {
             "nombre": "Rayo Vallecano",
             "dueno": "santi",
@@ -1556,14 +1562,8 @@
             "pj": 1
           },
           {
-            "nombre": "RCD Espanyol",
+            "nombre": "Real Sociedad",
             "dueno": "santi",
-            "pts": 0,
-            "pj": 0
-          },
-          {
-            "nombre": "Getafe CF",
-            "dueno": "roberto",
             "pts": 0,
             "pj": 0
           }
@@ -1586,16 +1586,25 @@
         "roberto",
         3,
         3
+      ],
+      [
+        "LaLiga",
+        "RCD Espanyol",
+        "santi",
+        "Getafe CF",
+        "roberto",
+        2,
+        4
       ]
     ],
     "arch": [],
     "historial": [],
     "rl": [],
     "logos": {
+      "Getafe CF": "https://thumb.wikimedia.org/wikipedia/en/thumb/4/46/Getafe_logo.svg/330px-Getafe_logo.svg.png?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail",
       "Rayo Vallecano": "https://thumb.wikimedia.org/wikipedia/en/thumb/d/d8/Rayo_Vallecano_logo.svg/330px-Rayo_Vallecano_logo.svg.png?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail",
       "CA Osasuna": "https://thumb.wikimedia.org/wikipedia/en/thumb/3/38/CA_Osasuna_2024_crest.svg/330px-CA_Osasuna_2024_crest.svg.png?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail",
-      "RCD Espanyol": "https://thumb.wikimedia.org/wikipedia/en/thumb/9/92/RCD_Espanyol_crest.svg/330px-RCD_Espanyol_crest.svg.png?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail",
-      "Getafe CF": "https://thumb.wikimedia.org/wikipedia/en/thumb/4/46/Getafe_logo.svg/330px-Getafe_logo.svg.png?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail"
+      "Real Sociedad": "https://thumb.wikimedia.org/wikipedia/en/thumb/f/f1/Real_Sociedad_logo.svg/330px-Real_Sociedad_logo.svg.png?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail"
     }
   },
   "histAuto": {}

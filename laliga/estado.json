@@ -1,6 +1,6 @@
 {
   "version": "2.0",
-  "ultimaActualizacion": "2026-10-27T00:54:18.886Z",
+  "ultimaActualizacion": "2026-10-27T04:19:07.632Z",
   "poolArgentino": [
     {
       "id": "pa1",
@@ -303,7 +303,7 @@
         "jornada": 1,
         "local": "pa14",
         "visitante": "pa13",
-        "golesLocal": null,
+        "golesLocal": 3,
         "golesVisitante": null
       },
       {
@@ -1398,17 +1398,17 @@
       "r2": [],
       "cuartos": [],
       "semis": [],
-      "final": [],
-      "reac": {
-        "r2": [],
-        "cuartos": [],
-        "semis": [],
-        "final": []
-      }
+      "final": []
     },
     "sorteo": {
       "realizado": true,
       "confirmado": true
+    },
+    "reac": {
+      "r2": [],
+      "cuartos": [],
+      "semis": [],
+      "final": []
     }
   },
   "equiposArgentinos": [
@@ -1528,7 +1528,7 @@
     }
   ],
   "resumen": {
-    "at": "2026-10-27T00:54:18.887Z",
+    "at": "2026-10-27T04:19:07.632Z",
     "labels": {
       "liga": "LaLiga",
       "copa": "Copa del Rey",

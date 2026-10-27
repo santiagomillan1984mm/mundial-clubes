@@ -1832,31 +1832,43 @@ function actualizarUIAdmin() {
 // ══════════════════════════════════════════════
 // GITHUB — LEER
 // ══════════════════════════════════════════════
+let estadoCargado = false   // si no se pudieron leer los datos, no se deja guardar (para no pisar lo que hay)
 async function cargarEstado() {
+  const token = getToken()
+  let data = null, statusApi = null
   try {
-    const token = getToken()
-    let res
     if (token) {
       // Admin: usar API (no tiene caché de CDN)
-      res = await fetch(GH_API, {
-        cache: 'no-store',
-        headers: { 'Authorization': `token ${token}`, 'Accept': 'application/vnd.github.v3.raw' }
-      })
-    } else {
-      res = await fetch(GH_RAW + '?t=' + Date.now(), { cache: 'no-store' })
+      try {
+        const res = await fetch(GH_API, { cache: 'no-store', headers: { 'Authorization': `token ${token}`, 'Accept': 'application/vnd.github.v3.raw' } })
+        statusApi = res.status
+        if (res.ok) data = await res.json()
+      } catch (e) { statusApi = 0 }
     }
-    if (res.status === 404) {
-      estado = JSON.parse(JSON.stringify(ESTADO_INICIAL))
-      renderTodo()
-      return
+    if (!data) {
+      // Si la API falló (token vencido, límite, sin señal…) se lee la copia pública
+      const r2 = await fetch(GH_RAW + '?t=' + Date.now(), { cache: 'no-store' })
+      if (r2.status === 404 && (!token || statusApi === 404)) {
+        // todavía no hay nada guardado: arranca vacío
+        estado = JSON.parse(JSON.stringify(ESTADO_INICIAL)); estadoCargado = true; renderTodo(); return
+      }
+      if (!r2.ok) throw new Error('raw ' + r2.status)
+      data = await r2.json()
+      if (token && (statusApi === 401 || statusApi === 403)) toast('⚠️ Tu token de admin no funciona: vuelve a pegarlo en 🔐 Modo Admin', true)
     }
-    estado = await res.json()
+    if (!data || typeof data !== 'object' || (data.message && !data.version)) throw new Error('datos inválidos')
+    estado = data
+    estadoCargado = true
     ultimaActualizacionConocida = estado.ultimaActualizacion || null
     if (token) await obtenerSha()
     renderTodo()
-  } catch(e) {
+  } catch (e) {
     console.error(e)
-    estado = JSON.parse(JSON.stringify(ESTADO_INICIAL))
+    if (!estadoCargado) {
+      estado = estado || JSON.parse(JSON.stringify(ESTADO_INICIAL))
+      toast('⚠️ No se pudieron cargar los datos. Revisa tu conexión y vuelve a abrir la app.', true)
+      setTimeout(() => { if (!estadoCargado) cargarEstado() }, 8000)
+    }
     renderTodo()
   }
 }
@@ -1925,6 +1937,7 @@ function exportResumen() {
 
 async function guardarEstado() {
   if (!esAdmin) { toast('No sos admin', true); return }
+  if (!estadoCargado) { toast('⚠️ No se guardó: los datos no se cargaron bien. Cierra y vuelve a abrir la app.', true); return }
   const token = getToken()
   estado.ultimaActualizacion = new Date().toISOString()
   try { estado.resumen = exportResumen() } catch (e) { console.warn('resumen', e) }
@@ -4983,7 +4996,8 @@ function avanzarRonda(rondaActual, siguienteRonda) {
     deseado[`${prefixSig}${i + 1}`] = { local: c1?.ganador || null, visitante: c2?.ganador || null }
   }
   const completa = Object.values(deseado).every(d => d.local && d.visitante)
-  reacAjustar(estado.bracket, siguienteRonda, deseado, crucesSig, completa, id => getEquipo(id)?.dueno, ['pa1', 'pa2'])
+  if (estado.bracket.reac) delete estado.bracket.reac  // (versión vieja lo guardaba acá)
+  reacAjustar((estado.reacMundial ||= {}), siguienteRonda, deseado, crucesSig, completa, id => getEquipo(id)?.dueno, ['pa1', 'pa2'])
   for (let i = 0; i < mitad; i++) {
     // Se busca por id fijo (o1, o2...), no por posición en el array: como los cruces
     // se van creando de a uno a medida que se conocen los ganadores, el array de una
@@ -6883,7 +6897,7 @@ function migrarCopa32() {
   if (!c?.configurado) return
   const tieneInvitados = (c.equipos || []).some(e => e.origen === 'invitado')
   if (tieneInvitados) return
-  const jugado = Object.values(c.bracket || {}).some(r => (r || []).some(x => x.golesLocal !== null && x.golesLocal !== undefined && x.local && x.visitante))
+  const jugado = Object.values(c.bracket || {}).some(r => Array.isArray(r) && r.some(x => x.golesLocal !== null && x.golesLocal !== undefined && x.local && x.visitante))
   if (jugado) return
   c.configurado = false
   c.equipos = (c.equipos || []).filter(e => e.origen === 'extra')
@@ -7219,7 +7233,8 @@ function avanzarRondaCopa(crucesActual, siguienteRonda, prefix, prefixAnt) {
     deseado[`${prefix}${i + 1}`] = { local: c1.ganador, visitante: c2.ganador }
   }
   const completa = mitad > 0 && Object.keys(deseado).length === mitad
-  reacAjustar(estado.copaArgentina.bracket, siguienteRonda, deseado, crucesSig, completa, getCopaDueno)
+  if (estado.copaArgentina.bracket.reac) delete estado.copaArgentina.bracket.reac  // (versión vieja lo guardaba acá)
+  reacAjustar(estado.copaArgentina, siguienteRonda, deseado, crucesSig, completa, getCopaDueno)
   for (const [id, d] of Object.entries(deseado)) {
     let sig = crucesSig.find(c => c.id === id)
     if (!sig) {

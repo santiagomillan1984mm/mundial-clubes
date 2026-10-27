@@ -9976,7 +9976,7 @@ async function pintarTelefonos() {
     const tipo = ep => /apple/.test(ep) ? '📱 iPhone' : /fcm|google/.test(ep) ? '🤖 Android / Chrome' : /mozilla/.test(ep) ? '🦊 Firefox' : '💻 Otro'
     box.innerHTML = (data || []).length ? data.map((t, i) => `<div style="display:flex;align-items:center;gap:8px;padding:7px 0;border-top:1px solid var(--border);font-size:13px;">
         <span style="flex:1;">${tipo(t.endpoint)} · <b style="color:${t.quien === 'Santi' ? '#4a9eff' : '#ff6b6b'}">${escAv(t.quien || '?')}</b>${t.endpoint === mio ? ' <span class="text-gris">(este teléfono)</span>' : ''}</span>
-        <button class="btn btn-secondary btn-sm" style="font-size:11px;" onclick="cambiarDuenoTel(${i})">Es de ${t.quien === 'Santi' ? EV_RIVAL : 'Santi'}</button></div>`).join('')
+        <button class="btn btn-secondary btn-sm" style="font-size:11px;" onclick="cambiarDuenoTel(${i})">Cambiar a ${t.quien === 'Santi' ? EV_RIVAL : 'Santi'}</button></div>`).join('')
       : '<div class="text-gris" style="font-size:12px;">Ningún teléfono activó los avisos todavía.</div>'
     window.__telefonos = data || []
   } catch (e) { box.innerHTML = '<div class="text-gris" style="font-size:12px;">No pude cargar la lista.</div>' }
@@ -9984,8 +9984,9 @@ async function pintarTelefonos() {
 async function cambiarDuenoTel(i) {
   const t = (window.__telefonos || [])[i]; if (!t) return
   const nuevo = t.quien === 'Santi' ? EV_RIVAL : 'Santi'
-  const { error } = await evCliente().from('suscripciones').update({ quien: nuevo }).eq('endpoint', t.endpoint).eq('app', PUSH_APP)
+  const { data, error } = await evCliente().from('suscripciones').update({ quien: nuevo }).eq('endpoint', t.endpoint).eq('app', PUSH_APP).select()
   if (error) { toast('No se pudo cambiar: ' + error.message, true); return }
+  if (!data || !data.length) { toast('Supabase no dejó guardar el cambio: falta un permiso en la tabla (ver instrucciones)', true); return }
   toast(`✓ Ahora ese teléfono es de ${nuevo}`); pintarTelefonos()
 }
 function avisoRapido(i) {

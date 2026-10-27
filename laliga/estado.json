@@ -1,6 +1,6 @@
 {
   "version": "2.0",
-  "ultimaActualizacion": "2026-10-27T00:47:00.597Z",
+  "ultimaActualizacion": "2026-10-27T00:54:18.886Z",
   "poolArgentino": [
     {
       "id": "pa1",
@@ -1398,7 +1398,13 @@
       "r2": [],
       "cuartos": [],
       "semis": [],
-      "final": []
+      "final": [],
+      "reac": {
+        "r2": [],
+        "cuartos": [],
+        "semis": [],
+        "final": []
+      }
     },
     "sorteo": {
       "realizado": true,
@@ -1513,9 +1519,16 @@
     "equipos": null,
     "registrado": false
   },
-  "avisos": [],
+  "avisos": [
+    {
+      "id": "avmvpz3bwl",
+      "texto": "😈 Prepárate que hoy no hay piedad",
+      "fecha": "2026-10-27T00:54:18.885Z",
+      "enviados": 1
+    }
+  ],
   "resumen": {
-    "at": "2026-10-27T00:47:00.597Z",
+    "at": "2026-10-27T00:54:18.887Z",
     "labels": {
       "liga": "LaLiga",
       "copa": "Copa del Rey",

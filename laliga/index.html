@@ -7093,6 +7093,7 @@ async function cargarLogosMX(nombres) {
   await cargarLogosIntl(nombres.filter(n => !logoPorNombre(n)))
 }
 function migrarCopa32() {
+  return  // en LaLiga la Copa del Rey no tiene invitado de la Liga MX: no hay nada que migrar
   const c = estado.copaArgentina
   if (!c?.configurado) return
   const tieneInvitados = (c.equipos || []).some(e => e.origen === 'invitado')

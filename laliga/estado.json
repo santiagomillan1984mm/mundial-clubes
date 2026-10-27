@@ -1,6 +1,6 @@
 {
   "version": "2.0",
-  "ultimaActualizacion": "2026-10-27T04:19:07.632Z",
+  "ultimaActualizacion": "2026-10-27T04:19:08.736Z",
   "poolArgentino": [
     {
       "id": "pa1",
@@ -304,7 +304,7 @@
         "local": "pa14",
         "visitante": "pa13",
         "golesLocal": 3,
-        "golesVisitante": null
+        "golesVisitante": 3
       },
       {
         "id": "liga_2",
@@ -1528,7 +1528,7 @@
     }
   ],
   "resumen": {
-    "at": "2026-10-27T04:19:07.632Z",
+    "at": "2026-10-27T04:19:08.736Z",
     "labels": {
       "liga": "LaLiga",
       "copa": "Copa del Rey",
@@ -1540,20 +1540,20 @@
     "sub": {},
     "prog": {
       "liga": {
-        "jug": 0,
+        "jug": 1,
         "total": 100,
         "top": [
           {
             "nombre": "Rayo Vallecano",
             "dueno": "santi",
-            "pts": 0,
-            "pj": 0
+            "pts": 1,
+            "pj": 1
           },
           {
             "nombre": "CA Osasuna",
             "dueno": "roberto",
-            "pts": 0,
-            "pj": 0
+            "pts": 1,
+            "pj": 1
           },
           {
             "nombre": "RCD Espanyol",
@@ -1577,7 +1577,17 @@
       "liga": "mqsy9f",
       "copa": "pnu2hx"
     },
-    "act": [],
+    "act": [
+      [
+        "LaLiga",
+        "Rayo Vallecano",
+        "santi",
+        "CA Osasuna",
+        "roberto",
+        3,
+        3
+      ]
+    ],
     "arch": [],
     "historial": [],
     "rl": [],

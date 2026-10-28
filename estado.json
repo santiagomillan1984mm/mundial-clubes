@@ -1,6 +1,6 @@
 {
   "version": "1.0",
-  "ultimaActualizacion": "2026-10-28T05:34:35.368Z",
+  "ultimaActualizacion": "2026-10-28T05:34:36.594Z",
   "equiposArgentinos": [
     {
       "id": "arg1",
@@ -380,7 +380,7 @@
         "local": "pa5",
         "visitante": "pa9",
         "golesLocal": 3,
-        "golesVisitante": null
+        "golesVisitante": 2
       },
       {
         "id": "liga_16",
@@ -2113,7 +2113,7 @@
   ],
   "histAuto": {},
   "resumen": {
-    "at": "2026-10-28T05:34:35.369Z",
+    "at": "2026-10-28T05:34:36.594Z",
     "labels": {
       "liga": "Liga AFA",
       "copa": "Copa Argentina",
@@ -2125,7 +2125,7 @@
     "sub": {},
     "prog": {
       "liga": {
-        "jug": 14,
+        "jug": 15,
         "total": 100,
         "top": [
           {
@@ -2288,6 +2288,15 @@
         "luciano",
         3,
         5
+      ],
+      [
+        "Liga AFA",
+        "Estudiantes",
+        "santi",
+        "Talleres",
+        "luciano",
+        3,
+        2
       ],
       [
         "Copa Argentina",

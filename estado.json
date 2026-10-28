@@ -1,6 +1,6 @@
 {
   "version": "1.0",
-  "ultimaActualizacion": "2026-10-28T06:17:26.960Z",
+  "ultimaActualizacion": "2026-10-28T06:39:10.200Z",
   "equiposArgentinos": [
     {
       "id": "arg1",
@@ -1276,9 +1276,9 @@
           "id": "cr1_6",
           "local": "pa26",
           "visitante": "pa12",
-          "golesLocal": null,
-          "golesVisitante": null,
-          "ganador": null
+          "golesLocal": 5,
+          "golesVisitante": 4,
+          "ganador": "pa26"
         },
         {
           "id": "cr1_7",
@@ -1374,6 +1374,14 @@
           "id": "cr2_2",
           "local": "pa24",
           "visitante": "pa7",
+          "golesLocal": null,
+          "golesVisitante": null,
+          "ganador": null
+        },
+        {
+          "id": "cr2_3",
+          "local": "pa2",
+          "visitante": "pa26",
           "golesLocal": null,
           "golesVisitante": null,
           "ganador": null
@@ -2113,7 +2121,7 @@
   ],
   "histAuto": {},
   "resumen": {
-    "at": "2026-10-28T06:17:26.960Z",
+    "at": "2026-10-28T06:39:10.200Z",
     "labels": {
       "liga": "Liga AFA",
       "copa": "Copa Argentina",
@@ -2360,6 +2368,15 @@
         "luciano",
         3,
         7
+      ],
+      [
+        "Copa Argentina",
+        "Sarmiento",
+        "santi",
+        "San Lorenzo",
+        "luciano",
+        5,
+        4
       ],
       [
         "Promoción",

@@ -1,6 +1,6 @@
 {
   "version": "1.0",
-  "ultimaActualizacion": "2026-10-28T05:56:27.398Z",
+  "ultimaActualizacion": "2026-10-28T06:17:25.713Z",
   "equiposArgentinos": [
     {
       "id": "arg1",
@@ -395,7 +395,7 @@
         "jornada": 2,
         "local": "pa14",
         "visitante": "pa12",
-        "golesLocal": null,
+        "golesLocal": 8,
         "golesVisitante": null
       },
       {
@@ -2113,7 +2113,7 @@
   ],
   "histAuto": {},
   "resumen": {
-    "at": "2026-10-28T05:56:27.398Z",
+    "at": "2026-10-28T06:17:25.714Z",
     "labels": {
       "liga": "Liga AFA",
       "copa": "Copa Argentina",

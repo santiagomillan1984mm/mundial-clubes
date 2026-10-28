@@ -1,6 +1,6 @@
 {
   "version": "1.0",
-  "ultimaActualizacion": "2026-10-26T21:28:41.000Z",
+  "ultimaActualizacion": "2026-10-28T05:34:35.368Z",
   "equiposArgentinos": [
     {
       "id": "arg1",
@@ -379,7 +379,7 @@
         "jornada": 2,
         "local": "pa5",
         "visitante": "pa9",
-        "golesLocal": null,
+        "golesLocal": 3,
         "golesVisitante": null
       },
       {
@@ -1381,17 +1381,17 @@
       ],
       "cuartos": [],
       "semis": [],
-      "final": [],
-      "reac": {
-        "r2": [],
-        "cuartos": [],
-        "semis": [],
-        "final": []
-      }
+      "final": []
     },
     "sorteo": {
       "realizado": true,
       "confirmado": true
+    },
+    "reac": {
+      "r2": [],
+      "cuartos": [],
+      "semis": [],
+      "final": []
     }
   },
   "historial": [
@@ -2113,7 +2113,7 @@
   ],
   "histAuto": {},
   "resumen": {
-    "at": "2026-10-26T21:09:35.578Z",
+    "at": "2026-10-28T05:34:35.369Z",
     "labels": {
       "liga": "Liga AFA",
       "copa": "Copa Argentina",

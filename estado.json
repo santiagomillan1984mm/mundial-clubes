@@ -1,6 +1,6 @@
 {
   "version": "1.0",
-  "ultimaActualizacion": "2026-10-29T05:12:55.062Z",
+  "ultimaActualizacion": "2026-10-29T05:12:56.188Z",
   "equiposArgentinos": [
     {
       "id": "arg1",
@@ -404,7 +404,7 @@
         "local": "pa15",
         "visitante": "pa16",
         "golesLocal": 2,
-        "golesVisitante": null
+        "golesVisitante": 2
       },
       {
         "id": "liga_19",
@@ -2121,7 +2121,7 @@
   ],
   "histAuto": {},
   "resumen": {
-    "at": "2026-10-29T05:12:55.063Z",
+    "at": "2026-10-29T05:12:56.188Z",
     "labels": {
       "liga": "Liga AFA",
       "copa": "Copa Argentina",
@@ -2133,7 +2133,7 @@
     "sub": {},
     "prog": {
       "liga": {
-        "jug": 17,
+        "jug": 18,
         "total": 100,
         "top": [
           {
@@ -2323,6 +2323,15 @@
         "luciano",
         8,
         4
+      ],
+      [
+        "Liga AFA",
+        "Huracán",
+        "santi",
+        "Platense",
+        "luciano",
+        2,
+        2
       ],
       [
         "Copa Argentina",

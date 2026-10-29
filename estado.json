@@ -1,6 +1,6 @@
 {
   "version": "1.0",
-  "ultimaActualizacion": "2026-10-29T05:52:47.952Z",
+  "ultimaActualizacion": "2026-10-29T06:12:36.008Z",
   "equiposArgentinos": [
     {
       "id": "arg1",
@@ -1284,9 +1284,9 @@
           "id": "cr1_7",
           "local": "pa14",
           "visitante": "mx_luciano",
-          "golesLocal": null,
-          "golesVisitante": null,
-          "ganador": null
+          "golesLocal": 5,
+          "golesVisitante": 3,
+          "ganador": "pa14"
         },
         {
           "id": "cr1_8",
@@ -2121,7 +2121,7 @@
   ],
   "histAuto": {},
   "resumen": {
-    "at": "2026-10-29T05:52:47.952Z",
+    "at": "2026-10-29T06:12:36.008Z",
     "labels": {
       "liga": "Liga AFA",
       "copa": "Copa Argentina",
@@ -2404,6 +2404,15 @@
         "luciano",
         5,
         4
+      ],
+      [
+        "Copa Argentina",
+        "Defensa y Justicia",
+        "santi",
+        "León",
+        "luciano",
+        5,
+        3
       ],
       [
         "Promoción",

@@ -1,6 +1,6 @@
 {
   "version": "1.0",
-  "ultimaActualizacion": "2026-11-02T01:35:45.890Z",
+  "ultimaActualizacion": "2026-11-02T01:58:38.020Z",
   "equiposArgentinos": [
     {
       "id": "arg1",
@@ -1292,9 +1292,9 @@
           "id": "cr1_8",
           "local": "pa4",
           "visitante": "pa16",
-          "golesLocal": null,
-          "golesVisitante": null,
-          "ganador": null
+          "golesLocal": 4,
+          "golesVisitante": 7,
+          "ganador": "pa16"
         },
         {
           "id": "cr1_9",
@@ -1382,6 +1382,14 @@
           "id": "cr2_3",
           "local": "pa2",
           "visitante": "pa26",
+          "golesLocal": null,
+          "golesVisitante": null,
+          "ganador": null
+        },
+        {
+          "id": "cr2_4",
+          "local": "pa14",
+          "visitante": "pa16",
           "golesLocal": null,
           "golesVisitante": null,
           "ganador": null
@@ -2121,7 +2129,7 @@
   ],
   "histAuto": {},
   "resumen": {
-    "at": "2026-11-02T01:35:45.890Z",
+    "at": "2026-11-02T01:58:38.020Z",
     "labels": {
       "liga": "Liga AFA",
       "copa": "Copa Argentina",
@@ -2440,6 +2448,15 @@
         "luciano",
         5,
         3
+      ],
+      [
+        "Copa Argentina",
+        "Rosario Central",
+        "santi",
+        "Platense",
+        "luciano",
+        4,
+        7
       ],
       [
         "Promoción",
